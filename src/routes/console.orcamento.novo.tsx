@@ -236,7 +236,7 @@ function NovoOrcamento() {
           <Footer>
             <Button variant="outline" onClick={() => setStep(2)}>Voltar</Button>
             <Button onClick={() => createMut.mutate()} disabled={createMut.isPending}
-              className="bg-coral hover:bg-[var(--color-coral-dark)] text-cream">
+              className="bg-coral hover:bg-[var(--color-coral-pressed)] text-cream">
               {createMut.isPending ? "Criando…" : "Criar caso"}
             </Button>
           </Footer>

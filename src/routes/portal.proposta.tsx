@@ -135,7 +135,7 @@ function PropostaPage() {
             <Button
               onClick={() => accept.mutate()}
               disabled={accept.isPending || items.isLoading}
-              className="w-full h-12 rounded-full bg-coral hover:bg-[var(--color-coral-dark)] text-cream font-bold"
+              className="w-full h-12 rounded-full bg-coral hover:bg-[var(--color-coral-pressed)] text-cream font-bold"
             >
               <Check size={18} className="mr-2" /> Aceitar proposta
             </Button>

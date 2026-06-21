@@ -31,7 +31,7 @@ function ConsoleHome() {
         </div>
         <Link
           to="/console/orcamento/novo"
-          className="inline-flex items-center gap-2 rounded-full bg-coral hover:bg-[var(--color-coral-dark)] text-cream font-semibold px-5 h-10 text-sm"
+          className="inline-flex items-center gap-2 rounded-full bg-coral hover:bg-[var(--color-coral-pressed)] text-cream font-semibold px-5 h-10 text-sm"
         >
           + Novo orçamento
         </Link>
