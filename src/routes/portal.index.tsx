@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useMyRequest, useJourney, useRequestRealtime } from "@/hooks/useJourney";
 import { PhoneFrame } from "@/components/viajaly/PhoneFrame";
 import { Logo } from "@/components/viajaly/Logo";
@@ -18,6 +19,12 @@ function PortalHome() {
   useRequestRealtime(req.data?.id);
   const journey = useJourney(req.data?.id);
   const signOut = useSignOut();
+  const nav = useNavigate();
+
+  useEffect(() => {
+    const s = req.data?.proposal_status;
+    if (s === "sent" || s === "viewed") nav({ to: "/portal/proposta" });
+  }, [req.data?.proposal_status, nav]);
 
   const done = journey.data?.filter((s) => s.status === "done").length ?? 0;
   const pct = Math.round((done / 7) * 100);

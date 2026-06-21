@@ -29,6 +29,12 @@ function ConsoleHome() {
           <h1 className="text-3xl font-display font-extrabold text-navy">Pipeline</h1>
           <p className="text-sm text-ink-soft mt-1">Todos os casos da agência em tempo real.</p>
         </div>
+        <Link
+          to="/console/orcamento/novo"
+          className="inline-flex items-center gap-2 rounded-full bg-coral hover:bg-[var(--color-coral-dark)] text-cream font-semibold px-5 h-10 text-sm"
+        >
+          + Novo orçamento
+        </Link>
       </div>
 
       <div className="bg-white rounded-2xl border border-[var(--color-border)] overflow-hidden">
