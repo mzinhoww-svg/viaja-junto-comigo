@@ -5,27 +5,21 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Design system definition.
- *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ * Viajaly — Design tokens (Sora + Inter, paleta navy/coral/teal/cream).
+ * Use only via Tailwind utilities or shadcn variants. Never hardcode hex in components.
  */
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-pill: 100px;
+
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -45,100 +39,136 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-ring-offset-background: var(--background);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Viajaly brand */
+  --color-navy: #10204A;
+  --color-navy-light: #2A3D6B;
+  --color-navy-dark: #0A1633;
+  --color-coral: #FF5A5F;
+  --color-coral-hover: #FF8488;
+  --color-coral-pressed: #E23F44;
+  --color-coral-disabled: #FFB0B3;
+  --color-teal: #2DB7C9;
+  --color-teal-light: #5BC9D6;
+  --color-teal-dark: #1E8E9D;
+  --color-vgreen: #1F8A5B;
+  --color-amber: #E8A33D;
+  --color-cream: #FFF6ED;
+  --color-appbg: #E7E5DF;
+  --color-ink: #3A4660;
+  --color-ink-soft: #5A6A86;
+  --color-ink-muted: #8A93A6;
+
+  /* status pill colors */
+  --color-success-bg: #E2F3EA;
+  --color-success-fg: #1F8A5B;
+  --color-warning-bg: #FFF1D9;
+  --color-warning-fg: #B07A1E;
+  --color-danger-bg: #FBE6E6;
+  --color-danger-fg: #C23B3B;
+  --color-info-bg: #E7EEFB;
+  --color-info-fg: #10204A;
+  --color-now-bg: #FFE4E5;
+  --color-now-fg: #E23F44;
+  --color-locked-bg: #F1F3F8;
+  --color-locked-fg: #A6AEBD;
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
+  --radius: 12px;
+  --background: #E7E5DF;          /* app-bg */
+  --foreground: #3A4660;          /* ink */
+  --card: #FFFFFF;
+  --card-foreground: #3A4660;
+  --popover: #FFFFFF;
+  --popover-foreground: #3A4660;
+  --primary: #FF5A5F;             /* coral */
+  --primary-foreground: #FFF6ED;
+  --secondary: #10204A;           /* navy */
+  --secondary-foreground: #FFF6ED;
+  --muted: #F4F2EC;
+  --muted-foreground: #5A6A86;
+  --accent: #2DB7C9;              /* teal */
+  --accent-foreground: #FFFFFF;
+  --destructive: #C23B3B;
+  --destructive-foreground: #FFFFFF;
+  --border: #E6E9F0;
+  --input: #E6E9F0;
+  --ring: #2DB7C9;
 }
 
 .dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+  --background: #0A1633;
+  --foreground: #FFF6ED;
+  --card: #10204A;
+  --card-foreground: #FFF6ED;
+  --popover: #10204A;
+  --popover-foreground: #FFF6ED;
+  --primary: #FF5A5F;
+  --primary-foreground: #FFF6ED;
+  --secondary: #2A3D6B;
+  --secondary-foreground: #FFF6ED;
+  --muted: #2A3D6B;
+  --muted-foreground: #8A93A6;
+  --accent: #2DB7C9;
+  --accent-foreground: #0A1633;
+  --destructive: #C23B3B;
+  --destructive-foreground: #FFF6ED;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #2DB7C9;
 }
 
 @layer base {
   * {
     border-color: var(--color-border);
   }
-
-  body {
+  html, body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
   }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    color: var(--color-navy);
+  }
+  :focus-visible {
+    outline: 2.5px solid var(--color-teal);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .font-display { font-family: var(--font-display); }
+  .text-navy { color: var(--color-navy); }
+  .text-coral { color: var(--color-coral); }
+  .text-teal { color: var(--color-teal); }
+  .text-ink { color: var(--color-ink); }
+  .text-ink-soft { color: var(--color-ink-soft); }
+  .text-ink-muted { color: var(--color-ink-muted); }
+  .text-cream { color: var(--color-cream); }
+  .bg-navy { background-color: var(--color-navy); }
+  .bg-coral { background-color: var(--color-coral); }
+  .bg-teal { background-color: var(--color-teal); }
+  .bg-cream { background-color: var(--color-cream); }
+  .bg-appbg { background-color: var(--color-appbg); }
+  .border-navy { border-color: var(--color-navy); }
+}
+
+@keyframes vfade {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes vpop {
+  0%   { transform: scale(0.7); }
+  60%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+.anim-vfade { animation: vfade .4s ease-out both; }
+.anim-vpop  { animation: vpop .35s ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-vfade, .anim-vpop { animation: none; }
 }

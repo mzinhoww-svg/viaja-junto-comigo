@@ -9,38 +9,138 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PortalRouteImport } from './routes/portal'
+import { Route as ConsoleRouteImport } from './routes/console'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PortalIndexRouteImport } from './routes/portal.index'
+import { Route as ConsoleIndexRouteImport } from './routes/console.index'
+import { Route as PortalLoginRouteImport } from './routes/portal.login'
+import { Route as ConsoleLoginRouteImport } from './routes/console.login'
+import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$id'
 
+const PortalRoute = PortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsoleRoute = ConsoleRouteImport.update({
+  id: '/console',
+  path: '/console',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortalIndexRoute = PortalIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PortalRoute,
+} as any)
+const ConsoleIndexRoute = ConsoleIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const PortalLoginRoute = PortalLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => PortalRoute,
+} as any)
+const ConsoleLoginRoute = ConsoleLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleClienteIdRoute = ConsoleClienteIdRouteImport.update({
+  id: '/cliente/$id',
+  path: '/cliente/$id',
+  getParentRoute: () => ConsoleRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/console': typeof ConsoleRouteWithChildren
+  '/portal': typeof PortalRouteWithChildren
+  '/console/login': typeof ConsoleLoginRoute
+  '/portal/login': typeof PortalLoginRoute
+  '/console/': typeof ConsoleIndexRoute
+  '/portal/': typeof PortalIndexRoute
+  '/console/cliente/$id': typeof ConsoleClienteIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/console/login': typeof ConsoleLoginRoute
+  '/portal/login': typeof PortalLoginRoute
+  '/console': typeof ConsoleIndexRoute
+  '/portal': typeof PortalIndexRoute
+  '/console/cliente/$id': typeof ConsoleClienteIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/console': typeof ConsoleRouteWithChildren
+  '/portal': typeof PortalRouteWithChildren
+  '/console/login': typeof ConsoleLoginRoute
+  '/portal/login': typeof PortalLoginRoute
+  '/console/': typeof ConsoleIndexRoute
+  '/portal/': typeof PortalIndexRoute
+  '/console/cliente/$id': typeof ConsoleClienteIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/console'
+    | '/portal'
+    | '/console/login'
+    | '/portal/login'
+    | '/console/'
+    | '/portal/'
+    | '/console/cliente/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/console/login'
+    | '/portal/login'
+    | '/console'
+    | '/portal'
+    | '/console/cliente/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/console'
+    | '/portal'
+    | '/console/login'
+    | '/portal/login'
+    | '/console/'
+    | '/portal/'
+    | '/console/cliente/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ConsoleRoute: typeof ConsoleRouteWithChildren
+  PortalRoute: typeof PortalRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/portal': {
+      id: '/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console': {
+      id: '/console'
+      path: '/console'
+      fullPath: '/console'
+      preLoaderRoute: typeof ConsoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +148,77 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal/': {
+      id: '/portal/'
+      path: '/'
+      fullPath: '/portal/'
+      preLoaderRoute: typeof PortalIndexRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/console/': {
+      id: '/console/'
+      path: '/'
+      fullPath: '/console/'
+      preLoaderRoute: typeof ConsoleIndexRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/portal/login': {
+      id: '/portal/login'
+      path: '/login'
+      fullPath: '/portal/login'
+      preLoaderRoute: typeof PortalLoginRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/console/login': {
+      id: '/console/login'
+      path: '/login'
+      fullPath: '/console/login'
+      preLoaderRoute: typeof ConsoleLoginRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/cliente/$id': {
+      id: '/console/cliente/$id'
+      path: '/cliente/$id'
+      fullPath: '/console/cliente/$id'
+      preLoaderRoute: typeof ConsoleClienteIdRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
   }
 }
 
+interface ConsoleRouteChildren {
+  ConsoleLoginRoute: typeof ConsoleLoginRoute
+  ConsoleIndexRoute: typeof ConsoleIndexRoute
+  ConsoleClienteIdRoute: typeof ConsoleClienteIdRoute
+}
+
+const ConsoleRouteChildren: ConsoleRouteChildren = {
+  ConsoleLoginRoute: ConsoleLoginRoute,
+  ConsoleIndexRoute: ConsoleIndexRoute,
+  ConsoleClienteIdRoute: ConsoleClienteIdRoute,
+}
+
+const ConsoleRouteWithChildren =
+  ConsoleRoute._addFileChildren(ConsoleRouteChildren)
+
+interface PortalRouteChildren {
+  PortalLoginRoute: typeof PortalLoginRoute
+  PortalIndexRoute: typeof PortalIndexRoute
+}
+
+const PortalRouteChildren: PortalRouteChildren = {
+  PortalLoginRoute: PortalLoginRoute,
+  PortalIndexRoute: PortalIndexRoute,
+}
+
+const PortalRouteWithChildren =
+  PortalRoute._addFileChildren(PortalRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ConsoleRoute: ConsoleRouteWithChildren,
+  PortalRoute: PortalRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
