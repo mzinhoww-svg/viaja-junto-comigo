@@ -456,6 +456,60 @@ export type Database = {
           },
         ]
       }
+      proposal_items: {
+        Row: {
+          created_at: string
+          discount_cents: number
+          id: string
+          kind: string
+          label: string
+          product_key: Database["public"]["Enums"]["product_key_t"] | null
+          qty: number
+          request_id: string
+          sort: number
+          unit_price_cents: number
+        }
+        Insert: {
+          created_at?: string
+          discount_cents?: number
+          id?: string
+          kind?: string
+          label: string
+          product_key?: Database["public"]["Enums"]["product_key_t"] | null
+          qty?: number
+          request_id: string
+          sort?: number
+          unit_price_cents?: number
+        }
+        Update: {
+          created_at?: string
+          discount_cents?: number
+          id?: string
+          kind?: string
+          label?: string
+          product_key?: Database["public"]["Enums"]["product_key_t"] | null
+          qty?: number
+          request_id?: string
+          sort?: number
+          unit_price_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposal_items_product_key_fkey"
+            columns: ["product_key"]
+            isOneToOne: false
+            referencedRelation: "products_catalog"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "proposal_items_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       request_group: {
         Row: {
           has_mil: boolean
@@ -496,7 +550,13 @@ export type Database = {
           lead_phone: string | null
           payment_method: Database["public"]["Enums"]["payment_method_t"] | null
           payment_status: Database["public"]["Enums"]["payment_status_t"]
+          proposal_accepted_at: string | null
+          proposal_decline_reason: string | null
+          proposal_discount_cents: number
+          proposal_sent_at: string | null
           proposal_status: Database["public"]["Enums"]["proposal_status_t"]
+          proposal_subtotal_cents: number
+          proposal_total_cents: number
           sched_window_open: boolean
           sign_name: string | null
           signed_at: string | null
@@ -504,6 +564,7 @@ export type Database = {
           usd_as_of: string | null
           usd_rate: number | null
           usd_source: string | null
+          whatsapp_e164: string | null
         }
         Insert: {
           access_code: string
@@ -520,7 +581,13 @@ export type Database = {
             | Database["public"]["Enums"]["payment_method_t"]
             | null
           payment_status?: Database["public"]["Enums"]["payment_status_t"]
+          proposal_accepted_at?: string | null
+          proposal_decline_reason?: string | null
+          proposal_discount_cents?: number
+          proposal_sent_at?: string | null
           proposal_status?: Database["public"]["Enums"]["proposal_status_t"]
+          proposal_subtotal_cents?: number
+          proposal_total_cents?: number
           sched_window_open?: boolean
           sign_name?: string | null
           signed_at?: string | null
@@ -528,6 +595,7 @@ export type Database = {
           usd_as_of?: string | null
           usd_rate?: number | null
           usd_source?: string | null
+          whatsapp_e164?: string | null
         }
         Update: {
           access_code?: string
@@ -544,7 +612,13 @@ export type Database = {
             | Database["public"]["Enums"]["payment_method_t"]
             | null
           payment_status?: Database["public"]["Enums"]["payment_status_t"]
+          proposal_accepted_at?: string | null
+          proposal_decline_reason?: string | null
+          proposal_discount_cents?: number
+          proposal_sent_at?: string | null
           proposal_status?: Database["public"]["Enums"]["proposal_status_t"]
+          proposal_subtotal_cents?: number
+          proposal_total_cents?: number
           sched_window_open?: boolean
           sign_name?: string | null
           signed_at?: string | null
@@ -552,6 +626,7 @@ export type Database = {
           usd_as_of?: string | null
           usd_rate?: number | null
           usd_source?: string | null
+          whatsapp_e164?: string | null
         }
         Relationships: [
           {
@@ -744,6 +819,7 @@ export type Database = {
           status: Database["public"]["Enums"]["journey_step_status_t"]
         }[]
       }
+      create_request_with_travelers: { Args: { payload: Json }; Returns: Json }
       current_agency_id: { Args: never; Returns: string }
       has_role: {
         Args: {
@@ -766,7 +842,7 @@ export type Database = {
       payment_status_t: "pending" | "processing" | "declined" | "paid"
       per_t: "person" | "group"
       product_key_t: "vistos" | "pass" | "rot" | "mil"
-      proposal_status_t: "draft" | "sent" | "accepted"
+      proposal_status_t: "draft" | "sent" | "accepted" | "viewed" | "declined"
       sched_service_t: "casv" | "entrevista" | "pf"
       sched_status_t: "open" | "sent" | "confirmed"
       tax_status_t: "pending" | "paid"
@@ -909,7 +985,7 @@ export const Constants = {
       payment_status_t: ["pending", "processing", "declined", "paid"],
       per_t: ["person", "group"],
       product_key_t: ["vistos", "pass", "rot", "mil"],
-      proposal_status_t: ["draft", "sent", "accepted"],
+      proposal_status_t: ["draft", "sent", "accepted", "viewed", "declined"],
       sched_service_t: ["casv", "entrevista", "pf"],
       sched_status_t: ["open", "sent", "confirmed"],
       tax_status_t: ["pending", "paid"],
