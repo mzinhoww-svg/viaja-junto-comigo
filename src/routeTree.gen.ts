@@ -14,8 +14,10 @@ import { Route as ConsoleRouteImport } from './routes/console'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as ConsoleIndexRouteImport } from './routes/console.index'
+import { Route as PortalPropostaRouteImport } from './routes/portal.proposta'
 import { Route as PortalLoginRouteImport } from './routes/portal.login'
 import { Route as ConsoleLoginRouteImport } from './routes/console.login'
+import { Route as ConsoleOrcamentoNovoRouteImport } from './routes/console.orcamento.novo'
 import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$id'
 
 const PortalRoute = PortalRouteImport.update({
@@ -43,6 +45,11 @@ const ConsoleIndexRoute = ConsoleIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ConsoleRoute,
 } as any)
+const PortalPropostaRoute = PortalPropostaRouteImport.update({
+  id: '/proposta',
+  path: '/proposta',
+  getParentRoute: () => PortalRoute,
+} as any)
 const PortalLoginRoute = PortalLoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -51,6 +58,11 @@ const PortalLoginRoute = PortalLoginRouteImport.update({
 const ConsoleLoginRoute = ConsoleLoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleOrcamentoNovoRoute = ConsoleOrcamentoNovoRouteImport.update({
+  id: '/orcamento/novo',
+  path: '/orcamento/novo',
   getParentRoute: () => ConsoleRoute,
 } as any)
 const ConsoleClienteIdRoute = ConsoleClienteIdRouteImport.update({
@@ -65,17 +77,21 @@ export interface FileRoutesByFullPath {
   '/portal': typeof PortalRouteWithChildren
   '/console/login': typeof ConsoleLoginRoute
   '/portal/login': typeof PortalLoginRoute
+  '/portal/proposta': typeof PortalPropostaRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
+  '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/console/login': typeof ConsoleLoginRoute
   '/portal/login': typeof PortalLoginRoute
+  '/portal/proposta': typeof PortalPropostaRoute
   '/console': typeof ConsoleIndexRoute
   '/portal': typeof PortalIndexRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
+  '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -84,9 +100,11 @@ export interface FileRoutesById {
   '/portal': typeof PortalRouteWithChildren
   '/console/login': typeof ConsoleLoginRoute
   '/portal/login': typeof PortalLoginRoute
+  '/portal/proposta': typeof PortalPropostaRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
+  '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -96,17 +114,21 @@ export interface FileRouteTypes {
     | '/portal'
     | '/console/login'
     | '/portal/login'
+    | '/portal/proposta'
     | '/console/'
     | '/portal/'
     | '/console/cliente/$id'
+    | '/console/orcamento/novo'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/console/login'
     | '/portal/login'
+    | '/portal/proposta'
     | '/console'
     | '/portal'
     | '/console/cliente/$id'
+    | '/console/orcamento/novo'
   id:
     | '__root__'
     | '/'
@@ -114,9 +136,11 @@ export interface FileRouteTypes {
     | '/portal'
     | '/console/login'
     | '/portal/login'
+    | '/portal/proposta'
     | '/console/'
     | '/portal/'
     | '/console/cliente/$id'
+    | '/console/orcamento/novo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -162,6 +186,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleIndexRouteImport
       parentRoute: typeof ConsoleRoute
     }
+    '/portal/proposta': {
+      id: '/portal/proposta'
+      path: '/proposta'
+      fullPath: '/portal/proposta'
+      preLoaderRoute: typeof PortalPropostaRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/portal/login': {
       id: '/portal/login'
       path: '/login'
@@ -174,6 +205,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/console/login'
       preLoaderRoute: typeof ConsoleLoginRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/orcamento/novo': {
+      id: '/console/orcamento/novo'
+      path: '/orcamento/novo'
+      fullPath: '/console/orcamento/novo'
+      preLoaderRoute: typeof ConsoleOrcamentoNovoRouteImport
       parentRoute: typeof ConsoleRoute
     }
     '/console/cliente/$id': {
@@ -190,12 +228,14 @@ interface ConsoleRouteChildren {
   ConsoleLoginRoute: typeof ConsoleLoginRoute
   ConsoleIndexRoute: typeof ConsoleIndexRoute
   ConsoleClienteIdRoute: typeof ConsoleClienteIdRoute
+  ConsoleOrcamentoNovoRoute: typeof ConsoleOrcamentoNovoRoute
 }
 
 const ConsoleRouteChildren: ConsoleRouteChildren = {
   ConsoleLoginRoute: ConsoleLoginRoute,
   ConsoleIndexRoute: ConsoleIndexRoute,
   ConsoleClienteIdRoute: ConsoleClienteIdRoute,
+  ConsoleOrcamentoNovoRoute: ConsoleOrcamentoNovoRoute,
 }
 
 const ConsoleRouteWithChildren =
@@ -203,11 +243,13 @@ const ConsoleRouteWithChildren =
 
 interface PortalRouteChildren {
   PortalLoginRoute: typeof PortalLoginRoute
+  PortalPropostaRoute: typeof PortalPropostaRoute
   PortalIndexRoute: typeof PortalIndexRoute
 }
 
 const PortalRouteChildren: PortalRouteChildren = {
   PortalLoginRoute: PortalLoginRoute,
+  PortalPropostaRoute: PortalPropostaRoute,
   PortalIndexRoute: PortalIndexRoute,
 }
 
@@ -222,13 +264,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -23,6 +23,8 @@ export function useRequestRealtime(requestId: string | undefined) {
         () => { qc.invalidateQueries({ queryKey: ["journey", requestId] }); qc.invalidateQueries({ queryKey: ["documents", requestId] }); })
       .on("postgres_changes", { event: "*", schema: "public", table: "schedule_intents" },
         () => qc.invalidateQueries({ queryKey: ["journey", requestId] }))
+      .on("postgres_changes", { event: "*", schema: "public", table: "proposal_items", filter: `request_id=eq.${requestId}` },
+        () => { qc.invalidateQueries({ queryKey: ["proposal_items", requestId] }); qc.invalidateQueries({ queryKey: ["request", requestId] }); })
       .on("postgres_changes", { event: "*", schema: "public", table: "notifications", filter: `request_id=eq.${requestId}` },
         () => qc.invalidateQueries({ queryKey: ["notifications", requestId] }))
       .subscribe();
