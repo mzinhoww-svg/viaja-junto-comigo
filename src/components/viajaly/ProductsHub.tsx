@@ -221,5 +221,3 @@ export function ProductsHub({ requestId }: { requestId: string }) {
   );
 }
 
-// Local import to keep tree-shaken (Button used only conditionally below).
-import { Button } from "@/components/ui/button";
