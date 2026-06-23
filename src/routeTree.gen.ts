@@ -33,6 +33,7 @@ import { Route as OrcamentoSucessoRouteImport } from './routes/orcamento.sucesso
 import { Route as ConsoleRelatorioRouteImport } from './routes/console.relatorio'
 import { Route as ConsoleLoginRouteImport } from './routes/console.login'
 import { Route as ConsoleJanelasRouteImport } from './routes/console.janelas'
+import { Route as ConsoleConfiguracoesRouteImport } from './routes/console.configuracoes'
 import { Route as ConsoleAuditoriaRouteImport } from './routes/console.auditoria'
 import { Route as ConsoleAgendaRouteImport } from './routes/console.agenda'
 import { Route as ConsoleOrcamentoNovoRouteImport } from './routes/console.orcamento.novo'
@@ -159,6 +160,11 @@ const ConsoleJanelasRoute = ConsoleJanelasRouteImport.update({
   path: '/janelas',
   getParentRoute: () => ConsoleRoute,
 } as any)
+const ConsoleConfiguracoesRoute = ConsoleConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => ConsoleRoute,
+} as any)
 const ConsoleAuditoriaRoute = ConsoleAuditoriaRouteImport.update({
   id: '/auditoria',
   path: '/auditoria',
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/privacidade': typeof PrivacidadeRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
+  '/console/configuracoes': typeof ConsoleConfiguracoesRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
   '/console/relatorio': typeof ConsoleRelatorioRoute
@@ -223,6 +230,7 @@ export interface FileRoutesByTo {
   '/privacidade': typeof PrivacidadeRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
+  '/console/configuracoes': typeof ConsoleConfiguracoesRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
   '/console/relatorio': typeof ConsoleRelatorioRoute
@@ -255,6 +263,7 @@ export interface FileRoutesById {
   '/privacidade': typeof PrivacidadeRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
+  '/console/configuracoes': typeof ConsoleConfiguracoesRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
   '/console/relatorio': typeof ConsoleRelatorioRoute
@@ -288,6 +297,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/console/agenda'
     | '/console/auditoria'
+    | '/console/configuracoes'
     | '/console/janelas'
     | '/console/login'
     | '/console/relatorio'
@@ -317,6 +327,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/console/agenda'
     | '/console/auditoria'
+    | '/console/configuracoes'
     | '/console/janelas'
     | '/console/login'
     | '/console/relatorio'
@@ -348,6 +359,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/console/agenda'
     | '/console/auditoria'
+    | '/console/configuracoes'
     | '/console/janelas'
     | '/console/login'
     | '/console/relatorio'
@@ -550,6 +562,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleJanelasRouteImport
       parentRoute: typeof ConsoleRoute
     }
+    '/console/configuracoes': {
+      id: '/console/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/console/configuracoes'
+      preLoaderRoute: typeof ConsoleConfiguracoesRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
     '/console/auditoria': {
       id: '/console/auditoria'
       path: '/auditoria'
@@ -591,6 +610,7 @@ declare module '@tanstack/react-router' {
 interface ConsoleRouteChildren {
   ConsoleAgendaRoute: typeof ConsoleAgendaRoute
   ConsoleAuditoriaRoute: typeof ConsoleAuditoriaRoute
+  ConsoleConfiguracoesRoute: typeof ConsoleConfiguracoesRoute
   ConsoleJanelasRoute: typeof ConsoleJanelasRoute
   ConsoleLoginRoute: typeof ConsoleLoginRoute
   ConsoleRelatorioRoute: typeof ConsoleRelatorioRoute
@@ -603,6 +623,7 @@ interface ConsoleRouteChildren {
 const ConsoleRouteChildren: ConsoleRouteChildren = {
   ConsoleAgendaRoute: ConsoleAgendaRoute,
   ConsoleAuditoriaRoute: ConsoleAuditoriaRoute,
+  ConsoleConfiguracoesRoute: ConsoleConfiguracoesRoute,
   ConsoleJanelasRoute: ConsoleJanelasRoute,
   ConsoleLoginRoute: ConsoleLoginRoute,
   ConsoleRelatorioRoute: ConsoleRelatorioRoute,
