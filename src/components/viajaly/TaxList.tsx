@@ -417,7 +417,7 @@ function AdminInline({
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="text-[10px] underline text-ink-soft"
+        className="text-xs underline text-ink-soft min-h-10 px-2"
         disabled={disabled}
       >
         editar
@@ -433,15 +433,15 @@ function AdminInline({
             maxLength={500}
           />
           <div className="mt-2 grid grid-cols-3 gap-1">
-            <Button size="sm" variant="outline" className="text-vgreen border-vgreen/40 text-[10px] h-7"
+            <Button size="sm" variant="outline" className="text-vgreen border-vgreen/40 text-xs min-h-10"
               onClick={() => { onSet("paid", notes); setOpen(false); }}
               disabled={current === "paid"}
             >Pago</Button>
-            <Button size="sm" variant="outline" className="text-[10px] h-7"
+            <Button size="sm" variant="outline" className="text-xs min-h-10"
               onClick={() => { onSet("pending", notes); setOpen(false); }}
               disabled={current === "pending"}
             >Pend.</Button>
-            <Button size="sm" variant="outline" className="text-amber-700 border-amber-300 text-[10px] h-7"
+            <Button size="sm" variant="outline" className="text-amber-700 border-amber-300 text-xs min-h-10"
               onClick={() => { onSet("waived", notes); setOpen(false); }}
               disabled={current === "waived"}
             >Isentar</Button>
