@@ -39,8 +39,8 @@ function PortalTaxes() {
           </button>
         </div>
 
-        <h1 className="mt-6 text-2xl font-display font-extrabold text-navy">Taxas consulares</h1>
-        <p className="mt-1 text-ink-soft text-sm">Anexe o comprovante da taxa MRV de cada viajante.</p>
+        <h1 className="mt-6 text-2xl font-display font-extrabold text-navy">Taxas governamentais</h1>
+        <p className="mt-1 text-ink-soft text-sm">Pague em reais via Pix — a Viajaly recolhe as taxas oficiais.</p>
 
         <div className="mt-6">
           {!req.data ? <Skeleton className="h-40 rounded-2xl" /> : <TaxList requestId={req.data.id} variant="portal" />}

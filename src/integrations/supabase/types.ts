@@ -335,28 +335,43 @@ export type Database = {
           completion_pct: number
           form: Json
           package: Json | null
+          requires_human_review: boolean
+          review_flags: Json
+          review_notes: string | null
           status: Database["public"]["Enums"]["ds160_status_t"]
           submitted_at: string | null
           traveler_id: string
           updated_at: string
+          validated_at: string | null
+          validated_by: string | null
         }
         Insert: {
           completion_pct?: number
           form?: Json
           package?: Json | null
+          requires_human_review?: boolean
+          review_flags?: Json
+          review_notes?: string | null
           status?: Database["public"]["Enums"]["ds160_status_t"]
           submitted_at?: string | null
           traveler_id: string
           updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
         }
         Update: {
           completion_pct?: number
           form?: Json
           package?: Json | null
+          requires_human_review?: boolean
+          review_flags?: Json
+          review_notes?: string | null
           status?: Database["public"]["Enums"]["ds160_status_t"]
           submitted_at?: string | null
           traveler_id?: string
           updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
         }
         Relationships: [
           {
@@ -1082,39 +1097,45 @@ export type Database = {
       }
       tax_payments: {
         Row: {
-          amount_cents: number
+          amount_brl_cents: number
+          amount_usd_cents: number | null
           created_at: string
-          currency: string
+          id: string
+          kind: Database["public"]["Enums"]["tax_kind_t"]
           notes: string | null
           paid_at: string | null
           payment_method: string | null
-          receipt_url: string | null
+          pix_txid: string | null
           reviewed_by: string | null
           status: Database["public"]["Enums"]["tax_payment_status_t"]
           traveler_id: string
           updated_at: string
         }
         Insert: {
-          amount_cents?: number
+          amount_brl_cents?: number
+          amount_usd_cents?: number | null
           created_at?: string
-          currency?: string
+          id?: string
+          kind: Database["public"]["Enums"]["tax_kind_t"]
           notes?: string | null
           paid_at?: string | null
           payment_method?: string | null
-          receipt_url?: string | null
+          pix_txid?: string | null
           reviewed_by?: string | null
           status?: Database["public"]["Enums"]["tax_payment_status_t"]
           traveler_id: string
           updated_at?: string
         }
         Update: {
-          amount_cents?: number
+          amount_brl_cents?: number
+          amount_usd_cents?: number | null
           created_at?: string
-          currency?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["tax_kind_t"]
           notes?: string | null
           paid_at?: string | null
           payment_method?: string | null
-          receipt_url?: string | null
+          pix_txid?: string | null
           reviewed_by?: string | null
           status?: Database["public"]["Enums"]["tax_payment_status_t"]
           traveler_id?: string
@@ -1124,7 +1145,7 @@ export type Database = {
           {
             foreignKeyName: "tax_payments_traveler_id_fkey"
             columns: ["traveler_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "travelers"
             referencedColumns: ["id"]
           },
@@ -1195,8 +1216,17 @@ export type Database = {
     }
     Functions: {
       accept_invite: { Args: { _token: string }; Returns: Json }
+      add_product_to_request: {
+        Args: {
+          _product_key: Database["public"]["Enums"]["product_key_t"]
+          _request_id: string
+          _traveler_id: string
+        }
+        Returns: Json
+      }
       admin_set_tax_status: {
         Args: {
+          _kind: Database["public"]["Enums"]["tax_kind_t"]
           _notes: string
           _status: Database["public"]["Enums"]["tax_payment_status_t"]
           _traveler_id: string
@@ -1236,6 +1266,10 @@ export type Database = {
         Args: { _paid: boolean; _request_id: string }
         Returns: undefined
       }
+      confirm_tax_payment: {
+        Args: { _paid: boolean; _request_id: string }
+        Returns: undefined
+      }
       create_request_with_travelers: { Args: { payload: Json }; Returns: Json }
       current_agency_id: { Args: never; Returns: string }
       has_role: {
@@ -1250,6 +1284,10 @@ export type Database = {
         Returns: Json
       }
       is_request_member: { Args: { _request_id: string }; Returns: boolean }
+      lock_usd_rate: {
+        Args: { _force?: boolean; _request_id: string }
+        Returns: Json
+      }
       log_audit: {
         Args: { _action: string; _payload?: Json; _target: string }
         Returns: undefined
@@ -1263,6 +1301,10 @@ export type Database = {
         Args: { _notification_id: string }
         Returns: undefined
       }
+      pay_taxes: {
+        Args: { _method?: string; _request_id: string }
+        Returns: Json
+      }
       publish_milhas: { Args: { _request_id: string }; Returns: undefined }
       publish_roteiro: { Args: { _roteiro_id: string }; Returns: undefined }
       refresh_request_tax_status: {
@@ -1270,10 +1312,6 @@ export type Database = {
         Returns: undefined
       }
       regenerate_access_code: { Args: { _request_id: string }; Returns: Json }
-      register_tax_payment: {
-        Args: { _method: string; _receipt_url: string; _traveler_id: string }
-        Returns: undefined
-      }
       render_template: {
         Args: { _request_id: string; _template_id: string }
         Returns: string
@@ -1378,7 +1416,7 @@ export type Database = {
         Returns: undefined
       }
       validate_ds160: {
-        Args: { _approve: boolean; _reason: string; _traveler_id: string }
+        Args: { _approve: boolean; _notes: string; _traveler_id: string }
         Returns: undefined
       }
     }
@@ -1387,7 +1425,7 @@ export type Database = {
       contract_status_t: "draft" | "sent" | "signed"
       doc_kind_t: "pass" | "foto" | "renda" | "vinc" | "ds160" | "outro"
       doc_status_t: "locked" | "pending" | "received" | "approved" | "rejected"
-      ds160_status_t: "draft" | "received" | "validated"
+      ds160_status_t: "draft" | "received" | "validated" | "pending_review"
       journey_step_status_t: "done" | "active" | "locked"
       msg_from_t: "client" | "consultant"
       payment_method_t: "pix" | "card"
@@ -1397,6 +1435,7 @@ export type Database = {
       proposal_status_t: "draft" | "sent" | "accepted" | "viewed" | "declined"
       sched_service_t: "casv" | "entrevista" | "pf"
       sched_status_t: "open" | "sent" | "confirmed"
+      tax_kind_t: "consular_mrv" | "passaporte_pf"
       tax_payment_status_t: "pending" | "paid" | "waived"
       tax_status_t: "pending" | "paid"
       visa_outcome_t: "aprovado" | "recusado" | "admin_processing" | "cancelado"
@@ -1532,7 +1571,7 @@ export const Constants = {
       contract_status_t: ["draft", "sent", "signed"],
       doc_kind_t: ["pass", "foto", "renda", "vinc", "ds160", "outro"],
       doc_status_t: ["locked", "pending", "received", "approved", "rejected"],
-      ds160_status_t: ["draft", "received", "validated"],
+      ds160_status_t: ["draft", "received", "validated", "pending_review"],
       journey_step_status_t: ["done", "active", "locked"],
       msg_from_t: ["client", "consultant"],
       payment_method_t: ["pix", "card"],
@@ -1542,6 +1581,7 @@ export const Constants = {
       proposal_status_t: ["draft", "sent", "accepted", "viewed", "declined"],
       sched_service_t: ["casv", "entrevista", "pf"],
       sched_status_t: ["open", "sent", "confirmed"],
+      tax_kind_t: ["consular_mrv", "passaporte_pf"],
       tax_payment_status_t: ["pending", "paid", "waived"],
       tax_status_t: ["pending", "paid"],
       visa_outcome_t: ["aprovado", "recusado", "admin_processing", "cancelado"],
