@@ -32,15 +32,15 @@ import { Route as PortalAgendaRouteImport } from './routes/portal.agenda'
 import { Route as OrcamentoSucessoRouteImport } from './routes/orcamento.sucesso'
 import { Route as ConsoleTemplatesRouteImport } from './routes/console.templates'
 import { Route as ConsoleRelatorioRouteImport } from './routes/console.relatorio'
+import { Route as ConsoleProdutosRouteImport } from './routes/console.produtos'
 import { Route as ConsoleLoginRouteImport } from './routes/console.login'
 import { Route as ConsoleJanelasRouteImport } from './routes/console.janelas'
+import { Route as ConsoleFinanceiroRouteImport } from './routes/console.financeiro'
 import { Route as ConsoleEquipeRouteImport } from './routes/console.equipe'
 import { Route as ConsoleConfiguracoesRouteImport } from './routes/console.configuracoes'
 import { Route as ConsoleAuditoriaRouteImport } from './routes/console.auditoria'
 import { Route as ConsoleAgendaRouteImport } from './routes/console.agenda'
 import { Route as ConsoleAceitarConviteRouteImport } from './routes/console.aceitar-convite'
-import { Route as ConsoleProdutosRouteImport } from './routes/console.produtos'
-import { Route as ConsoleFinanceiroRouteImport } from './routes/console.financeiro'
 import { Route as ConsoleOrcamentoNovoRouteImport } from './routes/console.orcamento.novo'
 import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$id'
 import { Route as ConsoleOrcamentoIdEditarRouteImport } from './routes/console.orcamento.$id.editar'
@@ -160,6 +160,11 @@ const ConsoleRelatorioRoute = ConsoleRelatorioRouteImport.update({
   path: '/relatorio',
   getParentRoute: () => ConsoleRoute,
 } as any)
+const ConsoleProdutosRoute = ConsoleProdutosRouteImport.update({
+  id: '/produtos',
+  path: '/produtos',
+  getParentRoute: () => ConsoleRoute,
+} as any)
 const ConsoleLoginRoute = ConsoleLoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -168,6 +173,11 @@ const ConsoleLoginRoute = ConsoleLoginRouteImport.update({
 const ConsoleJanelasRoute = ConsoleJanelasRouteImport.update({
   id: '/janelas',
   path: '/janelas',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleFinanceiroRoute = ConsoleFinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
   getParentRoute: () => ConsoleRoute,
 } as any)
 const ConsoleEquipeRoute = ConsoleEquipeRouteImport.update({
@@ -193,16 +203,6 @@ const ConsoleAgendaRoute = ConsoleAgendaRouteImport.update({
 const ConsoleAceitarConviteRoute = ConsoleAceitarConviteRouteImport.update({
   id: '/aceitar-convite',
   path: '/aceitar-convite',
-  getParentRoute: () => ConsoleRoute,
-} as any)
-const ConsoleProdutosRoute = ConsoleProdutosRouteImport.update({
-  id: '/produtos',
-  path: '/produtos',
-  getParentRoute: () => ConsoleRoute,
-} as any)
-const ConsoleFinanceiroRoute = ConsoleFinanceiroRouteImport.update({
-  id: '/financeiro',
-  path: '/financeiro',
   getParentRoute: () => ConsoleRoute,
 } as any)
 const ConsoleOrcamentoNovoRoute = ConsoleOrcamentoNovoRouteImport.update({
@@ -233,8 +233,10 @@ export interface FileRoutesByFullPath {
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/configuracoes': typeof ConsoleConfiguracoesRoute
   '/console/equipe': typeof ConsoleEquipeRoute
+  '/console/financeiro': typeof ConsoleFinanceiroRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
+  '/console/produtos': typeof ConsoleProdutosRoute
   '/console/relatorio': typeof ConsoleRelatorioRoute
   '/console/templates': typeof ConsoleTemplatesRoute
   '/orcamento/sucesso': typeof OrcamentoSucessoRoute
@@ -266,8 +268,10 @@ export interface FileRoutesByTo {
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/configuracoes': typeof ConsoleConfiguracoesRoute
   '/console/equipe': typeof ConsoleEquipeRoute
+  '/console/financeiro': typeof ConsoleFinanceiroRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
+  '/console/produtos': typeof ConsoleProdutosRoute
   '/console/relatorio': typeof ConsoleRelatorioRoute
   '/console/templates': typeof ConsoleTemplatesRoute
   '/orcamento/sucesso': typeof OrcamentoSucessoRoute
@@ -302,8 +306,10 @@ export interface FileRoutesById {
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/configuracoes': typeof ConsoleConfiguracoesRoute
   '/console/equipe': typeof ConsoleEquipeRoute
+  '/console/financeiro': typeof ConsoleFinanceiroRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
+  '/console/produtos': typeof ConsoleProdutosRoute
   '/console/relatorio': typeof ConsoleRelatorioRoute
   '/console/templates': typeof ConsoleTemplatesRoute
   '/orcamento/sucesso': typeof OrcamentoSucessoRoute
@@ -339,8 +345,10 @@ export interface FileRouteTypes {
     | '/console/auditoria'
     | '/console/configuracoes'
     | '/console/equipe'
+    | '/console/financeiro'
     | '/console/janelas'
     | '/console/login'
+    | '/console/produtos'
     | '/console/relatorio'
     | '/console/templates'
     | '/orcamento/sucesso'
@@ -372,8 +380,10 @@ export interface FileRouteTypes {
     | '/console/auditoria'
     | '/console/configuracoes'
     | '/console/equipe'
+    | '/console/financeiro'
     | '/console/janelas'
     | '/console/login'
+    | '/console/produtos'
     | '/console/relatorio'
     | '/console/templates'
     | '/orcamento/sucesso'
@@ -407,8 +417,10 @@ export interface FileRouteTypes {
     | '/console/auditoria'
     | '/console/configuracoes'
     | '/console/equipe'
+    | '/console/financeiro'
     | '/console/janelas'
     | '/console/login'
+    | '/console/produtos'
     | '/console/relatorio'
     | '/console/templates'
     | '/orcamento/sucesso'
@@ -603,6 +615,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleRelatorioRouteImport
       parentRoute: typeof ConsoleRoute
     }
+    '/console/produtos': {
+      id: '/console/produtos'
+      path: '/produtos'
+      fullPath: '/console/produtos'
+      preLoaderRoute: typeof ConsoleProdutosRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
     '/console/login': {
       id: '/console/login'
       path: '/login'
@@ -615,6 +634,13 @@ declare module '@tanstack/react-router' {
       path: '/janelas'
       fullPath: '/console/janelas'
       preLoaderRoute: typeof ConsoleJanelasRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/financeiro': {
+      id: '/console/financeiro'
+      path: '/financeiro'
+      fullPath: '/console/financeiro'
+      preLoaderRoute: typeof ConsoleFinanceiroRouteImport
       parentRoute: typeof ConsoleRoute
     }
     '/console/equipe': {
@@ -682,12 +708,12 @@ interface ConsoleRouteChildren {
   ConsoleAuditoriaRoute: typeof ConsoleAuditoriaRoute
   ConsoleConfiguracoesRoute: typeof ConsoleConfiguracoesRoute
   ConsoleEquipeRoute: typeof ConsoleEquipeRoute
+  ConsoleFinanceiroRoute: typeof ConsoleFinanceiroRoute
   ConsoleJanelasRoute: typeof ConsoleJanelasRoute
   ConsoleLoginRoute: typeof ConsoleLoginRoute
+  ConsoleProdutosRoute: typeof ConsoleProdutosRoute
   ConsoleRelatorioRoute: typeof ConsoleRelatorioRoute
   ConsoleTemplatesRoute: typeof ConsoleTemplatesRoute
-  ConsoleProdutosRoute: typeof ConsoleProdutosRoute
-  ConsoleFinanceiroRoute: typeof ConsoleFinanceiroRoute
   ConsoleIndexRoute: typeof ConsoleIndexRoute
   ConsoleClienteIdRoute: typeof ConsoleClienteIdRoute
   ConsoleOrcamentoNovoRoute: typeof ConsoleOrcamentoNovoRoute
@@ -700,12 +726,12 @@ const ConsoleRouteChildren: ConsoleRouteChildren = {
   ConsoleAuditoriaRoute: ConsoleAuditoriaRoute,
   ConsoleConfiguracoesRoute: ConsoleConfiguracoesRoute,
   ConsoleEquipeRoute: ConsoleEquipeRoute,
+  ConsoleFinanceiroRoute: ConsoleFinanceiroRoute,
   ConsoleJanelasRoute: ConsoleJanelasRoute,
   ConsoleLoginRoute: ConsoleLoginRoute,
+  ConsoleProdutosRoute: ConsoleProdutosRoute,
   ConsoleRelatorioRoute: ConsoleRelatorioRoute,
   ConsoleTemplatesRoute: ConsoleTemplatesRoute,
-  ConsoleProdutosRoute: ConsoleProdutosRoute,
-  ConsoleFinanceiroRoute: ConsoleFinanceiroRoute,
   ConsoleIndexRoute: ConsoleIndexRoute,
   ConsoleClienteIdRoute: ConsoleClienteIdRoute,
   ConsoleOrcamentoNovoRoute: ConsoleOrcamentoNovoRoute,
