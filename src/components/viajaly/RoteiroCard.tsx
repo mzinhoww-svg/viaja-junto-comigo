@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -120,12 +120,12 @@ export function RoteiroCardConsole({ requestId }: { requestId: string }) {
   const [uploading, setUploading] = useState(false);
 
   // sync when remote loads
-  useState(() => {
+  useEffect(() => {
     if (rot) {
       setTrip(rot.trip ?? ""); setShareUrl(rot.share_url ?? ""); setNotes(rot.release_notes ?? "");
       setNota(rot.nota ?? ""); setVersion(rot.version ?? 1); setAnexos(rot.anexos ?? []);
     }
-  });
+  }, [rot]);
 
   const save = useMutation({
     mutationFn: async () => {
