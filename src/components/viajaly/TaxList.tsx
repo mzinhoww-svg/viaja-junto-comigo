@@ -223,8 +223,8 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
                     return (
                       <li key={it.id} className="flex items-center justify-between gap-2 text-ink-soft">
                         <span className="flex items-center gap-2">
-                          <span className={`inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full ${meta.cls}`}>
-                            <meta.Icon size={10} /> {meta.label}
+                          <span className={`inline-flex items-center gap-1 text-xs uppercase tracking-wider font-bold px-2 py-0.5 rounded-full ${meta.cls}`}>
+                            <meta.Icon size={12} /> {meta.label}
                           </span>
                           <span>
                             {KIND_LABEL[it.kind]}
