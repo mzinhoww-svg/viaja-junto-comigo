@@ -72,9 +72,18 @@ function PortalHome() {
               <div className="space-y-2">{Array.from({ length: 7 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-2xl" />)}</div>
             ) : (
               <div className="space-y-2">
-                {journey.data?.map((s) => (
-                  <StepCard key={s.key} idx={s.idx} label={s.label} status={s.status} />
-                ))}
+                {journey.data?.map((s) => {
+                  const target = STEP_TO_ROUTE[s.key];
+                  return (
+                    <StepCard
+                      key={s.key}
+                      idx={s.idx}
+                      label={s.label}
+                      status={s.status}
+                      onClick={target ? () => nav({ to: target }) : undefined}
+                    />
+                  );
+                })}
               </div>
             )}
           </>
