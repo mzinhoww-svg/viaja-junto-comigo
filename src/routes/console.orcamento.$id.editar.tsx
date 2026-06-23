@@ -84,6 +84,14 @@ function EditarOrcamento() {
       return data;
     },
   });
+  const plans = useQuery({
+    queryKey: ["visto_plans"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("visto_plans").select("key, label, price").order("price");
+      if (error) throw error;
+      return data;
+    },
+  });
 
   // hidrata estado quando dados chegam
   useEffect(() => {
@@ -238,12 +246,33 @@ function EditarOrcamento() {
 
       <div className="bg-white rounded-2xl border border-[var(--color-border)] p-6 mt-6">
         <h2 className="font-display font-bold text-navy">Itens da proposta</h2>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {catalog.data?.map((p) => (
+        <div className="mt-4">
+          <p className="text-xs uppercase tracking-wider text-ink-muted font-bold mb-1.5">Vistos — escolha o plano</p>
+          <div className="flex flex-wrap gap-2">
+            {plans.data?.map((pl) => {
+              const cents = Math.round(Number(pl.price) * 100);
+              const active = items.some((i) => i.product_key === "vistos" && i.unit_price_cents === cents);
+              return (
+                <button key={pl.key} type="button"
+                  onClick={() => setItems((cur) => {
+                    const existing = cur.find((i) => i.product_key === "vistos");
+                    const rest = cur.filter((i) => i.product_key !== "vistos");
+                    return [...rest, { product_key: "vistos", kind: "visto", label: `Viajaly Vistos · ${pl.label}`, qty: existing?.qty ?? 1, unit_price_cents: cents, discount_cents: existing?.discount_cents ?? 0 }];
+                  })}
+                  className={`text-xs px-3 py-1.5 rounded-full border ${active ? "border-coral bg-coral/10 text-coral" : "border-[var(--color-border)] hover:border-teal hover:text-teal"}`}>
+                  {pl.label} · {formatBRL(cents)}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <p className="mt-4 text-xs uppercase tracking-wider text-ink-muted font-bold mb-1.5">Outros produtos</p>
+        <div className="flex flex-wrap gap-2">
+          {catalog.data?.filter((p) => p.key !== "vistos").map((p) => (
             <button key={p.key} type="button"
               onClick={() => setItems([...items, {
                 product_key: p.key,
-                kind: p.key === "vistos" ? "visto" : "consultoria",
+                kind: "consultoria",
                 label: p.name, qty: 1,
                 unit_price_cents: Math.round(Number(p.price) * 100),
                 discount_cents: 0,
