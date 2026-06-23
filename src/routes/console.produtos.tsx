@@ -143,7 +143,7 @@ function PlanRow({ plan, onChange }: { plan: Plan; onChange: () => void }) {
   });
   const del = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("visto_plans").delete().eq("key", plan.key);
+      const { error } = await supabase.from("visto_plans").delete().eq("key", plan.key as never);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Plano removido"); onChange(); },
