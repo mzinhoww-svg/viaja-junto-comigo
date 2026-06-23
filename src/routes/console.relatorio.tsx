@@ -42,10 +42,31 @@ function Relatorio() {
     new Date(b.visa_decision_at ?? b.created_at).getTime() - new Date(a.visa_decision_at ?? a.created_at).getTime()
   ).slice(0, 10);
 
+  function exportCSV() {
+    const rows = list.map((r) => ({
+      id: r.id,
+      cliente: r.lead_name,
+      resultado: r.visa_outcome ?? "",
+      decidido_em: r.visa_decision_at ?? "",
+      criado_em: r.created_at,
+      arquivado_em: r.archived_at ?? "",
+      avaliacao: r.client_rating ?? "",
+      feedback: r.client_feedback ?? "",
+    }));
+    downloadCSV(`viajaly-relatorio-${new Date().toISOString().slice(0,10)}.csv`, toCSV(rows));
+  }
+
   return (
     <section>
-      <h1 className="text-3xl font-display font-extrabold text-navy mb-1">Relatório</h1>
-      <p className="text-sm text-ink-soft mb-6">Visão agregada dos casos da agência.</p>
+      <div className="flex items-end justify-between mb-6 flex-wrap gap-3">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-navy mb-1">Relatório</h1>
+          <p className="text-sm text-ink-soft">Visão agregada dos casos da agência.</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={exportCSV} disabled={list.length === 0}>
+          <Download size={14} className="mr-1.5" /> Exportar CSV
+        </Button>
+      </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Stat label="Ativos" value={ativos} />
