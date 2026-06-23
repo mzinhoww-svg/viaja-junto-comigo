@@ -136,11 +136,11 @@ function ConsoleClient() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setShowShare((v) => !v)}>
+          <Button variant="outline" size="sm" className="min-h-10" onClick={() => setShowShare((v) => !v)}>
             <Share2 size={14} className="mr-1.5" /> {showShare ? "Ocultar acesso" : "Compartilhar acesso"}
           </Button>
           <Link to="/console/orcamento/$id/editar" params={{ id }}>
-            <Button size="sm" className="bg-navy hover:bg-[var(--color-navy-light)] text-cream">
+            <Button size="sm" className="bg-navy hover:bg-[var(--color-navy-light)] text-cream min-h-10">
               <Pencil size={14} className="mr-1.5" /> Editar orçamento
             </Button>
           </Link>
