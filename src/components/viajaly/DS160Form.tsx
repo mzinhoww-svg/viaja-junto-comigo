@@ -1017,6 +1017,15 @@ function FieldRow({
   );
 }
 
+/** Heurística: campos "largos" ocupam as 2 colunas no desktop. */
+function isWideField(field: Field): boolean {
+  if (field.type === "textarea") return true;
+  const k = field.key.toLowerCase();
+  return /address|street|endereco|endereço|full_name|complement|complemento|description|descric|detail|detalh|comment|coment|host|hotel|itinerary|itinerario|notes|observ|reason|motivo|previous_visa_(type|number)|employer|empresa|escola|school|university|universidade|occupation|ocupacao|ocupação|purpose/.test(
+    k,
+  );
+}
+
 function applyMask(field: Field, v: string): string {
   switch (field.mask) {
     case "cpf":
