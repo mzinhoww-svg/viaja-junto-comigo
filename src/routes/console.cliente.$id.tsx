@@ -1,23 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useJourney, useRequestRealtime } from "@/hooks/useJourney";
 import { StepCard } from "@/components/viajaly/StepCard";
-import { DocumentList } from "@/components/viajaly/DocumentList";
-import { DS160Form } from "@/components/viajaly/DS160Form";
-import { TaxList } from "@/components/viajaly/TaxList";
-import { ScheduleList } from "@/components/viajaly/ScheduleList";
-import { AccessAuditCard } from "@/components/viajaly/AccessAuditCard";
 import { HandoffCard } from "@/components/viajaly/HandoffCard";
-import { ConclusionPanel } from "@/components/viajaly/ConclusionPanel";
-import { RoteiroCardConsole } from "@/components/viajaly/RoteiroCard";
-import { MilhasCardConsole } from "@/components/viajaly/MilhasCard";
-import { PassportStatusEditor } from "@/components/viajaly/PassportStatusEditor";
-import { EmergencyContactsEditor } from "@/components/viajaly/EmergencyContactsEditor";
-import { BriefingReadOnly } from "@/components/viajaly/BriefingForm";
-import { MessageThread } from "@/components/viajaly/MessageThread";
-import { ContractPanel } from "@/components/viajaly/ContractPanel";
+
+// Componentes pesados por aba: code-splitting — carregam só quando a aba abre,
+// e os exclusivos do console saem do bundle inicial do app.
+const DocumentList = lazy(() => import("@/components/viajaly/DocumentList").then((m) => ({ default: m.DocumentList })));
+const DS160Form = lazy(() => import("@/components/viajaly/DS160Form").then((m) => ({ default: m.DS160Form })));
+const TaxList = lazy(() => import("@/components/viajaly/TaxList").then((m) => ({ default: m.TaxList })));
+const ScheduleList = lazy(() => import("@/components/viajaly/ScheduleList").then((m) => ({ default: m.ScheduleList })));
+const AccessAuditCard = lazy(() => import("@/components/viajaly/AccessAuditCard").then((m) => ({ default: m.AccessAuditCard })));
+const ConclusionPanel = lazy(() => import("@/components/viajaly/ConclusionPanel").then((m) => ({ default: m.ConclusionPanel })));
+const RoteiroCardConsole = lazy(() => import("@/components/viajaly/RoteiroCard").then((m) => ({ default: m.RoteiroCardConsole })));
+const MilhasCardConsole = lazy(() => import("@/components/viajaly/MilhasCard").then((m) => ({ default: m.MilhasCardConsole })));
+const PassportStatusEditor = lazy(() => import("@/components/viajaly/PassportStatusEditor").then((m) => ({ default: m.PassportStatusEditor })));
+const EmergencyContactsEditor = lazy(() => import("@/components/viajaly/EmergencyContactsEditor").then((m) => ({ default: m.EmergencyContactsEditor })));
+const BriefingReadOnly = lazy(() => import("@/components/viajaly/BriefingForm").then((m) => ({ default: m.BriefingReadOnly })));
+const MessageThread = lazy(() => import("@/components/viajaly/MessageThread").then((m) => ({ default: m.MessageThread })));
+const ContractPanel = lazy(() => import("@/components/viajaly/ContractPanel").then((m) => ({ default: m.ContractPanel })));
 import { OutcomeBadge, type VisaOutcome } from "@/components/viajaly/OutcomeBadge";
 import { StatusPill } from "@/components/viajaly/StatusPill";
 import { Button } from "@/components/ui/button";
@@ -172,6 +175,7 @@ function ConsoleClient() {
         ))}
       </div>
 
+      <Suspense fallback={<p className="mt-6 text-sm text-ink-muted">Carregando…</p>}>
       {tab === "jornada" && (
         <div className="grid md:grid-cols-2 gap-6 mt-6">
           <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5">
@@ -293,6 +297,7 @@ function ConsoleClient() {
           <AccessAuditCard requestId={id} />
         </div>
       )}
+      </Suspense>
     </section>
   );
 }
