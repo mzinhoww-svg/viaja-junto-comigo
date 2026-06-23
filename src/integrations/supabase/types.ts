@@ -815,9 +815,6 @@ export type Database = {
           client_rating: number | null
           client_signature_ip: string | null
           combo_pct: number
-          combo_discount_cents: number
-          manual_discount_cents: number
-          visto_plan: Database["public"]["Enums"]["visto_plan_t"] | null
           contract_signed: boolean
           created_at: string
           created_by: string | null
@@ -832,10 +829,7 @@ export type Database = {
           passport_notes: string | null
           passport_status: string
           payment_amount_cents: number
-          payment_attempts: number
-          payment_card_last4: string | null
           payment_confirmed_by: string | null
-          payment_installments: number | null
           payment_method: Database["public"]["Enums"]["payment_method_t"] | null
           payment_paid_at: string | null
           payment_status: Database["public"]["Enums"]["payment_status_t"]
@@ -869,9 +863,6 @@ export type Database = {
           client_rating?: number | null
           client_signature_ip?: string | null
           combo_pct?: number
-          combo_discount_cents?: number
-          manual_discount_cents?: number
-          visto_plan?: Database["public"]["Enums"]["visto_plan_t"] | null
           contract_signed?: boolean
           created_at?: string
           created_by?: string | null
@@ -886,10 +877,7 @@ export type Database = {
           passport_notes?: string | null
           passport_status?: string
           payment_amount_cents?: number
-          payment_attempts?: number
-          payment_card_last4?: string | null
           payment_confirmed_by?: string | null
-          payment_installments?: number | null
           payment_method?:
             | Database["public"]["Enums"]["payment_method_t"]
             | null
@@ -925,9 +913,6 @@ export type Database = {
           client_rating?: number | null
           client_signature_ip?: string | null
           combo_pct?: number
-          combo_discount_cents?: number
-          manual_discount_cents?: number
-          visto_plan?: Database["public"]["Enums"]["visto_plan_t"] | null
           contract_signed?: boolean
           created_at?: string
           created_by?: string | null
@@ -942,10 +927,7 @@ export type Database = {
           passport_notes?: string | null
           passport_status?: string
           payment_amount_cents?: number
-          payment_attempts?: number
-          payment_card_last4?: string | null
           payment_confirmed_by?: string | null
-          payment_installments?: number | null
           payment_method?:
             | Database["public"]["Enums"]["payment_method_t"]
             | null
@@ -1323,18 +1305,8 @@ export type Database = {
         Args: { _method?: string; _request_id: string }
         Returns: Json
       }
-      pay_with_card: {
-        Args: {
-          _card_last4: string
-          _installments: number
-          _request_id: string
-          _simulate_outcome: string
-        }
-        Returns: Json
-      }
       publish_milhas: { Args: { _request_id: string }; Returns: undefined }
       publish_roteiro: { Args: { _roteiro_id: string }; Returns: undefined }
-      recompute_request_totals: { Args: { _req: string }; Returns: undefined }
       refresh_request_tax_status: {
         Args: { _request_id: string }
         Returns: undefined
@@ -1385,10 +1357,6 @@ export type Database = {
       }
       set_passport_status: {
         Args: { _notes: string; _request_id: string; _status: string }
-        Returns: undefined
-      }
-      set_proposal_adjustments: {
-        Args: { _combo_pct: number; _manual_discount_cents: number; _request_id: string }
         Returns: undefined
       }
       set_visa_outcome: {
