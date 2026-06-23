@@ -1,12 +1,22 @@
+/**
+ * Constrói o link personalizado de acesso do cliente.
+ * Inclui o código como query param para auto-preenchimento no portal.
+ */
+export function personalizedAccessLink(code: string, origin?: string) {
+  const base = origin ?? (typeof window !== "undefined" ? window.location.origin : "");
+  return `${base}/portal/login?code=${encodeURIComponent(code)}`;
+}
+
 export function buildHandoffMessage(args: { name: string; link: string; code: string }) {
   const first = (args.name || "").trim().split(/\s+/)[0] || "Olá";
   return (
 `Oi, ${first}! Aqui é da Viajaly ✨
 
-Preparamos sua proposta personalizada. Para acessar é só seguir 2 passos:
+Preparamos sua proposta personalizada. Para acessar é só clicar no link abaixo — o código já vai preenchido:
 
-1) Abra: ${args.link}
-2) Use seu e-mail + o código: ${args.code}
+🔗 ${args.link}
+
+Caso precise digitar manualmente, seu código é: ${args.code}
 
 Qualquer dúvida, é só responder por aqui. Até já! 💛`
   );
