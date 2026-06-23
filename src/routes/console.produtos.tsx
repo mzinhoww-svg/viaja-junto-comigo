@@ -171,7 +171,7 @@ function AddPlan({ onAdded }: { onAdded: () => void }) {
   const [price, setPrice] = useState("");
   const add = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("visto_plans").insert({ key: key.trim(), label: label.trim(), price: Number(price.replace(",", ".")) || 0 });
+      const { error } = await supabase.from("visto_plans").insert({ key: key.trim(), label: label.trim(), price: Number(price.replace(",", ".")) || 0 } as never);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Plano adicionado"); setOpen(false); setKey(""); setLabel(""); setPrice(""); onAdded(); },
