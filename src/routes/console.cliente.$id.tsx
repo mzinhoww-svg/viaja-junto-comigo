@@ -15,6 +15,8 @@ import { RoteiroCardConsole } from "@/components/viajaly/RoteiroCard";
 import { MilhasCardConsole } from "@/components/viajaly/MilhasCard";
 import { PassportStatusEditor } from "@/components/viajaly/PassportStatusEditor";
 import { EmergencyContactsEditor } from "@/components/viajaly/EmergencyContactsEditor";
+import { BriefingReadOnly } from "@/components/viajaly/BriefingForm";
+import { MessageThread } from "@/components/viajaly/MessageThread";
 import { OutcomeBadge, type VisaOutcome } from "@/components/viajaly/OutcomeBadge";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Pencil, Share2 } from "lucide-react";
