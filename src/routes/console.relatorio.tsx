@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { OutcomeBadge, type VisaOutcome } from "@/components/viajaly/OutcomeBadge";
-import { Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toCSV, downloadCSV } from "@/lib/csv";
+import { Star, Download } from "lucide-react";
 
 export const Route = createFileRoute("/console/relatorio")({
   ssr: false,
