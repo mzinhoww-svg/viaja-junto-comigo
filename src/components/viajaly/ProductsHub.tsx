@@ -193,7 +193,7 @@ export function ProductsHub({ requestId }: { requestId: string }) {
 
       {missing.length > 0 && (
         <div className="mt-5">
-          <h3 className="mb-2 text-[11px] font-display font-bold text-ink-muted uppercase tracking-wider">Pode te interessar</h3>
+          <h3 className="mb-2 text-xs font-display font-bold text-ink-muted uppercase tracking-wider">Pode te interessar</h3>
           <div className="space-y-2">
             {missing.map((k) => {
               const m = META[k];
@@ -201,14 +201,14 @@ export function ProductsHub({ requestId }: { requestId: string }) {
                 <button
                   key={k}
                   onClick={() => nav({ to: "/portal/mensagens" })}
-                  className="w-full text-left rounded-xl border border-dashed border-[var(--color-border)] bg-white/60 p-3 hover:border-coral transition flex items-start gap-3"
+                  className="w-full text-left rounded-xl border border-dashed border-[var(--color-border)] bg-white/60 p-3 hover:border-coral focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral transition flex items-start gap-3 min-h-11"
                 >
                   <m.Icon size={18} className="text-ink-soft mt-0.5 shrink-0" />
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-navy">{m.label}</p>
-                    <p className="text-[11px] text-ink-soft">{m.cross}</p>
+                    <p className="text-xs text-ink-soft">{m.cross}</p>
                   </div>
-                  <span className="inline-flex items-center gap-1 text-[11px] text-coral whitespace-nowrap">
+                  <span className="inline-flex items-center gap-1 text-xs text-coral whitespace-nowrap">
                     <MessageCircle size={12} /> Falar com a Letícia
                   </span>
                 </button>
