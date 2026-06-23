@@ -5,64 +5,78 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
-// Editor do template de contrato (admin). O HTML usa placeholders que o portal preenche.
+// Templates de contrato por produto. O portal escolhe pelo produto principal do caso
+// (2+ produtos → "combo") e, na falta, usa o "Padrão".
+const SCOPES = [
+  { key: "default", label: "Padrão (fallback)" },
+  { key: "vistos", label: "Vistos" },
+  { key: "pass", label: "Passaporte" },
+  { key: "combo", label: "Combo (2+ produtos)" },
+  { key: "rot", label: "Roteiros" },
+  { key: "mil", label: "Milhas" },
+];
+
 export function ContractTemplateEditor() {
   const qc = useQueryClient();
-  const q = useQuery({
-    queryKey: ["contract-template-admin"],
+  const [scope, setScope] = useState("default");
+  const all = useQuery({
+    queryKey: ["contract-templates-admin"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("contract_templates")
-        .select("id, scope, title, body_html")
-        .eq("scope", "default")
-        .maybeSingle();
+      const { data, error } = await supabase.from("contract_templates").select("scope, title, body_html");
       if (error) throw error;
-      return data;
+      return data ?? [];
     },
   });
 
+  const current = (all.data ?? []).find((t) => t.scope === scope);
+  const defaultBody = (all.data ?? []).find((t) => t.scope === "default")?.body_html ?? "";
   const [body, setBody] = useState("");
-  useEffect(() => { if (q.data?.body_html != null) setBody(q.data.body_html); }, [q.data?.body_html]);
-  const dirty = q.data ? body !== q.data.body_html : false;
+  useEffect(() => { setBody(current?.body_html ?? ""); }, [scope, all.data]);
+  const dirty = body !== (current?.body_html ?? "");
 
   const save = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from("contract_templates")
-        .update({ body_html: body, updated_at: new Date().toISOString() })
-        .eq("scope", "default");
+      const { error } = await supabase.from("contract_templates").upsert(
+        { scope, title: current?.title ?? `Contrato ${scope}`, body_html: body, updated_at: new Date().toISOString() },
+        { onConflict: "scope" },
+      );
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Template de contrato salvo");
-      qc.invalidateQueries({ queryKey: ["contract-template-admin"] });
-      qc.invalidateQueries({ queryKey: ["contract-template-default"] });
+      toast.success("Template salvo");
+      qc.invalidateQueries({ queryKey: ["contract-templates-admin"] });
+      qc.invalidateQueries({ queryKey: ["contract-templates-all"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
-  if (q.isLoading) return <p className="text-sm text-ink-muted">Carregando template…</p>;
-  if (!q.data) return <p className="text-sm text-ink-muted">Template ainda não disponível (criado pela migration no sync).</p>;
-
   return (
     <div className="space-y-3">
+      <div className="flex flex-wrap gap-1.5">
+        {SCOPES.map((s) => {
+          const exists = (all.data ?? []).some((t) => t.scope === s.key);
+          return (
+            <button key={s.key} onClick={() => setScope(s.key)}
+              className={`text-xs px-3 py-1.5 rounded-full border ${scope === s.key ? "border-coral bg-coral/10 text-coral" : "border-[var(--color-border)] text-ink-soft hover:border-navy"}`}>
+              {s.label}{!exists && s.key !== "default" ? " ·novo" : ""}
+            </button>
+          );
+        })}
+      </div>
       <p className="text-sm text-ink-soft">
-        HTML do contrato. Os campos dinâmicos são preenchidos automaticamente — <b>mantenha os placeholders</b>:{" "}
-        <code className="text-[11px] bg-[var(--color-muted)] px-1 rounded">{"{{AGENCY}}"}</code>{" "}
-        <code className="text-[11px] bg-[var(--color-muted)] px-1 rounded">{"{{CLIENT}}"}</code>{" "}
-        <code className="text-[11px] bg-[var(--color-muted)] px-1 rounded">{"{{TRAVELERS}}"}</code>{" "}
-        <code className="text-[11px] bg-[var(--color-muted)] px-1 rounded">{"{{ITEMS}}"}</code>{" "}
-        <code className="text-[11px] bg-[var(--color-muted)] px-1 rounded">{"{{TOTAL}}"}</code>{" "}
-        <code className="text-[11px] bg-[var(--color-muted)] px-1 rounded">{"{{DATE}}"}</code>.
-        Se algum placeholder faltar, o portal usa o contrato padrão como segurança.
+        Editando: <b>{SCOPES.find((s) => s.key === scope)?.label}</b>. Placeholders preenchidos automaticamente:{" "}
+        <code className="text-[11px] bg-[var(--color-muted)] px-1 rounded">{"{{AGENCY}} {{CLIENT}} {{TRAVELERS}} {{ITEMS}} {{TOTAL}} {{DATE}}"}</code>.
+        Produto sem template próprio cai no <b>Padrão</b> (mantenha os placeholders).
       </p>
-      <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={16} className="font-mono text-xs" />
+      <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={16} className="font-mono text-xs" placeholder="HTML do contrato com placeholders" />
       <div className="flex gap-2">
         <Button size="sm" variant={dirty ? "default" : "outline"} className={dirty ? "bg-navy text-cream" : ""}
           disabled={!dirty || save.isPending} onClick={() => save.mutate()}>
           {save.isPending ? "Salvando…" : "Salvar template"}
         </Button>
-        <Button size="sm" variant="ghost" disabled={!dirty} onClick={() => setBody(q.data!.body_html)}>Desfazer</Button>
+        {scope !== "default" && !current && (
+          <Button size="sm" variant="ghost" onClick={() => setBody(defaultBody)}>Copiar do padrão</Button>
+        )}
       </div>
     </div>
   );

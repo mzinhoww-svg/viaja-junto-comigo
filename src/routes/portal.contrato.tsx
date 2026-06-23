@@ -20,6 +20,16 @@ export const Route = createFileRoute("/portal/contrato")({
   component: ContratoPage,
 });
 
+// Escolhe o template por produto principal do caso (2+ produtos → "combo"); senão "default".
+function pickTemplate(
+  list: { scope: string; body_html: string }[],
+  items: { product_key: string | null }[],
+): string | null {
+  const keys = Array.from(new Set(items.map((i) => i.product_key).filter(Boolean) as string[]));
+  const scope = keys.length >= 2 ? "combo" : (keys[0] ?? "default");
+  return list.find((t) => t.scope === scope)?.body_html ?? list.find((t) => t.scope === "default")?.body_html ?? null;
+}
+
 function ContratoPage() {
   const req = useMyRequest();
   useRequestRealtime(req.data?.id);
@@ -69,11 +79,11 @@ function ContratoPage() {
     },
   });
 
-  const template = useQuery({
-    queryKey: ["contract-template-default"],
+  const templates = useQuery({
+    queryKey: ["contract-templates-all"],
     queryFn: async () => {
-      const { data } = await supabase.from("contract_templates").select("body_html").eq("scope", "default").maybeSingle();
-      return data?.body_html ?? null;
+      const { data } = await supabase.from("contract_templates").select("scope, body_html");
+      return data ?? [];
     },
   });
 
@@ -89,8 +99,8 @@ function ContratoPage() {
       })),
       totalCents: req.data.proposal_total_cents,
       todayISO: new Date().toISOString(),
-    }, template.data);
-  }, [req.data, items.data, ctx.data, template.data]);
+    }, pickTemplate(templates.data ?? [], items.data ?? []));
+  }, [req.data, items.data, ctx.data, templates.data]);
 
   const sign = useMutation({
     mutationFn: async () => {

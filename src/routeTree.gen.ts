@@ -39,6 +39,8 @@ import { Route as ConsoleConfiguracoesRouteImport } from './routes/console.confi
 import { Route as ConsoleAuditoriaRouteImport } from './routes/console.auditoria'
 import { Route as ConsoleAgendaRouteImport } from './routes/console.agenda'
 import { Route as ConsoleAceitarConviteRouteImport } from './routes/console.aceitar-convite'
+import { Route as ConsoleProdutosRouteImport } from './routes/console.produtos'
+import { Route as ConsoleFinanceiroRouteImport } from './routes/console.financeiro'
 import { Route as ConsoleOrcamentoNovoRouteImport } from './routes/console.orcamento.novo'
 import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$id'
 import { Route as ConsoleOrcamentoIdEditarRouteImport } from './routes/console.orcamento.$id.editar'
@@ -191,6 +193,16 @@ const ConsoleAgendaRoute = ConsoleAgendaRouteImport.update({
 const ConsoleAceitarConviteRoute = ConsoleAceitarConviteRouteImport.update({
   id: '/aceitar-convite',
   path: '/aceitar-convite',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleProdutosRoute = ConsoleProdutosRouteImport.update({
+  id: '/produtos',
+  path: '/produtos',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleFinanceiroRoute = ConsoleFinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
   getParentRoute: () => ConsoleRoute,
 } as any)
 const ConsoleOrcamentoNovoRoute = ConsoleOrcamentoNovoRouteImport.update({
@@ -674,6 +686,8 @@ interface ConsoleRouteChildren {
   ConsoleLoginRoute: typeof ConsoleLoginRoute
   ConsoleRelatorioRoute: typeof ConsoleRelatorioRoute
   ConsoleTemplatesRoute: typeof ConsoleTemplatesRoute
+  ConsoleProdutosRoute: typeof ConsoleProdutosRoute
+  ConsoleFinanceiroRoute: typeof ConsoleFinanceiroRoute
   ConsoleIndexRoute: typeof ConsoleIndexRoute
   ConsoleClienteIdRoute: typeof ConsoleClienteIdRoute
   ConsoleOrcamentoNovoRoute: typeof ConsoleOrcamentoNovoRoute
@@ -690,6 +704,8 @@ const ConsoleRouteChildren: ConsoleRouteChildren = {
   ConsoleLoginRoute: ConsoleLoginRoute,
   ConsoleRelatorioRoute: ConsoleRelatorioRoute,
   ConsoleTemplatesRoute: ConsoleTemplatesRoute,
+  ConsoleProdutosRoute: ConsoleProdutosRoute,
+  ConsoleFinanceiroRoute: ConsoleFinanceiroRoute,
   ConsoleIndexRoute: ConsoleIndexRoute,
   ConsoleClienteIdRoute: ConsoleClienteIdRoute,
   ConsoleOrcamentoNovoRoute: ConsoleOrcamentoNovoRoute,

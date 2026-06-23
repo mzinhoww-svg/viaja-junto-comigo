@@ -22,6 +22,8 @@ const NAV = [
   { to: "/console/agenda", label: "Agenda" },
   { to: "/console/janelas", label: "Janelas" },
   { to: "/console/relatorio", label: "Relatório" },
+  { to: "/console/financeiro", label: "Financeiro" },
+  { to: "/console/produtos", label: "Produtos" },
   { to: "/console/templates", label: "Templates" },
   { to: "/console/equipe", label: "Equipe" },
   { to: "/console/auditoria", label: "Auditoria" },
