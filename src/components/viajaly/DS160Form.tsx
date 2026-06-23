@@ -639,7 +639,7 @@ function IntroCard({ travelerName, onStart }: { travelerName: string; onStart: (
         >
           Começar
         </Button>
-        <p className="text-[11px] text-ink-muted text-center flex items-center justify-center gap-1">
+        <p className="text-xs text-ink-soft text-center flex items-center justify-center gap-1">
           <ShieldCheck size={12} /> Seus dados são tratados conforme a LGPD, apenas para o preenchimento do DS-160.
         </p>
       </div>
