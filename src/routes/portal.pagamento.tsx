@@ -119,17 +119,52 @@ function PagamentoPage() {
         </div>
 
         {paid ? (
-          <div className="mt-6 rounded-2xl bg-[var(--color-success-bg)] text-[var(--color-success-fg)] p-5 text-center">
-            <CheckCircle2 className="mx-auto mb-2" size={32} />
-            <p className="font-bold">Pagamento confirmado!</p>
-            {req.data?.payment_method && (
-              <p className="text-xs mt-1 opacity-80">
-                {req.data.payment_method === "card" ? "Cartão" : "Pix"}
-                {req.data?.payment_paid_at && ` · ${new Date(req.data.payment_paid_at).toLocaleString("pt-BR")}`}
+          <div className="mt-6 space-y-4">
+            <div className="rounded-2xl bg-[var(--color-success-bg)] border border-[color-mix(in_oklab,var(--color-success-fg)_25%,transparent)] p-6 text-center">
+              <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-white shadow-sm">
+                <CheckCircle2 className="text-[var(--color-success-fg)]" size={36} strokeWidth={2.4} />
+              </div>
+              <h2 className="mt-4 font-display font-extrabold text-navy text-xl">Pagamento confirmado</h2>
+              <p className="mt-1 text-sm text-ink-soft">
+                <b className="text-navy font-mono">{formatBRL(amount)}</b> · recebido. Próximo passo: enviar os documentos.
               </p>
-            )}
-            <Button onClick={goNext} className="mt-4 bg-navy text-cream hover:bg-navy/90">
-              {hasContrato ? "Assinar o contrato" : "Continuar jornada"}
+            </div>
+
+            <div className="rounded-2xl bg-white border border-[var(--color-border)] overflow-hidden">
+              <div className="px-4 py-2 bg-cream border-b border-[var(--color-border)] text-[11px] font-bold tracking-wider text-ink-muted uppercase">
+                Comprovante
+              </div>
+              <dl className="divide-y divide-[var(--color-border)] text-sm">
+                <div className="flex justify-between gap-3 px-4 py-3">
+                  <dt className="text-ink-soft">Consultoria Viajaly</dt>
+                  <dd className="font-mono text-navy font-semibold">{formatBRL(amount)}</dd>
+                </div>
+                <div className="flex justify-between gap-3 px-4 py-3">
+                  <dt className="text-ink-soft">Forma de pagamento</dt>
+                  <dd className="text-navy font-semibold">
+                    {req.data?.payment_method === "card" ? "Cartão" : req.data?.payment_method === "pix" ? "Pix" : "—"}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-3 px-4 py-3">
+                  <dt className="text-ink-soft">Autenticação</dt>
+                  <dd className="font-mono text-navy">
+                    VJ-{req.data?.access_code ?? "------"}-CN
+                  </dd>
+                </div>
+                {req.data?.payment_paid_at && (
+                  <div className="flex justify-between gap-3 px-4 py-3">
+                    <dt className="text-ink-soft">Recebido em</dt>
+                    <dd className="text-navy">{new Date(req.data.payment_paid_at).toLocaleString("pt-BR")}</dd>
+                  </div>
+                )}
+              </dl>
+            </div>
+
+            <Button
+              onClick={() => nav({ to: hasContrato ? "/portal/contrato" : "/portal/documentos" })}
+              className="w-full min-h-12 rounded-full bg-coral hover:bg-[var(--color-coral-pressed)] text-cream font-bold"
+            >
+              {hasContrato ? "Assinar o contrato →" : "Enviar documentos →"}
             </Button>
           </div>
         ) : !paymentsConfigured() ? (
