@@ -28,7 +28,7 @@ export const Route = createFileRoute("/console/cliente/$id")({
   component: ConsoleClient,
 });
 
-type Tab = "jornada" | "documentos" | "ds160" | "taxas" | "agenda" | "passaporte" | "roteiro" | "milhas" | "conclusao" | "acesso";
+type Tab = "jornada" | "documentos" | "ds160" | "taxas" | "agenda" | "passaporte" | "roteiro" | "milhas" | "mensagens" | "conclusao" | "acesso";
 
 function ConsoleClient() {
   const { id } = Route.useParams();
