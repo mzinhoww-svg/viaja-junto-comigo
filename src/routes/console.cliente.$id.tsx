@@ -72,6 +72,7 @@ function ConsoleClient() {
     { key: "documentos", label: "Documentos" },
     { key: "ds160", label: "DS-160" },
     { key: "taxas", label: "Taxas" },
+    { key: "agenda", label: "Agenda" },
     { key: "acesso", label: "Acesso" },
   ];
 
