@@ -69,7 +69,7 @@ function ProductRow({ product, onChange }: { product: Product; onChange: () => v
   const save = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from("products_catalog")
-        .update({ name, price: Number(price.replace(",", ".")) || 0, active }).eq("key", product.key);
+        .update({ name, price: Number(price.replace(",", ".")) || 0, active }).eq("key", product.key as never);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Produto salvo"); onChange(); },
@@ -77,7 +77,7 @@ function ProductRow({ product, onChange }: { product: Product; onChange: () => v
   });
   const del = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("products_catalog").delete().eq("key", product.key);
+      const { error } = await supabase.from("products_catalog").delete().eq("key", product.key as never);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Produto removido"); onChange(); },
@@ -110,7 +110,7 @@ function AddProduct({ onAdded }: { onAdded: () => void }) {
   const add = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from("products_catalog")
-        .insert({ key: key.trim(), name: name.trim(), price: Number(price.replace(",", ".")) || 0, active: true });
+        .insert({ key: key.trim(), name: name.trim(), price: Number(price.replace(",", ".")) || 0, active: true, per: "person" } as never);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Produto adicionado"); setOpen(false); setKey(""); setName(""); setPrice(""); onAdded(); },
@@ -135,7 +135,7 @@ function PlanRow({ plan, onChange }: { plan: Plan; onChange: () => void }) {
   const dirty = label !== plan.label || price !== String(plan.price);
   const save = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("visto_plans").update({ label, price: Number(price.replace(",", ".")) || 0 }).eq("key", plan.key);
+      const { error } = await supabase.from("visto_plans").update({ label, price: Number(price.replace(",", ".")) || 0 }).eq("key", plan.key as never);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Plano salvo"); onChange(); },
@@ -143,7 +143,7 @@ function PlanRow({ plan, onChange }: { plan: Plan; onChange: () => void }) {
   });
   const del = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("visto_plans").delete().eq("key", plan.key);
+      const { error } = await supabase.from("visto_plans").delete().eq("key", plan.key as never);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Plano removido"); onChange(); },
@@ -171,7 +171,7 @@ function AddPlan({ onAdded }: { onAdded: () => void }) {
   const [price, setPrice] = useState("");
   const add = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("visto_plans").insert({ key: key.trim(), label: label.trim(), price: Number(price.replace(",", ".")) || 0 });
+      const { error } = await supabase.from("visto_plans").insert({ key: key.trim(), label: label.trim(), price: Number(price.replace(",", ".")) || 0 } as never);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Plano adicionado"); setOpen(false); setKey(""); setLabel(""); setPrice(""); onAdded(); },
