@@ -48,7 +48,7 @@ function PagamentoPage() {
   const status = req.data?.payment_status;
   const paid = status === "paid";
   const hasContrato = (journey.data ?? []).some((s) => s.key === "contrato");
-  const goNext = () => nav({ to: hasContrato ? "/portal/contrato" : "/portal" });
+  
 
   // Poll briefly after returning from Stripe so the UI catches the webhook
   useEffect(() => {
