@@ -1,12 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useMyRequest, useRequestRealtime } from "@/hooks/useJourney";
 import { PhoneFrame } from "@/components/viajaly/PhoneFrame";
 import { Logo } from "@/components/viajaly/Logo";
-import { DS160Form } from "@/components/viajaly/DS160Form";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSignOut } from "./portal";
 import { ChevronLeft, LogOut } from "lucide-react";
+
+// DS160Form é o maior componente do portal — carrega sob demanda nesta rota.
+const DS160Form = lazy(() => import("@/components/viajaly/DS160Form").then((m) => ({ default: m.DS160Form })));
 
 export const Route = createFileRoute("/portal/ds160")({
   ssr: false,
@@ -45,7 +47,11 @@ function PortalDS160() {
         </p>
 
         <div className="mt-6">
-          {!req.data ? <Skeleton className="h-40 rounded-2xl" /> : <DS160Form requestId={req.data.id} variant="portal" />}
+          {!req.data ? <Skeleton className="h-40 rounded-2xl" /> : (
+            <Suspense fallback={<Skeleton className="h-40 rounded-2xl" />}>
+              <DS160Form requestId={req.data.id} variant="portal" />
+            </Suspense>
+          )}
         </div>
       </div>
     </PhoneFrame>

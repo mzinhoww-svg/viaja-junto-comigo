@@ -14,7 +14,7 @@ export type ContractCtx = {
 const esc = (s: string) =>
   s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 
-export function renderContract(c: ContractCtx): string {
+export function renderContract(c: ContractCtx, templateHtml?: string | null): string {
   const today = new Date(c.todayISO).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
   const itemsHtml = c.items
     .map(
@@ -26,6 +26,17 @@ export function renderContract(c: ContractCtx): string {
   const travHtml = c.travelers
     .map((t) => `<li>${esc(t.name)}${t.relation ? ` <span class="muted">(${esc(t.relation)})</span>` : ""}</li>`)
     .join("");
+
+  // Template editável (admin): preenche placeholders. Qualquer ausência cai no padrão abaixo.
+  if (templateHtml && templateHtml.trim()) {
+    return templateHtml
+      .split("{{AGENCY}}").join(esc(c.agencyName))
+      .split("{{CLIENT}}").join(`${esc(c.clientName)} — ${esc(c.clientEmail)}`)
+      .split("{{TRAVELERS}}").join(travHtml || "<li>Titular</li>")
+      .split("{{ITEMS}}").join(itemsHtml)
+      .split("{{TOTAL}}").join(formatBRL(c.totalCents))
+      .split("{{DATE}}").join(today);
+  }
 
   return `
 <h2>Contrato de Prestação de Serviços de Consultoria de Viagem</h2>
