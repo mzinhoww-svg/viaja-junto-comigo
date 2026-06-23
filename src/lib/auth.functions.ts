@@ -3,31 +3,29 @@ import { getRequestIP } from "@tanstack/react-start/server";
 import { z } from "zod";
 
 /**
- * Login do cliente com código de 6 dígitos.
- * - Rate-limit: 5 tentativas / 15 min por (e-mail + IP). Bloqueia por 30 min após exceder.
+ * Login do cliente apenas com código de 6 dígitos.
+ * - Rate-limit: 5 tentativas / 15 min por IP. Bloqueia por 30 min após exceder.
  * - O código por si só NÃO é credencial: ao validar, gera um magic link de uso único
  *   (action_link) que o front consome via verifyOtp para criar a sessão.
  */
 export const loginWithCode = createServerFn({ method: "POST" })
   .inputValidator((input) =>
     z.object({
-      email: z.string().email(),
       code: z.string().regex(/^\d{6}$/, "Código deve ter 6 dígitos"),
     }).parse(input),
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const email = data.email.trim().toLowerCase();
     const ip = getRequestIP({ xForwardedFor: true }) ?? "unknown";
     const now = new Date();
     const windowStart = new Date(now.getTime() - 15 * 60 * 1000);
     const blockWindowStart = new Date(now.getTime() - 30 * 60 * 1000);
 
-    // Rate-limit check
+    // Rate-limit por IP
     const { data: recent } = await supabaseAdmin
       .from("access_code_attempts")
       .select("success, at")
-      .ilike("email", email)
+      .eq("ip", ip)
       .gte("at", blockWindowStart.toISOString())
       .order("at", { ascending: false })
       .limit(20);
@@ -36,24 +34,24 @@ export const loginWithCode = createServerFn({ method: "POST" })
       throw new Error("Muitas tentativas. Tente novamente em alguns minutos.");
     }
 
-    // Locate request
-    const { data: req } = await supabaseAdmin
+    // Localiza solicitação pelo código
+    const { data: matches } = await supabaseAdmin
       .from("requests")
       .select("id, access_code, lead_email")
-      .ilike("lead_email", email)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .eq("access_code", data.code)
+      .limit(2);
 
-    const ok = !!req && req.access_code === data.code;
+    const req = matches && matches.length === 1 ? matches[0] : null;
+    const ok = !!req;
+    const email = req?.lead_email?.toLowerCase() ?? "";
 
     await supabaseAdmin.from("access_code_attempts").insert({ email, ip, success: ok });
 
     if (!ok) {
-      throw new Error("E-mail ou código inválido.");
+      throw new Error("Código inválido.");
     }
 
-    // Generate one-time magic link → return action_link for the client to redeem.
+    // Gera magic link de uso único → front consome via verifyOtp.
     const { data: link, error: linkErr } = await supabaseAdmin.auth.admin.generateLink({
       type: "magiclink",
       email,
