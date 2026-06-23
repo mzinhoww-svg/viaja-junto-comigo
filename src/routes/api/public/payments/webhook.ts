@@ -15,11 +15,22 @@ function getSupabase() {
   return _supabase;
 }
 
-async function handleCheckoutCompleted(session: any) {
+type CheckoutKind = "consultancy" | "taxes";
+
+function readKind(meta: Record<string, unknown> | undefined | null): CheckoutKind {
+  const k = (meta?.kind ?? "") as string;
+  return k === "taxes" ? "taxes" : "consultancy";
+}
+
+function readRequestId(meta: Record<string, unknown> | undefined | null): string | null {
+  const r = meta?.request_id;
+  return typeof r === "string" && /^[0-9a-f-]{36}$/i.test(r) ? r : null;
+}
+
+async function handleConsultancyCheckout(session: any) {
   const sessionId: string = session.id;
   const paymentIntentId: string | null = session.payment_intent ?? null;
   const amount: number | null = session.amount_total ?? null;
-
   let method: string | null = null;
   const pmTypes: string[] = session.payment_method_types ?? [];
   if (pmTypes.length === 1) method = pmTypes[0];
@@ -34,13 +45,57 @@ async function handleCheckoutCompleted(session: any) {
   if (error) console.error("mark_paid_from_stripe error:", error);
 }
 
+async function handleTaxesCheckout(session: any) {
+  const requestId = readRequestId(session.metadata);
+  if (!requestId) {
+    console.error("taxes webhook missing request_id metadata", session.id);
+    return;
+  }
+  const sessionId: string = session.id;
+  const paymentIntentId: string | null = session.payment_intent ?? null;
+  const amount: number | null = session.amount_total ?? null;
+  let method: string | null = null;
+  const pmTypes: string[] = session.payment_method_types ?? [];
+  if (pmTypes.length === 1) method = pmTypes[0];
+
+  const supabase = getSupabase();
+  const { error } = await supabase.rpc("mark_taxes_paid_from_stripe", {
+    _request_id: requestId,
+    _session_id: sessionId,
+    _payment_intent_id: paymentIntentId,
+    _payment_method: method,
+    _amount_cents: amount,
+  } as never);
+  if (error) console.error("mark_taxes_paid_from_stripe error:", error);
+}
+
+async function handleCheckoutCompleted(session: any) {
+  const kind = readKind(session.metadata);
+  if (kind === "taxes") return handleTaxesCheckout(session);
+  return handleConsultancyCheckout(session);
+}
+
 async function handlePaymentIntentSucceeded(intent: any) {
+  const kind = readKind(intent.metadata);
   const charges = intent.charges?.data ?? [];
   const method: string | null = charges[0]?.payment_method_details?.type ?? null;
   const amount: number | null = intent.amount_received ?? intent.amount ?? null;
-
   const supabase = getSupabase();
-  // Resolve session id via existing payment_intent_id or via metadata.request_id
+
+  if (kind === "taxes") {
+    const requestId = readRequestId(intent.metadata);
+    if (!requestId) return;
+    await supabase.rpc("mark_taxes_paid_from_stripe", {
+      _request_id: requestId,
+      _session_id: null as unknown as string,
+      _payment_intent_id: intent.id,
+      _payment_method: method,
+      _amount_cents: amount,
+    } as never);
+    return;
+  }
+
+  // consultancy: resolve session id via payment_intent_id or metadata.request_id
   const { data: byIntent } = await supabase
     .from("requests")
     .select("stripe_session_id")
@@ -49,7 +104,7 @@ async function handlePaymentIntentSucceeded(intent: any) {
 
   let sessionId = byIntent?.stripe_session_id ?? null;
   if (!sessionId) {
-    const requestId: string | undefined = intent.metadata?.request_id;
+    const requestId = readRequestId(intent.metadata);
     if (!requestId) return;
     const { data: byReq } = await supabase
       .from("requests")
