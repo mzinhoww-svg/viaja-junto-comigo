@@ -722,15 +722,18 @@ function SectionStep({
                 {g.label}
               </p>
             )}
-            {g.fields.map((field) => (
-              <FieldRow
-                key={field.key}
-                field={field}
-                value={form[field.key]}
-                onChange={(v) => update(field.key, v)}
-                readOnly={readOnly}
-              />
-            ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
+              {g.fields.map((field) => (
+                <div key={field.key} className={isWideField(field) ? "sm:col-span-2" : ""}>
+                  <FieldRow
+                    field={field}
+                    value={form[field.key]}
+                    onChange={(v) => update(field.key, v)}
+                    readOnly={readOnly}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </div>
@@ -1011,6 +1014,15 @@ function FieldRow({
       )}
       {field.help && <p className="text-xs text-ink-muted">{field.help}</p>}
     </div>
+  );
+}
+
+/** Heurística: campos "largos" ocupam as 2 colunas no desktop. */
+function isWideField(field: Field): boolean {
+  if (field.type === "textarea") return true;
+  const k = field.key.toLowerCase();
+  return /address|street|endereco|endereço|full_name|complement|complemento|description|descric|detail|detalh|comment|coment|host|hotel|itinerary|itinerario|notes|observ|reason|motivo|previous_visa_(type|number)|employer|empresa|escola|school|university|universidade|occupation|ocupacao|ocupação|purpose/.test(
+    k,
   );
 }
 
