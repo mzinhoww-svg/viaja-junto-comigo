@@ -7,6 +7,7 @@ import { StepCard } from "@/components/viajaly/StepCard";
 import { DocumentList } from "@/components/viajaly/DocumentList";
 import { DS160Form } from "@/components/viajaly/DS160Form";
 import { TaxList } from "@/components/viajaly/TaxList";
+import { ScheduleList } from "@/components/viajaly/ScheduleList";
 import { AccessAuditCard } from "@/components/viajaly/AccessAuditCard";
 import { HandoffCard } from "@/components/viajaly/HandoffCard";
 import { Button } from "@/components/ui/button";
