@@ -69,6 +69,14 @@ function ContratoPage() {
     },
   });
 
+  const template = useQuery({
+    queryKey: ["contract-template-default"],
+    queryFn: async () => {
+      const { data } = await supabase.from("contract_templates").select("body_html").eq("scope", "default").maybeSingle();
+      return data?.body_html ?? null;
+    },
+  });
+
   const bodyHtml = useMemo(() => {
     if (!req.data || !items.data || !ctx.data) return "";
     return renderContract({
@@ -81,8 +89,8 @@ function ContratoPage() {
       })),
       totalCents: req.data.proposal_total_cents,
       todayISO: new Date().toISOString(),
-    });
-  }, [req.data, items.data, ctx.data]);
+    }, template.data);
+  }, [req.data, items.data, ctx.data, template.data]);
 
   const sign = useMutation({
     mutationFn: async () => {
