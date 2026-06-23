@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PortalRouteImport } from './routes/portal'
+import { Route as OrcamentoRouteImport } from './routes/orcamento'
 import { Route as ConsoleRouteImport } from './routes/console'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
@@ -39,6 +40,11 @@ import { Route as ConsoleOrcamentoIdEditarRouteImport } from './routes/console.o
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
   path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrcamentoRoute = OrcamentoRouteImport.update({
+  id: '/orcamento',
+  path: '/orcamento',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConsoleRoute = ConsoleRouteImport.update({
@@ -171,6 +177,7 @@ const ConsoleOrcamentoIdEditarRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/console': typeof ConsoleRouteWithChildren
+  '/orcamento': typeof OrcamentoRoute
   '/portal': typeof PortalRouteWithChildren
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
@@ -198,6 +205,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/orcamento': typeof OrcamentoRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/janelas': typeof ConsoleJanelasRoute
@@ -226,6 +234,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/console': typeof ConsoleRouteWithChildren
+  '/orcamento': typeof OrcamentoRoute
   '/portal': typeof PortalRouteWithChildren
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
@@ -256,6 +265,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/console'
+    | '/orcamento'
     | '/portal'
     | '/console/agenda'
     | '/console/auditoria'
@@ -283,6 +293,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/orcamento'
     | '/console/agenda'
     | '/console/auditoria'
     | '/console/janelas'
@@ -310,6 +321,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/console'
+    | '/orcamento'
     | '/portal'
     | '/console/agenda'
     | '/console/auditoria'
@@ -339,6 +351,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConsoleRoute: typeof ConsoleRouteWithChildren
+  OrcamentoRoute: typeof OrcamentoRoute
   PortalRoute: typeof PortalRouteWithChildren
 }
 
@@ -349,6 +362,13 @@ declare module '@tanstack/react-router' {
       path: '/portal'
       fullPath: '/portal'
       preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orcamento': {
+      id: '/orcamento'
+      path: '/orcamento'
+      fullPath: '/orcamento'
+      preLoaderRoute: typeof OrcamentoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/console': {
@@ -596,6 +616,7 @@ const PortalRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConsoleRoute: ConsoleRouteWithChildren,
+  OrcamentoRoute: OrcamentoRoute,
   PortalRoute: PortalRouteWithChildren,
 }
 export const routeTree = rootRouteImport
