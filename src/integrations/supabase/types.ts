@@ -17,26 +17,40 @@ export type Database = {
       access_code_attempts: {
         Row: {
           at: string
+          attempted_code: string | null
           email: string
           id: string
           ip: string | null
+          request_id: string | null
           success: boolean
         }
         Insert: {
           at?: string
+          attempted_code?: string | null
           email: string
           id?: string
           ip?: string | null
+          request_id?: string | null
           success?: boolean
         }
         Update: {
           at?: string
+          attempted_code?: string | null
           email?: string
           id?: string
           ip?: string | null
+          request_id?: string | null
           success?: boolean
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "access_code_attempts_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       agencies: {
         Row: {
@@ -563,6 +577,7 @@ export type Database = {
       requests: {
         Row: {
           access_code: string
+          access_code_expires_at: string
           agency_id: string
           client_signature_ip: string | null
           combo_pct: number
@@ -596,6 +611,7 @@ export type Database = {
         }
         Insert: {
           access_code: string
+          access_code_expires_at?: string
           agency_id: string
           client_signature_ip?: string | null
           combo_pct?: number
@@ -631,6 +647,7 @@ export type Database = {
         }
         Update: {
           access_code?: string
+          access_code_expires_at?: string
           agency_id?: string
           client_signature_ip?: string | null
           combo_pct?: number
@@ -869,6 +886,8 @@ export type Database = {
         Returns: boolean
       }
       is_request_member: { Args: { _request_id: string }; Returns: boolean }
+      regenerate_access_code: { Args: { _request_id: string }; Returns: Json }
+      request_code_resend: { Args: { _request_id: string }; Returns: undefined }
       review_document: {
         Args: { _approve: boolean; _doc_id: string; _reason: string }
         Returns: undefined
