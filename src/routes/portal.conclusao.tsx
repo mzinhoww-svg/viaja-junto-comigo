@@ -8,7 +8,6 @@ import { LegalDisclaimer } from "@/components/viajaly/LegalDisclaimer";
 import { TravelChecklist } from "@/components/viajaly/TravelChecklist";
 import { FeedbackForm } from "@/components/viajaly/FeedbackForm";
 import { useMyRequest, useRequestRealtime } from "@/hooks/useJourney";
-import { generateTravelKitPDF } from "@/lib/travel-kit-pdf";
 import { ChevronLeft, Phone, Download } from "lucide-react";
 
 export const Route = createFileRoute("/portal/conclusao")({
@@ -75,6 +74,8 @@ function PortalConclusao() {
             <button
               onClick={async () => {
                 const { data: ag } = await supabase.from("agencies").select("name, emergency_contacts").maybeSingle();
+                // import dinâmico: jsPDF (~120KB+deps) só carrega ao clicar, fora do bundle inicial
+                const { generateTravelKitPDF } = await import("@/lib/travel-kit-pdf");
                 generateTravelKitPDF({
                   clientName: r.lead_name ?? "Viajante",
                   accessCode: r.access_code ?? "",
