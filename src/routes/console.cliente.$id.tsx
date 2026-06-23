@@ -159,6 +159,19 @@ function ConsoleClient() {
         </div>
       )}
 
+      {tab === "ds160" && (
+        <div className="mt-6 max-w-3xl">
+          <DS160Form requestId={id} variant="console" />
+        </div>
+      )}
+
+      {tab === "taxas" && (
+        <div className="mt-6 max-w-3xl">
+          <TaxList requestId={id} variant="console" />
+        </div>
+      )}
+
+
       {tab === "acesso" && (
         <div className="mt-6 max-w-2xl">
           <AccessAuditCard requestId={id} />
