@@ -44,7 +44,7 @@ function ConsoleFinanceiro() {
   const taxesPaidCents = (taxes.data ?? []).filter((t) => t.status === "paid").reduce((a, t) => a + (t.amount_brl_cents ?? 0), 0);
 
   return (
-    <section>
+    <section className="anim-vfade">
       <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-navy">Financeiro</h1>
       <p className="text-sm text-ink-soft mt-1">Receita da consultoria (proposta) e taxas recebidas. Taxas governamentais são repassadas ao governo.</p>
 

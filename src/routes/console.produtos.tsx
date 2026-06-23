@@ -38,7 +38,7 @@ function ConsoleProdutos() {
   const refreshPl = () => qc.invalidateQueries({ queryKey: ["produtos-plans"] });
 
   return (
-    <section className="max-w-3xl">
+    <section className="max-w-3xl anim-vfade">
       <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-navy">Produtos &amp; planos</h1>
       <p className="text-sm text-ink-soft mt-1">Catálogo usado no wizard de orçamento. Alterações refletem em novos orçamentos.</p>
 
