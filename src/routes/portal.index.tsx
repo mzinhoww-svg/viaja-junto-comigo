@@ -77,7 +77,7 @@ function PortalHome() {
             </div>
 
             {req.data.payment_status === "paid" && (
-              <div className="mt-6 grid grid-cols-2 gap-2">
+              <div className="mt-6 grid grid-cols-3 gap-2">
                 <button
                   onClick={() => nav({ to: "/portal/ds160" })}
                   className="rounded-2xl border border-[var(--color-border)] bg-white p-3 text-left hover:border-coral transition"
@@ -91,6 +91,13 @@ function PortalHome() {
                 >
                   <p className="text-[10px] uppercase tracking-wider text-ink-muted font-bold">Pagamento</p>
                   <p className="mt-1 font-display font-bold text-navy text-sm">Taxa MRV</p>
+                </button>
+                <button
+                  onClick={() => nav({ to: "/portal/agenda" })}
+                  className="rounded-2xl border border-[var(--color-border)] bg-white p-3 text-left hover:border-coral transition"
+                >
+                  <p className="text-[10px] uppercase tracking-wider text-ink-muted font-bold">Datas</p>
+                  <p className="mt-1 font-display font-bold text-navy text-sm">Agendamentos</p>
                 </button>
               </div>
             )}
