@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as OrcamentoRouteImport } from './routes/orcamento'
 import { Route as ConsoleRouteImport } from './routes/console'
@@ -38,6 +39,11 @@ import { Route as ConsoleOrcamentoNovoRouteImport } from './routes/console.orcam
 import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$id'
 import { Route as ConsoleOrcamentoIdEditarRouteImport } from './routes/console.orcamento.$id.editar'
 
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
   path: '/portal',
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/console': typeof ConsoleRouteWithChildren
   '/orcamento': typeof OrcamentoRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
+  '/privacidade': typeof PrivacidadeRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/janelas': typeof ConsoleJanelasRoute
@@ -213,6 +220,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/orcamento': typeof OrcamentoRouteWithChildren
+  '/privacidade': typeof PrivacidadeRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/janelas': typeof ConsoleJanelasRoute
@@ -244,6 +252,7 @@ export interface FileRoutesById {
   '/console': typeof ConsoleRouteWithChildren
   '/orcamento': typeof OrcamentoRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
+  '/privacidade': typeof PrivacidadeRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/janelas': typeof ConsoleJanelasRoute
@@ -276,6 +285,7 @@ export interface FileRouteTypes {
     | '/console'
     | '/orcamento'
     | '/portal'
+    | '/privacidade'
     | '/console/agenda'
     | '/console/auditoria'
     | '/console/janelas'
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/orcamento'
+    | '/privacidade'
     | '/console/agenda'
     | '/console/auditoria'
     | '/console/janelas'
@@ -334,6 +345,7 @@ export interface FileRouteTypes {
     | '/console'
     | '/orcamento'
     | '/portal'
+    | '/privacidade'
     | '/console/agenda'
     | '/console/auditoria'
     | '/console/janelas'
@@ -365,10 +377,18 @@ export interface RootRouteChildren {
   ConsoleRoute: typeof ConsoleRouteWithChildren
   OrcamentoRoute: typeof OrcamentoRouteWithChildren
   PortalRoute: typeof PortalRouteWithChildren
+  PrivacidadeRoute: typeof PrivacidadeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/portal': {
       id: '/portal'
       path: '/portal'
@@ -649,6 +669,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConsoleRoute: ConsoleRouteWithChildren,
   OrcamentoRoute: OrcamentoRouteWithChildren,
   PortalRoute: PortalRouteWithChildren,
+  PrivacidadeRoute: PrivacidadeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
