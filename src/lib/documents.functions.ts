@@ -32,7 +32,7 @@ export const reviewDocument = createServerFn({ method: "POST" })
     const { error } = await context.supabase.rpc("review_document", {
       _doc_id: data.doc_id,
       _approve: data.approve,
-      _reason: data.reason ?? null,
+      _reason: data.reason ?? "",
     });
     if (error) throw new Error(error.message);
     return { ok: true };
