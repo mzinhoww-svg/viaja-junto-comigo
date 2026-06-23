@@ -11,8 +11,15 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { AlertCircle, RefreshCw } from "lucide-react";
 
+import { z } from "zod";
+
+const loginSearch = z.object({
+  code: z.string().regex(/^\d{6}$/).optional(),
+});
+
 export const Route = createFileRoute("/portal/login")({
   ssr: false,
+  validateSearch: (search) => loginSearch.parse(search),
   head: () => ({ meta: [{ title: "Entrar — Viajaly" }] }),
   component: PortalLogin,
 });
@@ -43,7 +50,8 @@ function clearCooldown() {
 }
 
 function PortalLogin() {
-  const [code, setCode] = useState("");
+  const search = Route.useSearch();
+  const [code, setCode] = useState(search.code ?? "");
   const [err, setErr] = useState<ErrorState | null>(null);
   const [lockSecs, setLockSecs] = useState(readCooldown());
   const [resendSecs, setResendSecs] = useState(0);
@@ -51,6 +59,17 @@ function PortalLogin() {
   const nav = useNavigate();
   const codeLogin = useServerFn(loginWithCode);
   const resendFn = useServerFn(requestCodeResend);
+
+  // Se chegou com ?code= já preenchido e não bloqueado, dispara o login.
+  useEffect(() => {
+    if (search.code && search.code.length === 6 && readCooldown() === 0 && submittedRef.current !== search.code) {
+      submittedRef.current = search.code;
+      codeMutRef.current?.(search.code);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.code]);
+  const codeMutRef = useRef<((c: string) => void) | null>(null);
+
 
   // tick countdowns
   useEffect(() => {
@@ -101,6 +120,8 @@ function PortalLogin() {
       submittedRef.current = "";
     },
   });
+  codeMutRef.current = (c: string) => codeMut.mutate(c);
+
 
   const resendMut = useMutation({
     mutationFn: async () => {

@@ -6,8 +6,9 @@ import { useJourney, useRequestRealtime } from "@/hooks/useJourney";
 import { StepCard } from "@/components/viajaly/StepCard";
 import { DocumentList } from "@/components/viajaly/DocumentList";
 import { AccessAuditCard } from "@/components/viajaly/AccessAuditCard";
+import { HandoffCard } from "@/components/viajaly/HandoffCard";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Pencil, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/console/cliente/$id")({
@@ -21,6 +22,7 @@ type Tab = "jornada" | "documentos" | "acesso";
 function ConsoleClient() {
   const { id } = Route.useParams();
   const [tab, setTab] = useState<Tab>("jornada");
+  const [showShare, setShowShare] = useState(false);
   const qc = useQueryClient();
   useRequestRealtime(id);
   const req = useQuery({
@@ -73,10 +75,37 @@ function ConsoleClient() {
       <Link to="/console" className="inline-flex items-center gap-1 text-ink-soft text-sm hover:text-coral">
         <ChevronLeft size={16} /> Pipeline
       </Link>
-      <h1 className="mt-2 text-3xl font-display font-extrabold text-navy">{req.data.lead_name}</h1>
-      <p className="text-ink-soft text-sm">
-        {req.data.lead_email} · código <span className="font-mono">{req.data.access_code}</span>
-      </p>
+      <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-display font-extrabold text-navy">{req.data.lead_name}</h1>
+          <p className="text-ink-soft text-sm">
+            {req.data.lead_email} · código <span className="font-mono">{req.data.access_code}</span>
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setShowShare((v) => !v)}>
+            <Share2 size={14} className="mr-1.5" /> {showShare ? "Ocultar acesso" : "Compartilhar acesso"}
+          </Button>
+          <Link to="/console/orcamento/$id/editar" params={{ id }}>
+            <Button size="sm" className="bg-navy hover:bg-[var(--color-navy-light)] text-cream">
+              <Pencil size={14} className="mr-1.5" /> Editar orçamento
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {showShare && (
+        <div className="mt-5 max-w-2xl">
+          <HandoffCard
+            clientName={req.data.lead_name}
+            accessCode={req.data.access_code}
+            phone={req.data.lead_phone ?? req.data.whatsapp_e164 ?? ""}
+            title="Link do cliente"
+            subtitle="Envie sempre que precisar — o código já vem preenchido."
+          />
+        </div>
+      )}
+
 
       <div className="mt-6 border-b border-[var(--color-border)] flex gap-1">
         {tabs.map((t) => (
