@@ -44,7 +44,8 @@ function PortalHome() {
     if (!r || !journey.data) return;
     const has = (k: string) => journey.data!.some((s) => s.key === k);
     const s = r.proposal_status;
-    if (s === "sent" || s === "viewed" || s === "draft") { nav({ to: "/portal/proposta" }); return; }
+    // 'draft' fica no hub mostrando "aguardando orçamento" — não força navegação
+    if (s === "sent" || s === "viewed") { nav({ to: "/portal/proposta" }); return; }
     if (s === "accepted") {
       if (has("contrato") && !r.contract_signed) { nav({ to: "/portal/contrato" }); return; }
       if (r.payment_status !== "paid") { nav({ to: "/portal/pagamento" }); return; }
