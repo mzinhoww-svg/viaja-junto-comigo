@@ -14,7 +14,7 @@ export const saveDs160Draft = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("save_ds160_draft", {
       _traveler_id: data.traveler_id,
-      _form: data.form,
+      _form: data.form as never,
       _completion_pct: data.completion_pct,
     });
     if (error) throw new Error(error.message);
