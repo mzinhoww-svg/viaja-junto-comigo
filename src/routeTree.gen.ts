@@ -30,12 +30,15 @@ import { Route as PortalContratoRouteImport } from './routes/portal.contrato'
 import { Route as PortalConclusaoRouteImport } from './routes/portal.conclusao'
 import { Route as PortalAgendaRouteImport } from './routes/portal.agenda'
 import { Route as OrcamentoSucessoRouteImport } from './routes/orcamento.sucesso'
+import { Route as ConsoleTemplatesRouteImport } from './routes/console.templates'
 import { Route as ConsoleRelatorioRouteImport } from './routes/console.relatorio'
 import { Route as ConsoleLoginRouteImport } from './routes/console.login'
 import { Route as ConsoleJanelasRouteImport } from './routes/console.janelas'
+import { Route as ConsoleEquipeRouteImport } from './routes/console.equipe'
 import { Route as ConsoleConfiguracoesRouteImport } from './routes/console.configuracoes'
 import { Route as ConsoleAuditoriaRouteImport } from './routes/console.auditoria'
 import { Route as ConsoleAgendaRouteImport } from './routes/console.agenda'
+import { Route as ConsoleAceitarConviteRouteImport } from './routes/console.aceitar-convite'
 import { Route as ConsoleOrcamentoNovoRouteImport } from './routes/console.orcamento.novo'
 import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$id'
 import { Route as ConsoleOrcamentoIdEditarRouteImport } from './routes/console.orcamento.$id.editar'
@@ -145,6 +148,11 @@ const OrcamentoSucessoRoute = OrcamentoSucessoRouteImport.update({
   path: '/sucesso',
   getParentRoute: () => OrcamentoRoute,
 } as any)
+const ConsoleTemplatesRoute = ConsoleTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => ConsoleRoute,
+} as any)
 const ConsoleRelatorioRoute = ConsoleRelatorioRouteImport.update({
   id: '/relatorio',
   path: '/relatorio',
@@ -160,6 +168,11 @@ const ConsoleJanelasRoute = ConsoleJanelasRouteImport.update({
   path: '/janelas',
   getParentRoute: () => ConsoleRoute,
 } as any)
+const ConsoleEquipeRoute = ConsoleEquipeRouteImport.update({
+  id: '/equipe',
+  path: '/equipe',
+  getParentRoute: () => ConsoleRoute,
+} as any)
 const ConsoleConfiguracoesRoute = ConsoleConfiguracoesRouteImport.update({
   id: '/configuracoes',
   path: '/configuracoes',
@@ -173,6 +186,11 @@ const ConsoleAuditoriaRoute = ConsoleAuditoriaRouteImport.update({
 const ConsoleAgendaRoute = ConsoleAgendaRouteImport.update({
   id: '/agenda',
   path: '/agenda',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleAceitarConviteRoute = ConsoleAceitarConviteRouteImport.update({
+  id: '/aceitar-convite',
+  path: '/aceitar-convite',
   getParentRoute: () => ConsoleRoute,
 } as any)
 const ConsoleOrcamentoNovoRoute = ConsoleOrcamentoNovoRouteImport.update({
@@ -198,12 +216,15 @@ export interface FileRoutesByFullPath {
   '/orcamento': typeof OrcamentoRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
+  '/console/aceitar-convite': typeof ConsoleAceitarConviteRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/configuracoes': typeof ConsoleConfiguracoesRoute
+  '/console/equipe': typeof ConsoleEquipeRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
   '/console/relatorio': typeof ConsoleRelatorioRoute
+  '/console/templates': typeof ConsoleTemplatesRoute
   '/orcamento/sucesso': typeof OrcamentoSucessoRoute
   '/portal/agenda': typeof PortalAgendaRoute
   '/portal/conclusao': typeof PortalConclusaoRoute
@@ -228,12 +249,15 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/orcamento': typeof OrcamentoRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
+  '/console/aceitar-convite': typeof ConsoleAceitarConviteRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/configuracoes': typeof ConsoleConfiguracoesRoute
+  '/console/equipe': typeof ConsoleEquipeRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
   '/console/relatorio': typeof ConsoleRelatorioRoute
+  '/console/templates': typeof ConsoleTemplatesRoute
   '/orcamento/sucesso': typeof OrcamentoSucessoRoute
   '/portal/agenda': typeof PortalAgendaRoute
   '/portal/conclusao': typeof PortalConclusaoRoute
@@ -261,12 +285,15 @@ export interface FileRoutesById {
   '/orcamento': typeof OrcamentoRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
+  '/console/aceitar-convite': typeof ConsoleAceitarConviteRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/configuracoes': typeof ConsoleConfiguracoesRoute
+  '/console/equipe': typeof ConsoleEquipeRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
   '/console/relatorio': typeof ConsoleRelatorioRoute
+  '/console/templates': typeof ConsoleTemplatesRoute
   '/orcamento/sucesso': typeof OrcamentoSucessoRoute
   '/portal/agenda': typeof PortalAgendaRoute
   '/portal/conclusao': typeof PortalConclusaoRoute
@@ -295,12 +322,15 @@ export interface FileRouteTypes {
     | '/orcamento'
     | '/portal'
     | '/privacidade'
+    | '/console/aceitar-convite'
     | '/console/agenda'
     | '/console/auditoria'
     | '/console/configuracoes'
+    | '/console/equipe'
     | '/console/janelas'
     | '/console/login'
     | '/console/relatorio'
+    | '/console/templates'
     | '/orcamento/sucesso'
     | '/portal/agenda'
     | '/portal/conclusao'
@@ -325,12 +355,15 @@ export interface FileRouteTypes {
     | '/'
     | '/orcamento'
     | '/privacidade'
+    | '/console/aceitar-convite'
     | '/console/agenda'
     | '/console/auditoria'
     | '/console/configuracoes'
+    | '/console/equipe'
     | '/console/janelas'
     | '/console/login'
     | '/console/relatorio'
+    | '/console/templates'
     | '/orcamento/sucesso'
     | '/portal/agenda'
     | '/portal/conclusao'
@@ -357,12 +390,15 @@ export interface FileRouteTypes {
     | '/orcamento'
     | '/portal'
     | '/privacidade'
+    | '/console/aceitar-convite'
     | '/console/agenda'
     | '/console/auditoria'
     | '/console/configuracoes'
+    | '/console/equipe'
     | '/console/janelas'
     | '/console/login'
     | '/console/relatorio'
+    | '/console/templates'
     | '/orcamento/sucesso'
     | '/portal/agenda'
     | '/portal/conclusao'
@@ -541,6 +577,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrcamentoSucessoRouteImport
       parentRoute: typeof OrcamentoRoute
     }
+    '/console/templates': {
+      id: '/console/templates'
+      path: '/templates'
+      fullPath: '/console/templates'
+      preLoaderRoute: typeof ConsoleTemplatesRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
     '/console/relatorio': {
       id: '/console/relatorio'
       path: '/relatorio'
@@ -562,6 +605,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleJanelasRouteImport
       parentRoute: typeof ConsoleRoute
     }
+    '/console/equipe': {
+      id: '/console/equipe'
+      path: '/equipe'
+      fullPath: '/console/equipe'
+      preLoaderRoute: typeof ConsoleEquipeRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
     '/console/configuracoes': {
       id: '/console/configuracoes'
       path: '/configuracoes'
@@ -581,6 +631,13 @@ declare module '@tanstack/react-router' {
       path: '/agenda'
       fullPath: '/console/agenda'
       preLoaderRoute: typeof ConsoleAgendaRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/aceitar-convite': {
+      id: '/console/aceitar-convite'
+      path: '/aceitar-convite'
+      fullPath: '/console/aceitar-convite'
+      preLoaderRoute: typeof ConsoleAceitarConviteRouteImport
       parentRoute: typeof ConsoleRoute
     }
     '/console/orcamento/novo': {
@@ -608,12 +665,15 @@ declare module '@tanstack/react-router' {
 }
 
 interface ConsoleRouteChildren {
+  ConsoleAceitarConviteRoute: typeof ConsoleAceitarConviteRoute
   ConsoleAgendaRoute: typeof ConsoleAgendaRoute
   ConsoleAuditoriaRoute: typeof ConsoleAuditoriaRoute
   ConsoleConfiguracoesRoute: typeof ConsoleConfiguracoesRoute
+  ConsoleEquipeRoute: typeof ConsoleEquipeRoute
   ConsoleJanelasRoute: typeof ConsoleJanelasRoute
   ConsoleLoginRoute: typeof ConsoleLoginRoute
   ConsoleRelatorioRoute: typeof ConsoleRelatorioRoute
+  ConsoleTemplatesRoute: typeof ConsoleTemplatesRoute
   ConsoleIndexRoute: typeof ConsoleIndexRoute
   ConsoleClienteIdRoute: typeof ConsoleClienteIdRoute
   ConsoleOrcamentoNovoRoute: typeof ConsoleOrcamentoNovoRoute
@@ -621,12 +681,15 @@ interface ConsoleRouteChildren {
 }
 
 const ConsoleRouteChildren: ConsoleRouteChildren = {
+  ConsoleAceitarConviteRoute: ConsoleAceitarConviteRoute,
   ConsoleAgendaRoute: ConsoleAgendaRoute,
   ConsoleAuditoriaRoute: ConsoleAuditoriaRoute,
   ConsoleConfiguracoesRoute: ConsoleConfiguracoesRoute,
+  ConsoleEquipeRoute: ConsoleEquipeRoute,
   ConsoleJanelasRoute: ConsoleJanelasRoute,
   ConsoleLoginRoute: ConsoleLoginRoute,
   ConsoleRelatorioRoute: ConsoleRelatorioRoute,
+  ConsoleTemplatesRoute: ConsoleTemplatesRoute,
   ConsoleIndexRoute: ConsoleIndexRoute,
   ConsoleClienteIdRoute: ConsoleClienteIdRoute,
   ConsoleOrcamentoNovoRoute: ConsoleOrcamentoNovoRoute,

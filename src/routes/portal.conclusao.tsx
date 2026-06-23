@@ -8,7 +8,8 @@ import { LegalDisclaimer } from "@/components/viajaly/LegalDisclaimer";
 import { TravelChecklist } from "@/components/viajaly/TravelChecklist";
 import { FeedbackForm } from "@/components/viajaly/FeedbackForm";
 import { useMyRequest, useRequestRealtime } from "@/hooks/useJourney";
-import { ChevronLeft, Phone } from "lucide-react";
+import { generateTravelKitPDF } from "@/lib/travel-kit-pdf";
+import { ChevronLeft, Phone, Download } from "lucide-react";
 
 export const Route = createFileRoute("/portal/conclusao")({
   ssr: false,
@@ -71,6 +72,24 @@ function PortalConclusao() {
         {outcome === "aprovado" && (
           <div className="mt-5 space-y-4">
             <TravelChecklist requestId={r.id} initial={checklist} />
+            <button
+              onClick={async () => {
+                const { data: ag } = await supabase.from("agencies").select("name, emergency_contacts").maybeSingle();
+                generateTravelKitPDF({
+                  clientName: r.lead_name ?? "Viajante",
+                  accessCode: r.access_code ?? "",
+                  outcome: r.visa_outcome ?? null,
+                  decisionAt: r.visa_decision_at ?? null,
+                  validityUntil: r.visa_validity_until ?? null,
+                  checklist,
+                  emergencyContacts: ((ag?.emergency_contacts as { items?: Array<{ label: string; value: string }> } | null)?.items ?? []),
+                  agencyName: ag?.name ?? "Viajaly",
+                });
+              }}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-navy hover:bg-[var(--color-navy-light)] text-cream font-semibold py-3 text-sm"
+            >
+              <Download size={16} /> Baixar Kit de Viagem (PDF)
+            </button>
             <FeedbackForm requestId={r.id} initialRating={r.client_rating ?? null} initialFeedback={r.client_feedback ?? null} />
           </div>
         )}

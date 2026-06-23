@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Send, Lock, Paperclip } from "lucide-react";
 import { toast } from "sonner";
+import { TemplatesPicker } from "@/components/viajaly/TemplatesPicker";
 
 type Attachment = { name: string; path: string };
 
@@ -168,10 +169,13 @@ export function MessageThread({ requestId, isAdmin }: { requestId: string; isAdm
           </div>
         </div>
         {isAdmin && (
-          <label className="inline-flex items-center gap-2 text-xs text-ink-soft">
-            <input type="checkbox" checked={internal} onChange={(e) => setInternal(e.target.checked)} />
-            <Lock size={12} /> Enviar como nota interna (cliente não vê)
-          </label>
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <label className="inline-flex items-center gap-2 text-xs text-ink-soft">
+              <input type="checkbox" checked={internal} onChange={(e) => setInternal(e.target.checked)} />
+              <Lock size={12} /> Nota interna (cliente não vê)
+            </label>
+            <TemplatesPicker requestId={requestId} onPick={(rendered) => setBody((b) => (b ? b + "\n\n" : "") + rendered)} />
+          </div>
         )}
       </div>
     </div>
