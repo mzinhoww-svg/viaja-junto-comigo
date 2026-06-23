@@ -10,6 +10,12 @@ import { TaxList } from "@/components/viajaly/TaxList";
 import { ScheduleList } from "@/components/viajaly/ScheduleList";
 import { AccessAuditCard } from "@/components/viajaly/AccessAuditCard";
 import { HandoffCard } from "@/components/viajaly/HandoffCard";
+import { ConclusionPanel } from "@/components/viajaly/ConclusionPanel";
+import { RoteiroCardConsole } from "@/components/viajaly/RoteiroCard";
+import { MilhasCardConsole } from "@/components/viajaly/MilhasCard";
+import { PassportStatusEditor } from "@/components/viajaly/PassportStatusEditor";
+import { EmergencyContactsEditor } from "@/components/viajaly/EmergencyContactsEditor";
+import { OutcomeBadge, type VisaOutcome } from "@/components/viajaly/OutcomeBadge";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Pencil, Share2 } from "lucide-react";
 import { toast } from "sonner";
@@ -20,7 +26,7 @@ export const Route = createFileRoute("/console/cliente/$id")({
   component: ConsoleClient,
 });
 
-type Tab = "jornada" | "documentos" | "ds160" | "taxas" | "agenda" | "acesso";
+type Tab = "jornada" | "documentos" | "ds160" | "taxas" | "agenda" | "passaporte" | "roteiro" | "milhas" | "conclusao" | "acesso";
 
 function ConsoleClient() {
   const { id } = Route.useParams();
@@ -73,6 +79,10 @@ function ConsoleClient() {
     { key: "ds160", label: "DS-160" },
     { key: "taxas", label: "Taxas" },
     { key: "agenda", label: "Agenda" },
+    { key: "passaporte", label: "Passaporte" },
+    { key: "roteiro", label: "Roteiro" },
+    { key: "milhas", label: "Milhas" },
+    { key: "conclusao", label: "Conclusão" },
     { key: "acesso", label: "Acesso" },
   ];
 
@@ -83,7 +93,11 @@ function ConsoleClient() {
       </Link>
       <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-display font-extrabold text-navy">{req.data.lead_name}</h1>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-3xl font-display font-extrabold text-navy">{req.data.lead_name}</h1>
+            <OutcomeBadge outcome={req.data.visa_outcome as VisaOutcome} size="sm" />
+            {req.data.archived_at && <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">Arquivado</span>}
+          </div>
           <p className="text-ink-soft text-sm">
             {req.data.lead_email} · código <span className="font-mono">{req.data.access_code}</span>
           </p>
@@ -180,6 +194,39 @@ function ConsoleClient() {
       )}
 
 
+
+      {tab === "passaporte" && (
+        <div className="mt-6 max-w-2xl">
+          <PassportStatusEditor requestId={id} status={req.data.passport_status ?? "coletando"} notes={req.data.passport_notes ?? null} />
+        </div>
+      )}
+
+      {tab === "roteiro" && (
+        <div className="mt-6 max-w-3xl">
+          <RoteiroCardConsole requestId={id} />
+        </div>
+      )}
+
+      {tab === "milhas" && (
+        <div className="mt-6 max-w-3xl">
+          <MilhasCardConsole requestId={id} />
+        </div>
+      )}
+
+      {tab === "conclusao" && (
+        <div className="mt-6 max-w-3xl space-y-6">
+          <ConclusionPanel request={{
+            id,
+            visa_outcome: req.data.visa_outcome as VisaOutcome,
+            visa_decision_at: req.data.visa_decision_at ?? null,
+            visa_validity_until: req.data.visa_validity_until ?? null,
+            archived_at: req.data.archived_at ?? null,
+            client_rating: req.data.client_rating ?? null,
+            client_feedback: req.data.client_feedback ?? null,
+          }} />
+          <EmergencyContactsEditor />
+        </div>
+      )}
 
       {tab === "acesso" && (
         <div className="mt-6 max-w-2xl">
