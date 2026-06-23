@@ -162,7 +162,7 @@ export function ProductsHub({ requestId }: { requestId: string }) {
                 <ChevronRight size={16} className="text-ink-muted group-hover:text-coral transition" />
               </div>
               <p className="mt-2 font-display font-bold text-navy text-sm">{m.label}</p>
-              <p className="text-[11px] text-ink-soft mt-0.5">{statusLine(k)}</p>
+              <p className="text-xs text-ink-soft mt-0.5">{statusLine(k)}</p>
             </button>
           );
         })}
