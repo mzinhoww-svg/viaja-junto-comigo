@@ -84,6 +84,7 @@ function ConsoleClient() {
     { key: "passaporte", label: "Passaporte" },
     { key: "roteiro", label: "Roteiro" },
     { key: "milhas", label: "Milhas" },
+    { key: "mensagens", label: "Mensagens" },
     { key: "conclusao", label: "Conclusão" },
     { key: "acesso", label: "Acesso" },
   ];
