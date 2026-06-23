@@ -259,7 +259,7 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
             <ul className="mt-1 space-y-1 text-sm">
               {upsells.map((u) => (
                 <li key={u.id} className="flex items-center justify-between text-ink-soft">
-                  <span>{u.label} <span className="text-[10px] uppercase tracking-wider text-coral">· preço especial</span></span>
+                  <span>{u.label} <span className="text-xs uppercase tracking-wider text-coral">· preço especial</span></span>
                   <span className="font-mono text-ink">
                     {formatBRL(u.qty * u.unit_price_cents - (u.discount_cents ?? 0))}
                   </span>
