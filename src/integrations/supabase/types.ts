@@ -55,6 +55,7 @@ export type Database = {
       agencies: {
         Row: {
           created_at: string
+          emergency_contacts: Json
           id: string
           name: string
           pix_key: string | null
@@ -64,6 +65,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          emergency_contacts?: Json
           id?: string
           name: string
           pix_key?: string | null
@@ -73,6 +75,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          emergency_contacts?: Json
           id?: string
           name?: string
           pix_key?: string | null
@@ -334,6 +337,7 @@ export type Database = {
           obs: string | null
           plano: string | null
           programa: string | null
+          published_at: string | null
           request_id: string
           saida: string | null
           saldo: string | null
@@ -349,6 +353,7 @@ export type Database = {
           obs?: string | null
           plano?: string | null
           programa?: string | null
+          published_at?: string | null
           request_id: string
           saida?: string | null
           saldo?: string | null
@@ -364,6 +369,7 @@ export type Database = {
           obs?: string | null
           plano?: string | null
           programa?: string | null
+          published_at?: string | null
           request_id?: string
           saida?: string | null
           saldo?: string | null
@@ -381,29 +387,35 @@ export type Database = {
       }
       notifications: {
         Row: {
+          audience: string
           body: string | null
           created_at: string
           id: string
           kind: string
           read: boolean
+          read_at: string | null
           request_id: string
           title: string
         }
         Insert: {
+          audience?: string
           body?: string | null
           created_at?: string
           id?: string
           kind: string
           read?: boolean
+          read_at?: string | null
           request_id: string
           title: string
         }
         Update: {
+          audience?: string
           body?: string | null
           created_at?: string
           id?: string
           kind?: string
           read?: boolean
+          read_at?: string | null
           request_id?: string
           title?: string
         }
@@ -579,6 +591,9 @@ export type Database = {
           access_code: string
           access_code_expires_at: string
           agency_id: string
+          archived_at: string | null
+          client_feedback: string | null
+          client_rating: number | null
           client_signature_ip: string | null
           combo_pct: number
           contract_signed: boolean
@@ -588,6 +603,8 @@ export type Database = {
           lead_email: string
           lead_name: string
           lead_phone: string | null
+          passport_notes: string | null
+          passport_status: string
           payment_amount_cents: number
           payment_confirmed_by: string | null
           payment_method: Database["public"]["Enums"]["payment_method_t"] | null
@@ -604,15 +621,22 @@ export type Database = {
           sign_name: string | null
           signed_at: string | null
           tax_status: Database["public"]["Enums"]["tax_status_t"]
+          travel_checklist: Json
           usd_as_of: string | null
           usd_rate: number | null
           usd_source: string | null
+          visa_decision_at: string | null
+          visa_outcome: Database["public"]["Enums"]["visa_outcome_t"] | null
+          visa_validity_until: string | null
           whatsapp_e164: string | null
         }
         Insert: {
           access_code: string
           access_code_expires_at?: string
           agency_id: string
+          archived_at?: string | null
+          client_feedback?: string | null
+          client_rating?: number | null
           client_signature_ip?: string | null
           combo_pct?: number
           contract_signed?: boolean
@@ -622,6 +646,8 @@ export type Database = {
           lead_email: string
           lead_name: string
           lead_phone?: string | null
+          passport_notes?: string | null
+          passport_status?: string
           payment_amount_cents?: number
           payment_confirmed_by?: string | null
           payment_method?:
@@ -640,15 +666,22 @@ export type Database = {
           sign_name?: string | null
           signed_at?: string | null
           tax_status?: Database["public"]["Enums"]["tax_status_t"]
+          travel_checklist?: Json
           usd_as_of?: string | null
           usd_rate?: number | null
           usd_source?: string | null
+          visa_decision_at?: string | null
+          visa_outcome?: Database["public"]["Enums"]["visa_outcome_t"] | null
+          visa_validity_until?: string | null
           whatsapp_e164?: string | null
         }
         Update: {
           access_code?: string
           access_code_expires_at?: string
           agency_id?: string
+          archived_at?: string | null
+          client_feedback?: string | null
+          client_rating?: number | null
           client_signature_ip?: string | null
           combo_pct?: number
           contract_signed?: boolean
@@ -658,6 +691,8 @@ export type Database = {
           lead_email?: string
           lead_name?: string
           lead_phone?: string | null
+          passport_notes?: string | null
+          passport_status?: string
           payment_amount_cents?: number
           payment_confirmed_by?: string | null
           payment_method?:
@@ -676,9 +711,13 @@ export type Database = {
           sign_name?: string | null
           signed_at?: string | null
           tax_status?: Database["public"]["Enums"]["tax_status_t"]
+          travel_checklist?: Json
           usd_as_of?: string | null
           usd_rate?: number | null
           usd_source?: string | null
+          visa_decision_at?: string | null
+          visa_outcome?: Database["public"]["Enums"]["visa_outcome_t"] | null
+          visa_validity_until?: string | null
           whatsapp_e164?: string | null
         }
         Relationships: [
@@ -697,7 +736,10 @@ export type Database = {
           created_at: string
           id: string
           nota: string | null
+          published_at: string | null
+          release_notes: string | null
           request_id: string
+          share_url: string | null
           status: string
           trip: string | null
           version: number
@@ -707,7 +749,10 @@ export type Database = {
           created_at?: string
           id?: string
           nota?: string | null
+          published_at?: string | null
+          release_notes?: string | null
           request_id: string
+          share_url?: string | null
           status?: string
           trip?: string | null
           version?: number
@@ -717,7 +762,10 @@ export type Database = {
           created_at?: string
           id?: string
           nota?: string | null
+          published_at?: string | null
+          release_notes?: string | null
           request_id?: string
+          share_url?: string | null
           status?: string
           trip?: string | null
           version?: number
@@ -936,6 +984,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      archive_request: {
+        Args: { _archive: boolean; _request_id: string }
+        Returns: undefined
+      }
       compute_journey_steps: {
         Args: { _request_id: string }
         Returns: {
@@ -967,6 +1019,12 @@ export type Database = {
         Returns: boolean
       }
       is_request_member: { Args: { _request_id: string }; Returns: boolean }
+      mark_notification_read: {
+        Args: { _notification_id: string }
+        Returns: undefined
+      }
+      publish_milhas: { Args: { _request_id: string }; Returns: undefined }
+      publish_roteiro: { Args: { _roteiro_id: string }; Returns: undefined }
       refresh_request_tax_status: {
         Args: { _request_id: string }
         Returns: undefined
@@ -976,6 +1034,7 @@ export type Database = {
         Args: { _method: string; _receipt_url: string; _traveler_id: string }
         Returns: undefined
       }
+      reopen_case: { Args: { _request_id: string }; Returns: undefined }
       reopen_intent: { Args: { _intent_id: string }; Returns: undefined }
       request_code_resend: { Args: { _request_id: string }; Returns: undefined }
       review_document: {
@@ -996,6 +1055,22 @@ export type Database = {
         }
         Returns: undefined
       }
+      save_travel_checklist: {
+        Args: { _items: Json; _request_id: string }
+        Returns: undefined
+      }
+      set_passport_status: {
+        Args: { _notes: string; _request_id: string; _status: string }
+        Returns: undefined
+      }
+      set_visa_outcome: {
+        Args: {
+          _outcome: Database["public"]["Enums"]["visa_outcome_t"]
+          _request_id: string
+          _validity_until: string
+        }
+        Returns: undefined
+      }
       sign_contract: {
         Args: {
           _body_html: string
@@ -1010,7 +1085,23 @@ export type Database = {
         Returns: undefined
       }
       submit_ds160: { Args: { _traveler_id: string }; Returns: undefined }
+      submit_feedback: {
+        Args: { _feedback: string; _rating: number; _request_id: string }
+        Returns: undefined
+      }
       update_request_with_items: {
+        Args: { _request_id: string; payload: Json }
+        Returns: Json
+      }
+      upsert_emergency_contacts: {
+        Args: { _contacts: Json }
+        Returns: undefined
+      }
+      upsert_milhas: {
+        Args: { _request_id: string; payload: Json }
+        Returns: Json
+      }
+      upsert_roteiro: {
         Args: { _request_id: string; payload: Json }
         Returns: Json
       }
@@ -1040,6 +1131,7 @@ export type Database = {
       sched_status_t: "open" | "sent" | "confirmed"
       tax_payment_status_t: "pending" | "paid" | "waived"
       tax_status_t: "pending" | "paid"
+      visa_outcome_t: "aprovado" | "recusado" | "admin_processing" | "cancelado"
       visto_plan_t: "start" | "pro" | "prem"
     }
     CompositeTypes: {
@@ -1184,6 +1276,7 @@ export const Constants = {
       sched_status_t: ["open", "sent", "confirmed"],
       tax_payment_status_t: ["pending", "paid", "waived"],
       tax_status_t: ["pending", "paid"],
+      visa_outcome_t: ["aprovado", "recusado", "admin_processing", "cancelado"],
       visto_plan_t: ["start", "pro", "prem"],
     },
   },
