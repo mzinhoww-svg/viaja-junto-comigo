@@ -280,9 +280,10 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
         )}
       </div>
 
-      {variant === "portal" && grandTotal > 0 && rate != null && (
+      {variant === "portal" && grandTotal > 0 && (!hasMrvPending || rate != null) && (
         <TaxesCheckout requestId={requestId} amount={grandTotal} />
       )}
+
 
       {variant === "portal" && allPaid && (
         <p className="text-sm text-vgreen text-center">Todas as taxas estão confirmadas.</p>
