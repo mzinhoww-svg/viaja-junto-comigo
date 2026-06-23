@@ -75,6 +75,25 @@ function PortalHome() {
               </div>
             </div>
 
+            {req.data.payment_status === "paid" && (
+              <div className="mt-6 grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => nav({ to: "/portal/ds160" })}
+                  className="rounded-2xl border border-[var(--color-border)] bg-white p-3 text-left hover:border-coral transition"
+                >
+                  <p className="text-[10px] uppercase tracking-wider text-ink-muted font-bold">Formulário</p>
+                  <p className="mt-1 font-display font-bold text-navy text-sm">DS-160</p>
+                </button>
+                <button
+                  onClick={() => nav({ to: "/portal/taxas" })}
+                  className="rounded-2xl border border-[var(--color-border)] bg-white p-3 text-left hover:border-coral transition"
+                >
+                  <p className="text-[10px] uppercase tracking-wider text-ink-muted font-bold">Pagamento</p>
+                  <p className="mt-1 font-display font-bold text-navy text-sm">Taxa MRV</p>
+                </button>
+              </div>
+            )}
+
             <h2 className="mt-8 mb-3 text-sm font-display font-bold text-navy uppercase tracking-wider">Etapas</h2>
             {journey.isLoading ? (
               <div className="space-y-2">{Array.from({ length: 7 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-2xl" />)}</div>
