@@ -11,8 +11,15 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { AlertCircle, RefreshCw } from "lucide-react";
 
+import { z } from "zod";
+
+const loginSearch = z.object({
+  code: z.string().regex(/^\d{6}$/).optional(),
+});
+
 export const Route = createFileRoute("/portal/login")({
   ssr: false,
+  validateSearch: (search) => loginSearch.parse(search),
   head: () => ({ meta: [{ title: "Entrar — Viajaly" }] }),
   component: PortalLogin,
 });
