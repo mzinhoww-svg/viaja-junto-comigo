@@ -905,6 +905,10 @@ export type Database = {
         Args: { _doc_id: string; _file_url: string }
         Returns: undefined
       }
+      update_request_with_items: {
+        Args: { _request_id: string; payload: Json }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "client"
