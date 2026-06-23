@@ -38,14 +38,14 @@ export const validateDs160 = createServerFn({ method: "POST" })
     z.object({
       traveler_id: z.string().uuid(),
       approve: z.boolean(),
-      reason: z.string().max(500).optional(),
+      notes: z.string().max(500).optional(),
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("validate_ds160", {
       _traveler_id: data.traveler_id,
       _approve: data.approve,
-      _reason: data.reason ?? "",
+      _notes: data.notes ?? "",
     });
     if (error) throw new Error(error.message);
     return { ok: true };
