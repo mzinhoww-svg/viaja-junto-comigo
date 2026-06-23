@@ -51,8 +51,9 @@ function PortalHome() {
     }
   }, [req.data, nav]);
 
+  const total = journey.data?.length ?? 7;
   const done = journey.data?.filter((s) => s.status === "done").length ?? 0;
-  const pct = Math.round((done / 7) * 100);
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
   const next = journey.data?.find((s) => s.status === "active")?.label;
 
   return (
