@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { PhoneFrame } from "@/components/viajaly/PhoneFrame";
+import { BriefingForm } from "@/components/viajaly/BriefingForm";
 import { useMyRequest, useRequestRealtime } from "@/hooks/useJourney";
 import { ChevronLeft, Plane } from "lucide-react";
 
@@ -21,6 +23,7 @@ function PortalPassaporte() {
   const req = useMyRequest();
   useRequestRealtime(req.data?.id);
   const r = req.data;
+  const [tab, setTab] = useState<"briefing" | "entrega">("briefing");
   if (!r) return null;
   const meta = LABELS[r.passport_status ?? "coletando"] ?? LABELS.coletando;
   return (
@@ -29,16 +32,33 @@ function PortalPassaporte() {
         <button onClick={() => nav({ to: "/portal" })} className="inline-flex items-center gap-1 text-ink-soft text-sm hover:text-coral mb-4">
           <ChevronLeft size={16} /> Hub
         </button>
-        <div className="rounded-3xl bg-white border border-[var(--color-border)] p-6 text-center">
-          <Plane size={32} className="mx-auto text-coral" />
-          <span className={`inline-block mt-3 px-3 py-1 rounded-full text-xs font-bold ${meta.cls}`}>{meta.label}</span>
-          <p className="mt-3 text-sm text-ink-soft">{meta.sub}</p>
+        <h1 className="text-2xl font-display font-extrabold text-navy mb-4">Passaporte</h1>
+
+        <div className="flex gap-1 border-b border-[var(--color-border)] mb-4">
+          {(["briefing","entrega"] as const).map((t) => (
+            <button key={t} onClick={() => setTab(t)}
+              className={`px-4 py-2 text-sm font-semibold border-b-2 -mb-px ${tab===t ? "border-coral text-coral" : "border-transparent text-ink-soft"}`}>
+              {t === "briefing" ? "Briefing" : "Entrega"}
+            </button>
+          ))}
         </div>
-        {r.passport_notes && (
-          <div className="mt-4 rounded-2xl bg-white border border-[var(--color-border)] p-5">
-            <h3 className="font-display font-bold text-navy text-sm">Mensagem da consultora</h3>
-            <p className="mt-2 text-sm text-ink whitespace-pre-line">{r.passport_notes}</p>
-          </div>
+
+        {tab === "briefing" && <BriefingForm requestId={r.id} productKey="passaporte" />}
+
+        {tab === "entrega" && (
+          <>
+            <div className="rounded-3xl bg-white border border-[var(--color-border)] p-6 text-center">
+              <Plane size={32} className="mx-auto text-coral" />
+              <span className={`inline-block mt-3 px-3 py-1 rounded-full text-xs font-bold ${meta.cls}`}>{meta.label}</span>
+              <p className="mt-3 text-sm text-ink-soft">{meta.sub}</p>
+            </div>
+            {r.passport_notes && (
+              <div className="mt-4 rounded-2xl bg-white border border-[var(--color-border)] p-5">
+                <h3 className="font-display font-bold text-navy text-sm">Mensagem da consultora</h3>
+                <p className="mt-2 text-sm text-ink whitespace-pre-line">{r.passport_notes}</p>
+              </div>
+            )}
+          </>
         )}
       </div>
     </PhoneFrame>

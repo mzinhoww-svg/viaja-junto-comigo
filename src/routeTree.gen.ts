@@ -20,6 +20,7 @@ import { Route as PortalPropostaRouteImport } from './routes/portal.proposta'
 import { Route as PortalPassaporteRouteImport } from './routes/portal.passaporte'
 import { Route as PortalPagamentoRouteImport } from './routes/portal.pagamento'
 import { Route as PortalMilhasRouteImport } from './routes/portal.milhas'
+import { Route as PortalMensagensRouteImport } from './routes/portal.mensagens'
 import { Route as PortalLoginRouteImport } from './routes/portal.login'
 import { Route as PortalDs160RouteImport } from './routes/portal.ds160'
 import { Route as PortalDocumentosRouteImport } from './routes/portal.documentos'
@@ -88,6 +89,11 @@ const PortalPagamentoRoute = PortalPagamentoRouteImport.update({
 const PortalMilhasRoute = PortalMilhasRouteImport.update({
   id: '/milhas',
   path: '/milhas',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalMensagensRoute = PortalMensagensRouteImport.update({
+  id: '/mensagens',
+  path: '/mensagens',
   getParentRoute: () => PortalRoute,
 } as any)
 const PortalLoginRoute = PortalLoginRouteImport.update({
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/portal/documentos': typeof PortalDocumentosRoute
   '/portal/ds160': typeof PortalDs160Route
   '/portal/login': typeof PortalLoginRoute
+  '/portal/mensagens': typeof PortalMensagensRoute
   '/portal/milhas': typeof PortalMilhasRoute
   '/portal/pagamento': typeof PortalPagamentoRoute
   '/portal/passaporte': typeof PortalPassaporteRoute
@@ -202,6 +209,7 @@ export interface FileRoutesByTo {
   '/portal/documentos': typeof PortalDocumentosRoute
   '/portal/ds160': typeof PortalDs160Route
   '/portal/login': typeof PortalLoginRoute
+  '/portal/mensagens': typeof PortalMensagensRoute
   '/portal/milhas': typeof PortalMilhasRoute
   '/portal/pagamento': typeof PortalPagamentoRoute
   '/portal/passaporte': typeof PortalPassaporteRoute
@@ -230,6 +238,7 @@ export interface FileRoutesById {
   '/portal/documentos': typeof PortalDocumentosRoute
   '/portal/ds160': typeof PortalDs160Route
   '/portal/login': typeof PortalLoginRoute
+  '/portal/mensagens': typeof PortalMensagensRoute
   '/portal/milhas': typeof PortalMilhasRoute
   '/portal/pagamento': typeof PortalPagamentoRoute
   '/portal/passaporte': typeof PortalPassaporteRoute
@@ -259,6 +268,7 @@ export interface FileRouteTypes {
     | '/portal/documentos'
     | '/portal/ds160'
     | '/portal/login'
+    | '/portal/mensagens'
     | '/portal/milhas'
     | '/portal/pagamento'
     | '/portal/passaporte'
@@ -284,6 +294,7 @@ export interface FileRouteTypes {
     | '/portal/documentos'
     | '/portal/ds160'
     | '/portal/login'
+    | '/portal/mensagens'
     | '/portal/milhas'
     | '/portal/pagamento'
     | '/portal/passaporte'
@@ -311,6 +322,7 @@ export interface FileRouteTypes {
     | '/portal/documentos'
     | '/portal/ds160'
     | '/portal/login'
+    | '/portal/mensagens'
     | '/portal/milhas'
     | '/portal/pagamento'
     | '/portal/passaporte'
@@ -407,6 +419,13 @@ declare module '@tanstack/react-router' {
       path: '/milhas'
       fullPath: '/portal/milhas'
       preLoaderRoute: typeof PortalMilhasRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/mensagens': {
+      id: '/portal/mensagens'
+      path: '/mensagens'
+      fullPath: '/portal/mensagens'
+      preLoaderRoute: typeof PortalMensagensRouteImport
       parentRoute: typeof PortalRoute
     }
     '/portal/login': {
@@ -544,6 +563,7 @@ interface PortalRouteChildren {
   PortalDocumentosRoute: typeof PortalDocumentosRoute
   PortalDs160Route: typeof PortalDs160Route
   PortalLoginRoute: typeof PortalLoginRoute
+  PortalMensagensRoute: typeof PortalMensagensRoute
   PortalMilhasRoute: typeof PortalMilhasRoute
   PortalPagamentoRoute: typeof PortalPagamentoRoute
   PortalPassaporteRoute: typeof PortalPassaporteRoute
@@ -560,6 +580,7 @@ const PortalRouteChildren: PortalRouteChildren = {
   PortalDocumentosRoute: PortalDocumentosRoute,
   PortalDs160Route: PortalDs160Route,
   PortalLoginRoute: PortalLoginRoute,
+  PortalMensagensRoute: PortalMensagensRoute,
   PortalMilhasRoute: PortalMilhasRoute,
   PortalPagamentoRoute: PortalPagamentoRoute,
   PortalPassaporteRoute: PortalPassaporteRoute,
