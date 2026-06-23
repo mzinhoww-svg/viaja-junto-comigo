@@ -15,7 +15,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as ConsoleIndexRouteImport } from './routes/console.index'
 import { Route as PortalPropostaRouteImport } from './routes/portal.proposta'
+import { Route as PortalPagamentoRouteImport } from './routes/portal.pagamento'
 import { Route as PortalLoginRouteImport } from './routes/portal.login'
+import { Route as PortalContratoRouteImport } from './routes/portal.contrato'
 import { Route as ConsoleLoginRouteImport } from './routes/console.login'
 import { Route as ConsoleOrcamentoNovoRouteImport } from './routes/console.orcamento.novo'
 import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$id'
@@ -50,9 +52,19 @@ const PortalPropostaRoute = PortalPropostaRouteImport.update({
   path: '/proposta',
   getParentRoute: () => PortalRoute,
 } as any)
+const PortalPagamentoRoute = PortalPagamentoRouteImport.update({
+  id: '/pagamento',
+  path: '/pagamento',
+  getParentRoute: () => PortalRoute,
+} as any)
 const PortalLoginRoute = PortalLoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalContratoRoute = PortalContratoRouteImport.update({
+  id: '/contrato',
+  path: '/contrato',
   getParentRoute: () => PortalRoute,
 } as any)
 const ConsoleLoginRoute = ConsoleLoginRouteImport.update({
@@ -76,7 +88,9 @@ export interface FileRoutesByFullPath {
   '/console': typeof ConsoleRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
   '/console/login': typeof ConsoleLoginRoute
+  '/portal/contrato': typeof PortalContratoRoute
   '/portal/login': typeof PortalLoginRoute
+  '/portal/pagamento': typeof PortalPagamentoRoute
   '/portal/proposta': typeof PortalPropostaRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -86,7 +100,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/console/login': typeof ConsoleLoginRoute
+  '/portal/contrato': typeof PortalContratoRoute
   '/portal/login': typeof PortalLoginRoute
+  '/portal/pagamento': typeof PortalPagamentoRoute
   '/portal/proposta': typeof PortalPropostaRoute
   '/console': typeof ConsoleIndexRoute
   '/portal': typeof PortalIndexRoute
@@ -99,7 +115,9 @@ export interface FileRoutesById {
   '/console': typeof ConsoleRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
   '/console/login': typeof ConsoleLoginRoute
+  '/portal/contrato': typeof PortalContratoRoute
   '/portal/login': typeof PortalLoginRoute
+  '/portal/pagamento': typeof PortalPagamentoRoute
   '/portal/proposta': typeof PortalPropostaRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -113,7 +131,9 @@ export interface FileRouteTypes {
     | '/console'
     | '/portal'
     | '/console/login'
+    | '/portal/contrato'
     | '/portal/login'
+    | '/portal/pagamento'
     | '/portal/proposta'
     | '/console/'
     | '/portal/'
@@ -123,7 +143,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/console/login'
+    | '/portal/contrato'
     | '/portal/login'
+    | '/portal/pagamento'
     | '/portal/proposta'
     | '/console'
     | '/portal'
@@ -135,7 +157,9 @@ export interface FileRouteTypes {
     | '/console'
     | '/portal'
     | '/console/login'
+    | '/portal/contrato'
     | '/portal/login'
+    | '/portal/pagamento'
     | '/portal/proposta'
     | '/console/'
     | '/portal/'
@@ -193,11 +217,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalPropostaRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/portal/pagamento': {
+      id: '/portal/pagamento'
+      path: '/pagamento'
+      fullPath: '/portal/pagamento'
+      preLoaderRoute: typeof PortalPagamentoRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/portal/login': {
       id: '/portal/login'
       path: '/login'
       fullPath: '/portal/login'
       preLoaderRoute: typeof PortalLoginRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/contrato': {
+      id: '/portal/contrato'
+      path: '/contrato'
+      fullPath: '/portal/contrato'
+      preLoaderRoute: typeof PortalContratoRouteImport
       parentRoute: typeof PortalRoute
     }
     '/console/login': {
@@ -242,13 +280,17 @@ const ConsoleRouteWithChildren =
   ConsoleRoute._addFileChildren(ConsoleRouteChildren)
 
 interface PortalRouteChildren {
+  PortalContratoRoute: typeof PortalContratoRoute
   PortalLoginRoute: typeof PortalLoginRoute
+  PortalPagamentoRoute: typeof PortalPagamentoRoute
   PortalPropostaRoute: typeof PortalPropostaRoute
   PortalIndexRoute: typeof PortalIndexRoute
 }
 
 const PortalRouteChildren: PortalRouteChildren = {
+  PortalContratoRoute: PortalContratoRoute,
   PortalLoginRoute: PortalLoginRoute,
+  PortalPagamentoRoute: PortalPagamentoRoute,
   PortalPropostaRoute: PortalPropostaRoute,
   PortalIndexRoute: PortalIndexRoute,
 }
