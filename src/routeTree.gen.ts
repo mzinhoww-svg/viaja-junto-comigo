@@ -23,6 +23,7 @@ import { Route as ConsoleLoginRouteImport } from './routes/console.login'
 import { Route as ConsoleAuditoriaRouteImport } from './routes/console.auditoria'
 import { Route as ConsoleOrcamentoNovoRouteImport } from './routes/console.orcamento.novo'
 import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$id'
+import { Route as ConsoleOrcamentoIdEditarRouteImport } from './routes/console.orcamento.$id.editar'
 
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
@@ -94,6 +95,12 @@ const ConsoleClienteIdRoute = ConsoleClienteIdRouteImport.update({
   path: '/cliente/$id',
   getParentRoute: () => ConsoleRoute,
 } as any)
+const ConsoleOrcamentoIdEditarRoute =
+  ConsoleOrcamentoIdEditarRouteImport.update({
+    id: '/orcamento/$id/editar',
+    path: '/orcamento/$id/editar',
+    getParentRoute: () => ConsoleRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/portal/': typeof PortalIndexRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
   '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
+  '/console/orcamento/$id/editar': typeof ConsoleOrcamentoIdEditarRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -124,6 +132,7 @@ export interface FileRoutesByTo {
   '/portal': typeof PortalIndexRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
   '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
+  '/console/orcamento/$id/editar': typeof ConsoleOrcamentoIdEditarRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -141,6 +150,7 @@ export interface FileRoutesById {
   '/portal/': typeof PortalIndexRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
   '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
+  '/console/orcamento/$id/editar': typeof ConsoleOrcamentoIdEditarRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/portal/'
     | '/console/cliente/$id'
     | '/console/orcamento/novo'
+    | '/console/orcamento/$id/editar'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/console/cliente/$id'
     | '/console/orcamento/novo'
+    | '/console/orcamento/$id/editar'
   id:
     | '__root__'
     | '/'
@@ -189,6 +201,7 @@ export interface FileRouteTypes {
     | '/portal/'
     | '/console/cliente/$id'
     | '/console/orcamento/novo'
+    | '/console/orcamento/$id/editar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -297,6 +310,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleClienteIdRouteImport
       parentRoute: typeof ConsoleRoute
     }
+    '/console/orcamento/$id/editar': {
+      id: '/console/orcamento/$id/editar'
+      path: '/orcamento/$id/editar'
+      fullPath: '/console/orcamento/$id/editar'
+      preLoaderRoute: typeof ConsoleOrcamentoIdEditarRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
   }
 }
 
@@ -306,6 +326,7 @@ interface ConsoleRouteChildren {
   ConsoleIndexRoute: typeof ConsoleIndexRoute
   ConsoleClienteIdRoute: typeof ConsoleClienteIdRoute
   ConsoleOrcamentoNovoRoute: typeof ConsoleOrcamentoNovoRoute
+  ConsoleOrcamentoIdEditarRoute: typeof ConsoleOrcamentoIdEditarRoute
 }
 
 const ConsoleRouteChildren: ConsoleRouteChildren = {
@@ -314,6 +335,7 @@ const ConsoleRouteChildren: ConsoleRouteChildren = {
   ConsoleIndexRoute: ConsoleIndexRoute,
   ConsoleClienteIdRoute: ConsoleClienteIdRoute,
   ConsoleOrcamentoNovoRoute: ConsoleOrcamentoNovoRoute,
+  ConsoleOrcamentoIdEditarRoute: ConsoleOrcamentoIdEditarRoute,
 }
 
 const ConsoleRouteWithChildren =

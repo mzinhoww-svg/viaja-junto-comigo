@@ -6,8 +6,9 @@ import { useJourney, useRequestRealtime } from "@/hooks/useJourney";
 import { StepCard } from "@/components/viajaly/StepCard";
 import { DocumentList } from "@/components/viajaly/DocumentList";
 import { AccessAuditCard } from "@/components/viajaly/AccessAuditCard";
+import { HandoffCard } from "@/components/viajaly/HandoffCard";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Pencil, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/console/cliente/$id")({
