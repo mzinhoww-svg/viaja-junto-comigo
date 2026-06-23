@@ -25,12 +25,12 @@ async function handleCheckoutCompleted(session: any) {
   if (pmTypes.length === 1) method = pmTypes[0];
 
   const supabase = getSupabase();
-  const { error } = await supabase.rpc("mark_paid_from_stripe", ({
+  const { error } = await supabase.rpc("mark_paid_from_stripe", {
     _session_id: sessionId,
     _payment_intent_id: paymentIntentId,
     _payment_method: method,
     _amount_cents: amount,
-  });
+  } as never);
   if (error) console.error("mark_paid_from_stripe error:", error);
 }
 
@@ -60,12 +60,12 @@ async function handlePaymentIntentSucceeded(intent: any) {
   }
   if (!sessionId) return;
 
-  await supabase.rpc("mark_paid_from_stripe", ({
+  await supabase.rpc("mark_paid_from_stripe", {
     _session_id: sessionId,
     _payment_intent_id: intent.id,
     _payment_method: method,
     _amount_cents: amount,
-  });
+  } as never);
 }
 
 async function handleEvent(event: { id: string; type: string; data: { object: any } }) {
