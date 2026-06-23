@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
  */
 export const Route = createFileRoute("/portal")({
   ssr: false,
+
   beforeLoad: async ({ location }) => {
     if (location.pathname === "/portal/login") return;
     const { data } = await supabase.auth.getSession();
