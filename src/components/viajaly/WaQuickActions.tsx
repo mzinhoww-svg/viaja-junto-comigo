@@ -32,8 +32,9 @@ export function WaQuickActions({
           href={waLink(phone ?? "", it.msg)}
           target="_blank"
           rel="noopener noreferrer"
+          className="inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral rounded-md"
         >
-          <Button variant="outline" size="sm" className="gap-1.5">
+          <Button variant="outline" size="sm" className="gap-1.5 min-h-10">
             <MessageCircle size={14} /> {it.label}
           </Button>
         </a>
