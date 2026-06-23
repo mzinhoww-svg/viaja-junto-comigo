@@ -89,7 +89,7 @@ function ConsoleClient() {
               </Button>
             </div>
             <div className="flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => flipPayment.mutate(req.data!.payment_status === "paid" ? "pending" : "paid")}>
+              <Button size="sm" variant="outline" onClick={() => flipPayment.mutate(req.data!.payment_status !== "paid")}>
                 {req.data.payment_status === "paid" ? "Reverter pagamento" : "Marcar pago"}
               </Button>
             </div>
