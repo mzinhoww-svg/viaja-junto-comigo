@@ -110,7 +110,7 @@ function AddProduct({ onAdded }: { onAdded: () => void }) {
   const add = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from("products_catalog")
-        .insert({ key: key.trim(), name: name.trim(), price: Number(price.replace(",", ".")) || 0, active: true });
+        .insert({ key: key.trim() as never, name: name.trim(), price: Number(price.replace(",", ".")) || 0, active: true });
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Produto adicionado"); setOpen(false); setKey(""); setName(""); setPrice(""); onAdded(); },
