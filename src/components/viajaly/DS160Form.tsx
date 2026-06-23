@@ -3,20 +3,22 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { saveDs160Draft, submitDs160, validateDs160 } from "@/lib/ds160.functions";
-import { DS160_SECTIONS, computeCompletion, type Field } from "@/lib/ds160-schema";
+import { DS160_SECTIONS, computeCompletion, isFieldVisible, reviewFlags, type Field } from "@/lib/ds160-schema";
+import { maskCPF, maskCEP, maskPhoneBR, normalizeNameMRZ } from "@/lib/format";
+import { buildDs160Package, downloadDs160Package } from "@/lib/ds160-export";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ChevronDown, Check, Send, Loader2, X } from "lucide-react";
+import { ChevronDown, Check, Send, Loader2, X, AlertTriangle, Download } from "lucide-react";
 
 type Traveler = { id: string; name: string; is_lead: boolean };
 type Submission = {
   traveler_id: string;
   form: Record<string, unknown>;
   completion_pct: number;
-  status: "draft" | "received" | "validated";
+  status: "draft" | "received" | "pending_review" | "validated";
   package: { reject_reason?: string } | null;
 };
 
@@ -89,6 +91,7 @@ export function DS160Form({
       {activeTraveler && (
         <TravelerDS160
           key={activeTraveler}
+          requestId={requestId}
           traveler={q.data.travelers.find((t) => t.id === activeTraveler)!}
           submission={q.data.submissions.find((s) => s.traveler_id === activeTraveler) ?? null}
           variant={variant}
@@ -100,11 +103,13 @@ export function DS160Form({
 }
 
 function TravelerDS160({
+  requestId,
   traveler,
   submission,
   variant,
   onChange,
 }: {
+  requestId: string;
   traveler: Traveler;
   submission: Submission | null;
   variant: "portal" | "console";
@@ -119,8 +124,13 @@ function TravelerDS160({
   const [rejecting, setRejecting] = useState(false);
   const [reason, setReason] = useState("");
   const status = submission?.status ?? "draft";
-  const readOnly = variant === "console" || status === "received" || status === "validated";
+  const readOnly = variant === "console" || status === "received" || status === "pending_review" || status === "validated";
   const pct = useMemo(() => computeCompletion(form), [form]);
+  const flags = useMemo(() => reviewFlags(form), [form]);
+  const needsReview = flags.length > 0;
+  const detailMissing = needsReview && !String(form.sec_notes ?? "").trim();
+  const passportMonths = monthsUntil(form.passport_expiry_date as string | undefined);
+  const passportShort = passportMonths !== null && passportMonths < 6;
   const initialRef = useRef(true);
 
   const saveMut = useMutation({
@@ -131,14 +141,31 @@ function TravelerDS160({
   });
 
   const submitMut = useMutation({
-    mutationFn: async () => { await submitFn({ data: { traveler_id: traveler.id } }); },
+    mutationFn: async () => {
+      // "dado coletado ≠ dado oficial": marca revisão humana quando há 'Sim' de elegibilidade
+      await supabase.from("ds160_submission")
+        .update({ requires_human_review: needsReview, review_flags: flags })
+        .eq("traveler_id", traveler.id);
+      await submitFn({ data: { traveler_id: traveler.id } });
+    },
     onSuccess: () => { toast.success("DS-160 enviado para análise"); onChange(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const upsellMut = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.rpc("add_product_to_request", {
+        _request_id: requestId, _traveler_id: traveler.id, _product_key: "pass",
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Assessoria de Passaporte adicionada à proposta"); onChange(); },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const validateMut = useMutation({
     mutationFn: async (vars: { approve: boolean; reason?: string }) => {
-      await validateFn({ data: { traveler_id: traveler.id, approve: vars.approve, reason: vars.reason } });
+      await validateFn({ data: { traveler_id: traveler.id, approve: vars.approve, notes: vars.reason } });
     },
     onSuccess: () => { toast.success("Atualizado"); onChange(); },
     onError: (e: Error) => toast.error(e.message),
@@ -164,6 +191,7 @@ function TravelerDS160({
             <p className="text-xs text-ink-soft mt-0.5">
               {status === "draft" && "Rascunho — preencha as 8 seções"}
               {status === "received" && "Recebido — em análise pela Viajaly"}
+              {status === "pending_review" && "Em revisão humana obrigatória"}
               {status === "validated" && "Validado ✓"}
             </p>
           </div>
@@ -185,10 +213,50 @@ function TravelerDS160({
         )}
       </div>
 
+      {variant === "portal" && status === "draft" && needsReview && (
+        <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-800 flex gap-2">
+          <AlertTriangle size={16} className="shrink-0 mt-0.5" />
+          <div>
+            <b>Revisão humana obrigatória.</b> Você respondeu "Sim" a {flags.length} pergunta(s) de
+            elegibilidade. Detalhe no campo da última seção. A Letícia revisa antes de qualquer envio
+            oficial — nada é enviado automaticamente.
+          </div>
+        </div>
+      )}
+
+      {variant === "portal" && status === "draft" && passportShort && (
+        <div className="rounded-2xl border border-coral/40 bg-cream p-4 text-sm text-ink space-y-2">
+          <div className="flex gap-2">
+            <AlertTriangle size={16} className="shrink-0 mt-0.5 text-coral" />
+            <div>
+              O passaporte precisa de <b>validade mínima de 6 meses</b> para o visto
+              {passportMonths !== null && passportMonths < 0 ? " (está vencido)" : ` (faltam ~${passportMonths} meses)`}.
+              Quer que a Viajaly cuide da emissão/renovação?
+            </div>
+          </div>
+          <Button size="sm" className="bg-coral text-cream hover:bg-[var(--color-coral-pressed)]"
+            disabled={upsellMut.isPending} onClick={() => upsellMut.mutate()}>
+            Adicionar Passaporte — R$ 390
+          </Button>
+        </div>
+      )}
+
+      {variant === "portal" && (status === "received" || status === "pending_review") && (
+        <div className="rounded-2xl border border-[var(--color-border)] bg-white p-4 text-sm">
+          <p className="font-display font-bold text-navy mb-2">Próximos passos</p>
+          <ol className="space-y-1.5 text-ink-soft">
+            <li>1. <b>Revisão</b> — a Letícia confere seus dados e documentos em até <b>2 dias úteis</b>.</li>
+            <li>2. <b>Preenchimento oficial</b> — a equipe preenche o DS-160 oficial com os dados validados.</li>
+            <li>3. <b>Confirmação</b> — você recebe o aviso quando estiver tudo certo.</li>
+          </ol>
+        </div>
+      )}
+
       <div className="space-y-2">
         {DS160_SECTIONS.map((section) => {
           const open = openSection === section.key;
-          const sectionFilled = section.fields.filter((f) => f.required).every((f) => {
+          const visibleFields = section.fields.filter((f) => isFieldVisible(f, form));
+          const sectionFilled = visibleFields.filter((f) => f.required).every((f) => {
             const v = form[f.key];
             return typeof v === "string" ? v.trim() !== "" : v !== undefined && v !== null;
           });
@@ -208,7 +276,7 @@ function TravelerDS160({
               {open && (
                 <div className="px-4 pb-4 pt-1 space-y-3">
                   {section.hint && <p className="text-xs text-ink-soft">{section.hint}</p>}
-                  {section.fields.map((field) => (
+                  {visibleFields.map((field) => (
                     <FieldRow key={field.key} field={field} value={form[field.key]} onChange={(v) => update(field.key, v)} readOnly={readOnly} />
                   ))}
                 </div>
@@ -221,11 +289,26 @@ function TravelerDS160({
       {variant === "portal" && status === "draft" && (
         <Button
           className="w-full bg-coral hover:bg-[var(--color-coral-hover)] text-cream rounded-full h-12"
-          disabled={pct < 100 || submitMut.isPending}
+          disabled={pct < 100 || detailMissing || submitMut.isPending}
           onClick={() => submitMut.mutate()}
         >
           {submitMut.isPending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} className="mr-2" />}
-          {pct < 100 ? `Faltam ${100 - pct}% para enviar` : "Enviar para a Viajaly"}
+          {pct < 100 ? `Faltam ${100 - pct}% para enviar` : detailMissing ? "Detalhe as respostas 'Sim'" : "Enviar para a Viajaly"}
+        </Button>
+      )}
+
+      {variant === "portal" && (
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() =>
+            downloadDs160Package(
+              buildDs160Package(form, { traveler: traveler.name, request: requestId }),
+              `ds160-${traveler.name.replace(/\s+/g, "_")}.json`,
+            )
+          }
+        >
+          <Download size={14} className="mr-2" /> Baixar pacote (de-para)
         </Button>
       )}
 
@@ -262,7 +345,7 @@ function FieldRow({ field, value, onChange, readOnly }: { field: Field; value: u
         {field.label} {field.required && <span className="text-coral">*</span>}
       </Label>
       {field.type === "text" && (
-        <Input id={id} value={(value as string) ?? ""} onChange={(e) => onChange(e.target.value)} placeholder={field.placeholder} disabled={readOnly} />
+        <Input id={id} value={(value as string) ?? ""} onChange={(e) => onChange(applyMask(field, e.target.value))} placeholder={field.placeholder} disabled={readOnly} />
       )}
       {field.type === "date" && (
         <Input id={id} type="date" value={(value as string) ?? ""} onChange={(e) => onChange(e.target.value)} disabled={readOnly} />
@@ -302,4 +385,22 @@ function FieldRow({ field, value, onChange, readOnly }: { field: Field; value: u
       {field.help && <p className="text-[11px] text-ink-muted">{field.help}</p>}
     </div>
   );
+}
+
+function applyMask(field: Field, v: string): string {
+  switch (field.mask) {
+    case "cpf": return maskCPF(v);
+    case "cep": return maskCEP(v);
+    case "phone": return maskPhoneBR(v);
+    case "mrz": return normalizeNameMRZ(v);
+    default: return v;
+  }
+}
+
+/** Meses (aprox.) até a data; negativo = vencido; null = sem data válida. */
+function monthsUntil(dateStr?: string): number | null {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return null;
+  return Math.round((d.getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30.44));
 }
