@@ -41,15 +41,15 @@ function PortalHome() {
 
   useEffect(() => {
     const r = req.data;
-    if (!r) return;
+    if (!r || !journey.data) return;
+    const has = (k: string) => journey.data!.some((s) => s.key === k);
     const s = r.proposal_status;
     if (s === "sent" || s === "viewed" || s === "draft") { nav({ to: "/portal/proposta" }); return; }
     if (s === "accepted") {
-      if (!r.contract_signed) { nav({ to: "/portal/contrato" }); return; }
+      if (has("contrato") && !r.contract_signed) { nav({ to: "/portal/contrato" }); return; }
       if (r.payment_status !== "paid") { nav({ to: "/portal/pagamento" }); return; }
-      // Pago: libera Documentos / DS-160 / Taxas em paralelo (fica no hub).
     }
-  }, [req.data, nav]);
+  }, [req.data, journey.data, nav]);
 
   const total = journey.data?.length ?? 7;
   const done = journey.data?.filter((s) => s.status === "done").length ?? 0;
