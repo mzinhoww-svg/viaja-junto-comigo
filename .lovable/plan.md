@@ -1,91 +1,107 @@
-# Fase 4 — Documentos & Fase 8 — Segurança/UX do Login
+# Fase 5 — DS-160 + Taxas consulares
 
-Vou implementar as duas fases na mesma rodada, em **duas migrations separadas** (uma para cada fase) e blocos de código independentes para facilitar revisão.
+Após documentos aprovados, o portal libera duas etapas paralelas:
+1. **DS-160** — formulário guiado por viajante (a equipe Viajaly preenche o oficial, mas coletamos os dados aqui).
+2. **Taxas** — pagamento da taxa consular (MRV) por viajante, com instruções e confirmação.
 
 ---
 
-## Fase 4 — Documentos (upload + checklist por viajante)
+## 5.1 DS-160 — Formulário guiado
 
-Quando `payment_status='paid'`, o portal libera **Documentos**. Cada viajante já tem 5 docs criados via trigger (`pass`, `foto`, `renda`, `vinc`, `ds160` — esse fica `locked` para Fase 5). Cliente faz upload, admin aprova/rejeita.
+Já existe a tabela `ds160_submission(traveler_id, form jsonb, completion_pct, status, package jsonb, submitted_at)` e um `document.kind='ds160'` por viajante (status `locked`).
 
 ### Backend
-- **Storage bucket privado `documents`** com policies: cliente lê/insere/atualiza só docs da sua request (via `travelers.request_id` → `is_request_member`); admin da agência lê/atualiza tudo da agência.
-- **RPC `submit_document(_doc_id uuid, _file_url text)`** SECURITY DEFINER: valida membro, grava `file_url`, marca `status='received'`, `uploaded_at=now()`, `version+1`, limpa `reject_reason`.
-- **RPC `review_document(_doc_id uuid, _approve boolean, _reason text)`** SECURITY DEFINER admin-only: alterna `approved`/`rejected`, grava `reviewed_by`.
-- `compute_journey_steps` já considera docs OK quando todos exceto `ds160` estão `received`/`approved` — sem mudança.
+- **RPC `save_ds160_draft(_traveler_id uuid, _form jsonb, _completion_pct int)`** SECURITY DEFINER: valida membro da request, faz upsert do rascunho, status permanece `draft`, atualiza `updated_at`.
+- **RPC `submit_ds160(_traveler_id uuid)`**: valida `completion_pct >= 100`, marca `status='received'`, `submitted_at=now()`, destrava o `documents.ds160` (status `received`).
+- **RPC `validate_ds160(_traveler_id uuid, _approve boolean, _reason text)`** admin-only: marca `validated` (ou volta para `draft` com motivo registrado em `package->>'reject_reason'`); quando validado, marca `documents.ds160` como `approved`.
+- `compute_journey_steps` já considera step `documentos` ok (excluindo ds160). Adicionar verificação: `documentos` step só fica `done` quando **inclusive** ds160 estiver `approved`. Ajuste minimalista no SQL.
+
+### Schema do formulário (jsonb `form`)
+Seções (espelham o DS-160 oficial, em PT-BR):
+1. **Dados pessoais** — nome completo, sobrenome solteiro(a), data/local de nascimento, sexo, estado civil, nacionalidades.
+2. **Endereço & contato** — endereço residencial, telefones, e-mail, redes sociais (últimos 5 anos).
+3. **Passaporte** — número, data emissão/expiração, país emissor, perdas anteriores.
+4. **Viagem** — propósito, datas previstas, quem paga, endereço nos EUA, companheiros.
+5. **Viagens anteriores** — visitas aos EUA, vistos anteriores, recusas.
+6. **Família** — pais (nome, data nascimento, status nos EUA), cônjuge, parentes nos EUA.
+7. **Trabalho/Educação** — ocupação atual, empregador, salário, formação, idiomas, viagens últimos 5 anos.
+8. **Segurança** — perguntas Sim/Não obrigatórias do DS-160 (saúde, criminal, etc.).
+
+Cada seção: componente próprio `<DS160SectionX />`, validação via zod por seção, salva rascunho a cada blur. `completion_pct` calculado pelo nº de campos obrigatórios preenchidos / total.
 
 ### Frontend
-- `/portal/documentos` — lista por viajante, accordion ou tabs. Cada doc: nome, badge de status (pending/received/approved/rejected), botão Upload (input file), preview, botão Trocar. Se `rejected` mostra `reject_reason` em vermelho.
-- Console: ficha do cliente ganha aba **Documentos** com a mesma lista + botões Aprovar/Rejeitar (modal de motivo). Realtime.
-- `portal.index.tsx` roteia para `/portal/documentos` quando pagamento=paid e docs≠ok.
-
-### Out of scope
-DS-160 form/PDF (Fase 5), OCR, validação automática de documentos.
+- **`/portal/ds160`** — lista de viajantes (tabs). Para cada um: progress bar + accordion de seções; última seção tem botão "Enviar para a Viajaly" (chama `submit_ds160`). Após enviar, mostra "Recebido — em análise".
+- **`/portal/ds160/$travelerId`** — opcional, wizard step-by-step em mobile (8 passos, "Anterior/Próximo", autosave).
+- Console: aba **DS-160** na ficha do cliente, lista por viajante com:
+  - Resumo do form (read-only, expandível por seção)
+  - Botões "Validar" / "Solicitar correção" (modal motivo)
+  - Botão "Baixar pacote" (gera JSON+PDF — apenas JSON nesta fase; PDF fica para Fase 7).
 
 ---
 
-## Fase 8 — Segurança & UX do código de acesso
+## 5.2 Taxas consulares (MRV)
 
-### 8.1 Expiração do código
-- Coluna nova em `requests`: `access_code_expires_at timestamptz` (default `now() + interval '30 days'`).
-- `loginWithCode` valida expiração e devolve erro `EXPIRED` distinto de `INVALID`.
-- Login mostra mensagem clara: "Este código expirou. Solicite um novo via WhatsApp ou peça reenvio abaixo."
+A coluna `requests.tax_status` já existe (`pending`/`paid`).
 
-### 8.2 Reenvio de código
-- Nova RPC `request_code_resend(_code text)` SECURITY DEFINER: aceita só códigos válidos (não-expirados), regenera novo código, marca `access_code_expires_at = now() + 30 days`, cria notificação interna (`notifications` table) para o admin/agência reenviar manualmente via WhatsApp (sem disparar mensagem ainda — futuro). Limite: 1 reenvio por 5 minutos por IP.
-- Botão "Reenviar código" na tela de login. Feedback: spinner → "Pedido enviado, fale com seu consultor" + cooldown visual de 5 min.
+### Decisão de modelagem
+A taxa MRV é **por viajante** (US$ 185 cada). Migrar para granularidade por viajante:
+- Nova tabela `tax_payments(id, traveler_id PK, amount_cents, currency, status enum('pending','paid','waived'), receipt_url, paid_at, payment_method text, notes text)`.
+- Trigger no insert de `traveler` cria registro `pending` automaticamente.
+- `requests.tax_status` passa a ser **derivado** (view ou função): paid quando todos os viajantes estão paid/waived. Atualizar `compute_journey_steps` para usar esse derivado.
 
-### 8.3 Bloqueio temporário + rate-limit reforçado
-- Atualizar `loginWithCode`: rate-limit por **IP** já existe; adicionar por **código tentado** (5 tentativas erradas no mesmo código em 15 min → bloqueia esse código por 30 min).
-- UI: após 5 erros consecutivos no front, desabilita input com countdown ("Tente novamente em X min Y s"). Persistir o cooldown em localStorage para sobreviver a reload.
-- Mensagens distintas: "Código inválido", "Código expirado", "Muitas tentativas, aguarde X min".
+### Backend
+- **RPC `register_tax_payment(_traveler_id uuid, _receipt_url text, _method text)`**: cliente envia comprovante, status vira `paid` (pendente de validação visual pelo admin? — decisão: marca direto `paid`, admin pode reverter).
+- **RPC `admin_set_tax_status(_traveler_id uuid, _status tax_status_t, _notes text)`** admin-only.
+- Storage: reaproveitar bucket `documents` com prefixo `taxes/<request_id>/<traveler_id>/` ou criar bucket `receipts`. **Decisão: reaproveitar `documents`** para evitar nova migração de policies.
 
-### 8.4 Console — auditoria de acesso
-- Nova rota `/console/auditoria` (atalho no menu). Filtros: por solicitação (lead_name/email), data.
-- Tabela: timestamp, e-mail (do `access_code_attempts`), IP, sucesso/falha, código tentado (mascarado: `••••12`).
-- Na ficha do cliente (`/console/cliente/$id`): card "Acesso" com:
-  - Código atual + cópia rápida
-  - Data de geração e expiração
-  - Últimas 10 tentativas (sucesso/falha + IP + horário)
-  - Botão "Gerar novo código" (admin) → server fn que cria novo `access_code` único + reseta `access_code_expires_at`.
-- Para suportar isso, adicionar coluna `attempted_code text` (últimos 2 dígitos só, para mascarar) em `access_code_attempts` e `request_id uuid` (nullable, preenchido quando código bate com alguma request).
+### Frontend
+- **`/portal/taxas`** — card por viajante:
+  - Instruções resumidas (link oficial CGI Federal, valor atual US$ 185, validade 1 ano).
+  - Botão **"Já paguei — anexar comprovante"** (upload PDF/imagem) → chama `register_tax_payment`.
+  - Estado pós-envio: badge "Recebido", botão "Trocar comprovante".
+- Console: aba **Taxas** na ficha do cliente, lista por viajante, preview do comprovante, botões "Confirmar pago" / "Marcar pendente" / "Isentar".
 
-### 8.5 UX do campo de código
-- Auto-focus no input ao montar a tela (já feito).
-- Auto-submit ao completar 6 dígitos.
-- Máscara visual: 6 caixas separadas (estilo OTP), uma por dígito, com auto-avanço entre elas e paste inteligente.
-- `inputMode="numeric"`, `autocomplete="one-time-code"`, `pattern="\d{6}"` para teclado numérico no mobile e suporte ao auto-preenchimento de SMS (iOS/Android).
+---
+
+## 5.3 Roteamento e Journey
+
+`portal.index.tsx` decide próxima etapa. Atualizar lógica:
+1. proposta → contrato → pagamento → documentos → **(ds160 + taxas em paralelo)** → agenda → conclusão
+- Quando `documentos` (excluindo ds160) ok e pagamento paid: libera **ds160** e **taxas** simultaneamente (mostrar dois cards no `/portal`).
+- Step `documentos` só vira `done` quando ds160 validado E taxas pagas (decisão alternativa: criar dois steps separados `ds160` e `taxas` na journey). **Decisão: manter chave `taxas` existente; ds160 fica embutido em `documentos` como hoje** — mais simples e respeita o array atual `['proposta','contrato','pagamento','documentos','taxas','agenda','conclusao']`.
 
 ---
 
 ## Arquivos previstos
 
-**Migrations (2):**
-- `phase4_documents.sql` — bucket + policies + RPCs.
-- `phase8_access_security.sql` — colunas `requests.access_code_expires_at`, `access_code_attempts.attempted_code/request_id`, RPCs `request_code_resend`, `regenerate_access_code`.
+**Migration** (`phase5_ds160_taxas.sql`):
+- `CREATE TABLE tax_payments` + grants + RLS + trigger autocreate
+- RPCs: `save_ds160_draft`, `submit_ds160`, `validate_ds160`, `register_tax_payment`, `admin_set_tax_status`
+- Atualizar `compute_journey_steps` para derivar `tax_status` de `tax_payments` e exigir ds160 validado para `documentos`
+- Realtime para `tax_payments`
 
-**Novos arquivos:**
-- `src/lib/documents.functions.ts`
-- `src/lib/access.functions.ts` (resend + regenerate)
-- `src/routes/portal.documentos.tsx`
-- `src/routes/console.auditoria.tsx`
-- `src/components/viajaly/OTPInput.tsx` — 6 caixas com auto-avanço/paste
-- `src/components/viajaly/DocumentList.tsx` (compartilhado portal/console)
-- `src/components/viajaly/AccessAuditCard.tsx` (ficha do cliente)
+**Novos:**
+- `src/lib/ds160.functions.ts`
+- `src/lib/taxes.functions.ts`
+- `src/lib/ds160-schema.ts` — zod por seção + cálculo de `completion_pct`
+- `src/routes/portal.ds160.tsx`
+- `src/routes/portal.taxas.tsx`
+- `src/components/viajaly/ds160/` — 8 seções (`Section1Personal.tsx` … `Section8Security.tsx`) + `DS160Form.tsx` orquestrador
+- `src/components/viajaly/TaxPaymentCard.tsx`
 
 **Editados:**
-- `src/routes/portal.login.tsx` — OTP input, reenviar, cooldown, mensagens
-- `src/lib/auth.functions.ts` — expiração + códigos de erro estruturados
-- `src/routes/console.cliente.$id.tsx` — abas Documentos + Acesso
-- `src/routes/console.index.tsx` — link para Auditoria
-- `src/routes/portal.index.tsx` — roteamento para Documentos
+- `src/routes/console.cliente.$id.tsx` — abas DS-160 e Taxas
+- `src/routes/portal.index.tsx` — roteamento p/ ds160/taxas
+- `src/integrations/supabase/types.ts` (auto)
 
 ---
 
 ## Ordem de execução
+1. Migration (tax_payments + RPCs + ajuste journey).
+2. Backend lib (ds160 + taxes functions).
+3. Frontend portal (rotas + componentes).
+4. Console (abas).
 
-1. Migration Fase 4 (bucket + RPCs docs).
-2. Migration Fase 8 (colunas acesso + RPCs).
-3. Implementação frontend (componentes + rotas + edits).
+Fora de escopo desta fase: PDF preenchido oficial do DS-160 (Fase 7), pagamento via Stripe/PIX direto da MRV (fluxo oficial só aceita pelo site CGI), OCR do comprovante.
 
-Posso aplicar as duas migrations? (vou enviar a da Fase 4 primeiro para você revisar.)
+Posso seguir com a migration?

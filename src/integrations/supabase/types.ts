@@ -799,6 +799,56 @@ export type Database = {
           },
         ]
       }
+      tax_payments: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          currency: string
+          notes: string | null
+          paid_at: string | null
+          payment_method: string | null
+          receipt_url: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["tax_payment_status_t"]
+          traveler_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          receipt_url?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["tax_payment_status_t"]
+          traveler_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          receipt_url?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["tax_payment_status_t"]
+          traveler_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tax_payments_traveler_id_fkey"
+            columns: ["traveler_id"]
+            isOneToOne: true
+            referencedRelation: "travelers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       travelers: {
         Row: {
           created_at: string
@@ -863,6 +913,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_set_tax_status: {
+        Args: {
+          _notes: string
+          _status: Database["public"]["Enums"]["tax_payment_status_t"]
+          _traveler_id: string
+        }
+        Returns: undefined
+      }
       compute_journey_steps: {
         Args: { _request_id: string }
         Returns: {
@@ -886,10 +944,22 @@ export type Database = {
         Returns: boolean
       }
       is_request_member: { Args: { _request_id: string }; Returns: boolean }
+      refresh_request_tax_status: {
+        Args: { _request_id: string }
+        Returns: undefined
+      }
       regenerate_access_code: { Args: { _request_id: string }; Returns: Json }
+      register_tax_payment: {
+        Args: { _method: string; _receipt_url: string; _traveler_id: string }
+        Returns: undefined
+      }
       request_code_resend: { Args: { _request_id: string }; Returns: undefined }
       review_document: {
         Args: { _approve: boolean; _doc_id: string; _reason: string }
+        Returns: undefined
+      }
+      save_ds160_draft: {
+        Args: { _completion_pct: number; _form: Json; _traveler_id: string }
         Returns: undefined
       }
       sign_contract: {
@@ -905,9 +975,14 @@ export type Database = {
         Args: { _doc_id: string; _file_url: string }
         Returns: undefined
       }
+      submit_ds160: { Args: { _traveler_id: string }; Returns: undefined }
       update_request_with_items: {
         Args: { _request_id: string; payload: Json }
         Returns: Json
+      }
+      validate_ds160: {
+        Args: { _approve: boolean; _reason: string; _traveler_id: string }
+        Returns: undefined
       }
     }
     Enums: {
@@ -925,6 +1000,7 @@ export type Database = {
       proposal_status_t: "draft" | "sent" | "accepted" | "viewed" | "declined"
       sched_service_t: "casv" | "entrevista" | "pf"
       sched_status_t: "open" | "sent" | "confirmed"
+      tax_payment_status_t: "pending" | "paid" | "waived"
       tax_status_t: "pending" | "paid"
       visto_plan_t: "start" | "pro" | "prem"
     }
@@ -1068,6 +1144,7 @@ export const Constants = {
       proposal_status_t: ["draft", "sent", "accepted", "viewed", "declined"],
       sched_service_t: ["casv", "entrevista", "pf"],
       sched_status_t: ["open", "sent", "confirmed"],
+      tax_payment_status_t: ["pending", "paid", "waived"],
       tax_status_t: ["pending", "paid"],
       visto_plan_t: ["start", "pro", "prem"],
     },
