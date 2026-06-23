@@ -8,12 +8,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSignOut } from "./portal";
 import { LogOut } from "lucide-react";
 
-const STEP_TO_ROUTE: Record<string, "/portal/proposta" | "/portal/contrato" | "/portal/pagamento" | "/portal/documentos" | "/portal/ds160" | "/portal/taxas"> = {
+const STEP_TO_ROUTE: Record<string, "/portal/proposta" | "/portal/contrato" | "/portal/pagamento" | "/portal/documentos" | "/portal/ds160" | "/portal/taxas" | "/portal/agenda"> = {
   proposta: "/portal/proposta",
   contrato: "/portal/contrato",
   pagamento: "/portal/pagamento",
   documentos: "/portal/documentos",
   taxas: "/portal/taxas",
+  agenda: "/portal/agenda",
 };
 
 export const Route = createFileRoute("/portal/")({
