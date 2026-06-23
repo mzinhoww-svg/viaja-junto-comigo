@@ -173,6 +173,13 @@ function ConsoleClient() {
         </div>
       )}
 
+      {tab === "agenda" && (
+        <div className="mt-6 max-w-3xl">
+          <ScheduleList requestId={id} variant="console" />
+        </div>
+      )}
+
+
 
       {tab === "acesso" && (
         <div className="mt-6 max-w-2xl">
