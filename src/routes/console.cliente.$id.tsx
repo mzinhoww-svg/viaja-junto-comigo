@@ -20,7 +20,7 @@ export const Route = createFileRoute("/console/cliente/$id")({
   component: ConsoleClient,
 });
 
-type Tab = "jornada" | "documentos" | "ds160" | "taxas" | "acesso";
+type Tab = "jornada" | "documentos" | "ds160" | "taxas" | "agenda" | "acesso";
 
 function ConsoleClient() {
   const { id } = Route.useParams();
