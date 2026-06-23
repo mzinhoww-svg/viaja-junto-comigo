@@ -6,6 +6,7 @@ import { Logo } from "@/components/viajaly/Logo";
 import { StepCard } from "@/components/viajaly/StepCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductsHub } from "@/components/viajaly/ProductsHub";
+import { EmptyStateAwaitingProposal } from "@/components/viajaly/EmptyStateAwaitingProposal";
 import { NotificationBell } from "@/components/viajaly/NotificationBell";
 import { useSignOut } from "./portal";
 import { LogOut, MessageSquare } from "lucide-react";
