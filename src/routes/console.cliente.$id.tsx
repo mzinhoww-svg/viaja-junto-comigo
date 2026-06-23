@@ -21,6 +21,7 @@ const EmergencyContactsEditor = lazy(() => import("@/components/viajaly/Emergenc
 const BriefingReadOnly = lazy(() => import("@/components/viajaly/BriefingForm").then((m) => ({ default: m.BriefingReadOnly })));
 const MessageThread = lazy(() => import("@/components/viajaly/MessageThread").then((m) => ({ default: m.MessageThread })));
 const ContractPanel = lazy(() => import("@/components/viajaly/ContractPanel").then((m) => ({ default: m.ContractPanel })));
+import { WaQuickActions } from "@/components/viajaly/WaQuickActions";
 import { OutcomeBadge, type VisaOutcome } from "@/components/viajaly/OutcomeBadge";
 import { StatusPill } from "@/components/viajaly/StatusPill";
 import { Button } from "@/components/ui/button";
@@ -157,6 +158,13 @@ function ConsoleClient() {
           />
         </div>
       )}
+
+      <WaQuickActions
+        phone={req.data.whatsapp_e164 ?? req.data.lead_phone ?? ""}
+        clientName={req.data.lead_name}
+      />
+
+
 
 
       <div className="mt-6 border-b border-[var(--color-border)] flex gap-1">

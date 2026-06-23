@@ -259,44 +259,59 @@ export type Database = {
       }
       contracts: {
         Row: {
+          accepted_terms_at: string | null
           body_html: string | null
+          body_sha256: string | null
           client: string | null
           created_at: string
           id: string
+          pdf_path: string | null
           pdf_url: string | null
           product: string | null
           request_id: string
           signed_at: string | null
+          signed_cpf: string | null
           signed_ip: string | null
           signed_name: string | null
+          signed_user_agent: string | null
           status: Database["public"]["Enums"]["contract_status_t"]
           template: string | null
         }
         Insert: {
+          accepted_terms_at?: string | null
           body_html?: string | null
+          body_sha256?: string | null
           client?: string | null
           created_at?: string
           id?: string
+          pdf_path?: string | null
           pdf_url?: string | null
           product?: string | null
           request_id: string
           signed_at?: string | null
+          signed_cpf?: string | null
           signed_ip?: string | null
           signed_name?: string | null
+          signed_user_agent?: string | null
           status?: Database["public"]["Enums"]["contract_status_t"]
           template?: string | null
         }
         Update: {
+          accepted_terms_at?: string | null
           body_html?: string | null
+          body_sha256?: string | null
           client?: string | null
           created_at?: string
           id?: string
+          pdf_path?: string | null
           pdf_url?: string | null
           product?: string | null
           request_id?: string
           signed_at?: string | null
+          signed_cpf?: string | null
           signed_ip?: string | null
           signed_name?: string | null
+          signed_user_agent?: string | null
           status?: Database["public"]["Enums"]["contract_status_t"]
           template?: string | null
         }
@@ -1482,6 +1497,10 @@ export type Database = {
         }
         Returns: Json
       }
+      set_contract_pdf_path: {
+        Args: { _contract_id: string; _path: string }
+        Returns: undefined
+      }
       set_passport_status: {
         Args: { _notes: string; _request_id: string; _status: string }
         Returns: undefined
@@ -1508,6 +1527,19 @@ export type Database = {
           _ip: string
           _name: string
           _request_id: string
+        }
+        Returns: Json
+      }
+      sign_contract_v2: {
+        Args: {
+          _accepted: boolean
+          _body_html: string
+          _body_sha256: string
+          _cpf: string
+          _ip: string
+          _name: string
+          _request_id: string
+          _user_agent: string
         }
         Returns: Json
       }
