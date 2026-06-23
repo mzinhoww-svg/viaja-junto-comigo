@@ -41,11 +41,6 @@ function PortalDS160() {
           </button>
         </div>
 
-        <h1 className="mt-6 text-2xl font-display font-extrabold text-navy">DS-160</h1>
-        <p className="mt-1 text-ink-soft text-sm">
-          Preencha as 8 seções com os dados de cada viajante. Salvamos automaticamente — você pode pausar e voltar.
-        </p>
-
         <div className="mt-6">
           {!req.data ? <Skeleton className="h-40 rounded-2xl" /> : (
             <Suspense fallback={<Skeleton className="h-40 rounded-2xl" />}>
