@@ -45,9 +45,10 @@ function ContratoPage() {
     queryFn: async () => {
       const [a, t] = await Promise.all([
         supabase.from("agencies").select("name").eq("id", req.data!.agency_id).maybeSingle(),
-        supabase.from("travelers").select("name, relation").eq("request_id", req.data!.id),
+        supabase.from("travelers").select("name, is_lead").eq("request_id", req.data!.id),
       ]);
-      return { agencyName: a.data?.name ?? "Viajaly", travelers: t.data ?? [] };
+      const travelers = (t.data ?? []).map((x) => ({ name: x.name, relation: x.is_lead ? "titular" : null }));
+      return { agencyName: a.data?.name ?? "Viajaly", travelers };
     },
   });
 
