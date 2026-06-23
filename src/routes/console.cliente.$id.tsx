@@ -69,6 +69,8 @@ function ConsoleClient() {
   const tabs: { key: Tab; label: string }[] = [
     { key: "jornada", label: "Jornada" },
     { key: "documentos", label: "Documentos" },
+    { key: "ds160", label: "DS-160" },
+    { key: "taxas", label: "Taxas" },
     { key: "acesso", label: "Acesso" },
   ];
 
