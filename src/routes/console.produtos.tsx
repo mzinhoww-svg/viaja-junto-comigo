@@ -77,7 +77,7 @@ function ProductRow({ product, onChange }: { product: Product; onChange: () => v
   });
   const del = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("products_catalog").delete().eq("key", product.key);
+      const { error } = await supabase.from("products_catalog").delete().eq("key", product.key as never);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Produto removido"); onChange(); },
