@@ -53,7 +53,7 @@ function AcceptInvite() {
         {state === "needs_auth" && (
           <>
             <p className="mt-4 text-sm text-ink">Faça login com o e-mail convidado para aceitar.</p>
-            <Button onClick={() => nav({ to: "/console/login", search: { redirect: `/console/aceitar-convite?token=${token}` } as never })} className="mt-5 w-full bg-coral hover:bg-[var(--color-coral-pressed)] text-cream">
+            <Button onClick={() => { window.location.href = `/console/login?redirect=${encodeURIComponent(`/console/aceitar-convite?token=${token}`)}`; }} className="mt-5 w-full bg-coral hover:bg-[var(--color-coral-pressed)] text-cream">
               Entrar
             </Button>
           </>
