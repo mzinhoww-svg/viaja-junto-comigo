@@ -869,6 +869,10 @@ export type Database = {
         Returns: boolean
       }
       is_request_member: { Args: { _request_id: string }; Returns: boolean }
+      review_document: {
+        Args: { _approve: boolean; _doc_id: string; _reason: string }
+        Returns: undefined
+      }
       sign_contract: {
         Args: {
           _body_html: string
@@ -877,6 +881,10 @@ export type Database = {
           _request_id: string
         }
         Returns: Json
+      }
+      submit_document: {
+        Args: { _doc_id: string; _file_url: string }
+        Returns: undefined
       }
     }
     Enums: {
