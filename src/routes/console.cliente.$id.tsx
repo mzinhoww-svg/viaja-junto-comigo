@@ -17,6 +17,7 @@ import { PassportStatusEditor } from "@/components/viajaly/PassportStatusEditor"
 import { EmergencyContactsEditor } from "@/components/viajaly/EmergencyContactsEditor";
 import { BriefingReadOnly } from "@/components/viajaly/BriefingForm";
 import { MessageThread } from "@/components/viajaly/MessageThread";
+import { ContractPanel } from "@/components/viajaly/ContractPanel";
 import { OutcomeBadge, type VisaOutcome } from "@/components/viajaly/OutcomeBadge";
 import { StatusPill } from "@/components/viajaly/StatusPill";
 import { Button } from "@/components/ui/button";
@@ -30,7 +31,7 @@ export const Route = createFileRoute("/console/cliente/$id")({
   component: ConsoleClient,
 });
 
-type Tab = "jornada" | "pagamentos" | "documentos" | "ds160" | "taxas" | "agenda" | "passaporte" | "roteiro" | "milhas" | "mensagens" | "historico" | "conclusao" | "acesso";
+type Tab = "jornada" | "pagamentos" | "contrato" | "documentos" | "ds160" | "taxas" | "agenda" | "passaporte" | "roteiro" | "milhas" | "mensagens" | "historico" | "conclusao" | "acesso";
 
 function ConsoleClient() {
   const { id } = Route.useParams();
@@ -95,6 +96,7 @@ function ConsoleClient() {
   const tabs: { key: Tab; label: string }[] = [
     { key: "jornada", label: "Jornada" },
     { key: "pagamentos", label: "Pagamentos" },
+    { key: "contrato", label: "Contrato" },
     { key: "documentos", label: "Documentos" },
     { key: "ds160", label: "DS-160" },
     { key: "taxas", label: "Taxas" },
@@ -203,6 +205,12 @@ function ConsoleClient() {
             pending={flipPayment.isPending}
             onToggle={() => flipPayment.mutate(req.data!.payment_status !== "paid")}
           />
+        </div>
+      )}
+
+      {tab === "contrato" && (
+        <div className="mt-6 max-w-3xl">
+          <ContractPanel requestId={id} request={req.data} />
         </div>
       )}
 
