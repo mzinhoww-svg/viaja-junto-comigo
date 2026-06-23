@@ -722,15 +722,18 @@ function SectionStep({
                 {g.label}
               </p>
             )}
-            {g.fields.map((field) => (
-              <FieldRow
-                key={field.key}
-                field={field}
-                value={form[field.key]}
-                onChange={(v) => update(field.key, v)}
-                readOnly={readOnly}
-              />
-            ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
+              {g.fields.map((field) => (
+                <div key={field.key} className={isWideField(field) ? "sm:col-span-2" : ""}>
+                  <FieldRow
+                    field={field}
+                    value={form[field.key]}
+                    onChange={(v) => update(field.key, v)}
+                    readOnly={readOnly}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </div>
