@@ -29,8 +29,7 @@ function PortalHome() {
     if (s === "accepted") {
       if (!r.contract_signed) { nav({ to: "/portal/contrato" }); return; }
       if (r.payment_status !== "paid") { nav({ to: "/portal/pagamento" }); return; }
-      // Pago → libera Documentos
-      nav({ to: "/portal/documentos" });
+      // Pago: libera Documentos / DS-160 / Taxas em paralelo (fica no hub).
     }
   }, [req.data, nav]);
 
