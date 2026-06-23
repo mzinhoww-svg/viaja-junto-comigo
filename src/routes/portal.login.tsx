@@ -162,7 +162,7 @@ function PortalLogin() {
   };
 
   return (
-    <PhoneFrame>
+    <PhoneFrame showNav={false}>
       <div className="px-6 pt-10 pb-8 anim-vfade">
         <Logo size={40} />
         <h1 className="mt-8 text-2xl font-display font-extrabold text-navy">Bem-vindo de volta</h1>
