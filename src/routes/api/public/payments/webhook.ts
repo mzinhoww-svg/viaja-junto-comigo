@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { type StripeEnv, verifyWebhook } from "@/lib/stripe.server";
+import type { Database } from "@/integrations/supabase/types";
 
-let _supabase: ReturnType<typeof createClient> | null = null;
+let _supabase: ReturnType<typeof createClient<Database>> | null = null;
 function getSupabase() {
   if (!_supabase) {
-    _supabase = createClient(
+    _supabase = createClient<Database>(
       process.env.SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
       { auth: { persistSession: false, autoRefreshToken: false } },
@@ -16,14 +17,12 @@ function getSupabase() {
 
 async function handleCheckoutCompleted(session: any) {
   const sessionId: string = session.id;
-  const requestId: string | undefined = session.metadata?.request_id;
   const paymentIntentId: string | null = session.payment_intent ?? null;
   const amount: number | null = session.amount_total ?? null;
 
-  // Resolve method: prefer the actual method used (charge details) over the configured list
   let method: string | null = null;
   const pmTypes: string[] = session.payment_method_types ?? [];
-  if (pmTypes.length === 1) method = pmTypes[0] === "card" ? "card" : pmTypes[0];
+  if (pmTypes.length === 1) method = pmTypes[0];
 
   const supabase = getSupabase();
   const { error } = await supabase.rpc("mark_paid_from_stripe", {
@@ -32,46 +31,37 @@ async function handleCheckoutCompleted(session: any) {
     _payment_method: method,
     _amount_cents: amount,
   });
-  if (error) console.error("mark_paid_from_stripe error:", error, { sessionId, requestId });
+  if (error) console.error("mark_paid_from_stripe error:", error);
 }
 
 async function handlePaymentIntentSucceeded(intent: any) {
-  // Fallback path for Pix (which confirms asynchronously after checkout.session expires-style flows)
   const charges = intent.charges?.data ?? [];
-  const method = charges[0]?.payment_method_details?.type ?? null;
-  const amount = intent.amount_received ?? intent.amount ?? null;
+  const method: string | null = charges[0]?.payment_method_details?.type ?? null;
+  const amount: number | null = intent.amount_received ?? intent.amount ?? null;
 
   const supabase = getSupabase();
-  // Find the request by payment_intent_id (set on checkout.session.completed) OR by session metadata
-  const { data: req } = await supabase
+  // Resolve session id via existing payment_intent_id or via metadata.request_id
+  const { data: byIntent } = await supabase
     .from("requests")
-    .select("id")
+    .select("stripe_session_id")
     .eq("stripe_payment_intent_id", intent.id)
     .maybeSingle();
 
-  if (!req) {
-    // Try to locate via metadata.request_id on the intent
-    const requestId = intent.metadata?.request_id;
+  let sessionId = byIntent?.stripe_session_id ?? null;
+  if (!sessionId) {
+    const requestId: string | undefined = intent.metadata?.request_id;
     if (!requestId) return;
-    const { data: req2 } = await supabase.from("requests").select("stripe_session_id").eq("id", requestId).maybeSingle();
-    if (!req2?.stripe_session_id) return;
-    await supabase.rpc("mark_paid_from_stripe", {
-      _session_id: req2.stripe_session_id,
-      _payment_intent_id: intent.id,
-      _payment_method: method,
-      _amount_cents: amount,
-    });
-    return;
+    const { data: byReq } = await supabase
+      .from("requests")
+      .select("stripe_session_id")
+      .eq("id", requestId)
+      .maybeSingle();
+    sessionId = byReq?.stripe_session_id ?? null;
   }
+  if (!sessionId) return;
 
-  const { data: full } = await supabase
-    .from("requests")
-    .select("stripe_session_id")
-    .eq("id", req.id as string)
-    .maybeSingle();
-  if (!full?.stripe_session_id) return;
   await supabase.rpc("mark_paid_from_stripe", {
-    _session_id: full.stripe_session_id,
+    _session_id: sessionId,
     _payment_intent_id: intent.id,
     _payment_method: method,
     _amount_cents: amount,
@@ -81,7 +71,6 @@ async function handlePaymentIntentSucceeded(intent: any) {
 async function handleEvent(event: { id: string; type: string; data: { object: any } }) {
   const supabase = getSupabase();
 
-  // Idempotency: skip already-processed events
   const { data: existing } = await supabase
     .from("stripe_webhook_events").select("id").eq("id", event.id).maybeSingle();
   if (existing) return { skipped: true };
@@ -96,15 +85,12 @@ async function handleEvent(event: { id: string; type: string; data: { object: an
       break;
     case "checkout.session.async_payment_failed":
     case "payment_intent.payment_failed":
-      // Surface in audit log; UI keeps showing pending state
       break;
     default:
-      // ignore other types
       break;
   }
 
-  // Record processed event for idempotency
-  const requestId = event.data.object?.metadata?.request_id ?? null;
+  const requestId: string | null = event.data.object?.metadata?.request_id ?? null;
   await supabase.from("stripe_webhook_events").insert({
     id: event.id,
     type: event.type,
