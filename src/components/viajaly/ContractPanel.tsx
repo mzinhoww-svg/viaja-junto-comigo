@@ -85,7 +85,7 @@ export function ContractPanel({
             {request.signed_at && <> em {new Date(request.signed_at).toLocaleString("pt-BR")}</>}.
           </p>
           {existing.data?.body_sha256 && (
-            <p className="text-[11px] text-ink-muted break-all">
+            <p className="text-xs text-ink-muted break-all">
               <b>IP:</b> {existing.data?.signed_ip || "—"} · <b>SHA-256:</b> {existing.data.body_sha256}
             </p>
           )}
@@ -93,6 +93,7 @@ export function ContractPanel({
             <Button
               variant="outline"
               size="sm"
+              className="min-h-10"
               onClick={async () => {
                 const { data, error } = await supabase.storage
                   .from("documents")

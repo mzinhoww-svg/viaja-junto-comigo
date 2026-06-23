@@ -136,11 +136,11 @@ function ConsoleClient() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setShowShare((v) => !v)}>
+          <Button variant="outline" size="sm" className="min-h-10" onClick={() => setShowShare((v) => !v)}>
             <Share2 size={14} className="mr-1.5" /> {showShare ? "Ocultar acesso" : "Compartilhar acesso"}
           </Button>
           <Link to="/console/orcamento/$id/editar" params={{ id }}>
-            <Button size="sm" className="bg-navy hover:bg-[var(--color-navy-light)] text-cream">
+            <Button size="sm" className="bg-navy hover:bg-[var(--color-navy-light)] text-cream min-h-10">
               <Pencil size={14} className="mr-1.5" /> Editar orçamento
             </Button>
           </Link>
@@ -196,13 +196,13 @@ function ConsoleClient() {
             <h2 className="font-display font-bold text-navy">Controles rápidos</h2>
             <p className="text-xs text-ink-soft">Atalhos manuais — portal reflete em &lt;2s via realtime.</p>
             <div className="space-y-2">
-              <Button size="sm" variant="outline" onClick={() => flipProposal.mutate(req.data!.proposal_status === "accepted" ? "sent" : "accepted")}>
+              <Button size="sm" variant="outline" className="min-h-10" onClick={() => flipProposal.mutate(req.data!.proposal_status === "accepted" ? "sent" : "accepted")}>
                 {req.data.proposal_status === "accepted" ? "Marcar proposta como enviada" : "Aceitar proposta"}
               </Button>
-              <Button size="sm" variant="outline" onClick={() => flipSigned.mutate(!req.data!.contract_signed)}>
+              <Button size="sm" variant="outline" className="min-h-10" onClick={() => flipSigned.mutate(!req.data!.contract_signed)}>
                 {req.data.contract_signed ? "Desassinar contrato" : "Assinar contrato"}
               </Button>
-              <Button size="sm" variant="outline" onClick={() => flipPayment.mutate(req.data!.payment_status !== "paid")}>
+              <Button size="sm" variant="outline" className="min-h-10" onClick={() => flipPayment.mutate(req.data!.payment_status !== "paid")}>
                 {req.data.payment_status === "paid" ? "Reverter pagamento" : "Marcar pago"}
               </Button>
             </div>

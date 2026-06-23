@@ -223,8 +223,8 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
                     return (
                       <li key={it.id} className="flex items-center justify-between gap-2 text-ink-soft">
                         <span className="flex items-center gap-2">
-                          <span className={`inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full ${meta.cls}`}>
-                            <meta.Icon size={10} /> {meta.label}
+                          <span className={`inline-flex items-center gap-1 text-xs uppercase tracking-wider font-bold px-2 py-0.5 rounded-full ${meta.cls}`}>
+                            <meta.Icon size={12} /> {meta.label}
                           </span>
                           <span>
                             {KIND_LABEL[it.kind]}
@@ -259,7 +259,7 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
             <ul className="mt-1 space-y-1 text-sm">
               {upsells.map((u) => (
                 <li key={u.id} className="flex items-center justify-between text-ink-soft">
-                  <span>{u.label} <span className="text-[10px] uppercase tracking-wider text-coral">· preço especial</span></span>
+                  <span>{u.label} <span className="text-xs uppercase tracking-wider text-coral">· preço especial</span></span>
                   <span className="font-mono text-ink">
                     {formatBRL(u.qty * u.unit_price_cents - (u.discount_cents ?? 0))}
                   </span>
@@ -417,7 +417,7 @@ function AdminInline({
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="text-[10px] underline text-ink-soft"
+        className="text-xs underline text-ink-soft min-h-10 px-2"
         disabled={disabled}
       >
         editar
@@ -433,15 +433,15 @@ function AdminInline({
             maxLength={500}
           />
           <div className="mt-2 grid grid-cols-3 gap-1">
-            <Button size="sm" variant="outline" className="text-vgreen border-vgreen/40 text-[10px] h-7"
+            <Button size="sm" variant="outline" className="text-vgreen border-vgreen/40 text-xs min-h-10"
               onClick={() => { onSet("paid", notes); setOpen(false); }}
               disabled={current === "paid"}
             >Pago</Button>
-            <Button size="sm" variant="outline" className="text-[10px] h-7"
+            <Button size="sm" variant="outline" className="text-xs min-h-10"
               onClick={() => { onSet("pending", notes); setOpen(false); }}
               disabled={current === "pending"}
             >Pend.</Button>
-            <Button size="sm" variant="outline" className="text-amber-700 border-amber-300 text-[10px] h-7"
+            <Button size="sm" variant="outline" className="text-amber-700 border-amber-300 text-xs min-h-10"
               onClick={() => { onSet("waived", notes); setOpen(false); }}
               disabled={current === "waived"}
             >Isentar</Button>
