@@ -22,7 +22,7 @@ const LeadPayload = z.object({
 export const submitLead = createServerFn({ method: "POST" })
   .inputValidator((input) => LeadPayload.parse(input))
   .handler(async ({ data }) => {
-    const req = getWebRequest();
+    const req = getRequest();
     const ip =
       req?.headers.get("cf-connecting-ip") ??
       req?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
