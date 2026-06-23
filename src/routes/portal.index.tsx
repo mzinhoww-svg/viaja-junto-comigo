@@ -5,16 +5,19 @@ import { PhoneFrame } from "@/components/viajaly/PhoneFrame";
 import { Logo } from "@/components/viajaly/Logo";
 import { StepCard } from "@/components/viajaly/StepCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ProductsHub } from "@/components/viajaly/ProductsHub";
+import { NotificationBell } from "@/components/viajaly/NotificationBell";
 import { useSignOut } from "./portal";
 import { LogOut } from "lucide-react";
 
-const STEP_TO_ROUTE: Record<string, "/portal/proposta" | "/portal/contrato" | "/portal/pagamento" | "/portal/documentos" | "/portal/ds160" | "/portal/taxas" | "/portal/agenda"> = {
+const STEP_TO_ROUTE: Record<string, "/portal/proposta" | "/portal/contrato" | "/portal/pagamento" | "/portal/documentos" | "/portal/ds160" | "/portal/taxas" | "/portal/agenda" | "/portal/conclusao"> = {
   proposta: "/portal/proposta",
   contrato: "/portal/contrato",
   pagamento: "/portal/pagamento",
   documentos: "/portal/documentos",
   taxas: "/portal/taxas",
   agenda: "/portal/agenda",
+  conclusao: "/portal/conclusao",
 };
 
 export const Route = createFileRoute("/portal/")({
@@ -51,9 +54,12 @@ function PortalHome() {
       <div className="px-5 pt-8 pb-24 anim-vfade">
         <div className="flex items-center justify-between">
           <Logo size={32} />
-          <button onClick={signOut} className="text-ink-muted hover:text-coral p-2" aria-label="Sair">
-            <LogOut size={18} />
-          </button>
+          <div className="flex items-center">
+            <NotificationBell />
+            <button onClick={signOut} className="text-ink-muted hover:text-coral p-2" aria-label="Sair">
+              <LogOut size={18} />
+            </button>
+          </div>
         </div>
 
         {!req.data ? (
@@ -101,6 +107,8 @@ function PortalHome() {
                 </button>
               </div>
             )}
+
+            <ProductsHub requestId={req.data.id} />
 
             <h2 className="mt-8 mb-3 text-sm font-display font-bold text-navy uppercase tracking-wider">Etapas</h2>
             {journey.isLoading ? (

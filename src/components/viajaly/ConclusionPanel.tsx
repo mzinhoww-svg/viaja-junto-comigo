@@ -31,7 +31,9 @@ export function ConclusionPanel({ request }: { request: {
   const saveOutcome = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.rpc("set_visa_outcome", {
-        _request_id: request.id, _outcome: outcome, _validity_until: outcome === "aprovado" && validity ? validity : null,
+        _request_id: request.id,
+        _outcome: (outcome ?? null) as never,
+        _validity_until: (outcome === "aprovado" && validity ? validity : null) as never,
       });
       if (error) throw error;
     },

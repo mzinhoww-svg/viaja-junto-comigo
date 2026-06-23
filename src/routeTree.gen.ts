@@ -15,13 +15,18 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as ConsoleIndexRouteImport } from './routes/console.index'
 import { Route as PortalTaxasRouteImport } from './routes/portal.taxas'
+import { Route as PortalRoteiroRouteImport } from './routes/portal.roteiro'
 import { Route as PortalPropostaRouteImport } from './routes/portal.proposta'
+import { Route as PortalPassaporteRouteImport } from './routes/portal.passaporte'
 import { Route as PortalPagamentoRouteImport } from './routes/portal.pagamento'
+import { Route as PortalMilhasRouteImport } from './routes/portal.milhas'
 import { Route as PortalLoginRouteImport } from './routes/portal.login'
 import { Route as PortalDs160RouteImport } from './routes/portal.ds160'
 import { Route as PortalDocumentosRouteImport } from './routes/portal.documentos'
 import { Route as PortalContratoRouteImport } from './routes/portal.contrato'
+import { Route as PortalConclusaoRouteImport } from './routes/portal.conclusao'
 import { Route as PortalAgendaRouteImport } from './routes/portal.agenda'
+import { Route as ConsoleRelatorioRouteImport } from './routes/console.relatorio'
 import { Route as ConsoleLoginRouteImport } from './routes/console.login'
 import { Route as ConsoleJanelasRouteImport } from './routes/console.janelas'
 import { Route as ConsoleAuditoriaRouteImport } from './routes/console.auditoria'
@@ -60,14 +65,29 @@ const PortalTaxasRoute = PortalTaxasRouteImport.update({
   path: '/taxas',
   getParentRoute: () => PortalRoute,
 } as any)
+const PortalRoteiroRoute = PortalRoteiroRouteImport.update({
+  id: '/roteiro',
+  path: '/roteiro',
+  getParentRoute: () => PortalRoute,
+} as any)
 const PortalPropostaRoute = PortalPropostaRouteImport.update({
   id: '/proposta',
   path: '/proposta',
   getParentRoute: () => PortalRoute,
 } as any)
+const PortalPassaporteRoute = PortalPassaporteRouteImport.update({
+  id: '/passaporte',
+  path: '/passaporte',
+  getParentRoute: () => PortalRoute,
+} as any)
 const PortalPagamentoRoute = PortalPagamentoRouteImport.update({
   id: '/pagamento',
   path: '/pagamento',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalMilhasRoute = PortalMilhasRouteImport.update({
+  id: '/milhas',
+  path: '/milhas',
   getParentRoute: () => PortalRoute,
 } as any)
 const PortalLoginRoute = PortalLoginRouteImport.update({
@@ -90,10 +110,20 @@ const PortalContratoRoute = PortalContratoRouteImport.update({
   path: '/contrato',
   getParentRoute: () => PortalRoute,
 } as any)
+const PortalConclusaoRoute = PortalConclusaoRouteImport.update({
+  id: '/conclusao',
+  path: '/conclusao',
+  getParentRoute: () => PortalRoute,
+} as any)
 const PortalAgendaRoute = PortalAgendaRouteImport.update({
   id: '/agenda',
   path: '/agenda',
   getParentRoute: () => PortalRoute,
+} as any)
+const ConsoleRelatorioRoute = ConsoleRelatorioRouteImport.update({
+  id: '/relatorio',
+  path: '/relatorio',
+  getParentRoute: () => ConsoleRoute,
 } as any)
 const ConsoleLoginRoute = ConsoleLoginRouteImport.update({
   id: '/login',
@@ -140,13 +170,18 @@ export interface FileRoutesByFullPath {
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
+  '/console/relatorio': typeof ConsoleRelatorioRoute
   '/portal/agenda': typeof PortalAgendaRoute
+  '/portal/conclusao': typeof PortalConclusaoRoute
   '/portal/contrato': typeof PortalContratoRoute
   '/portal/documentos': typeof PortalDocumentosRoute
   '/portal/ds160': typeof PortalDs160Route
   '/portal/login': typeof PortalLoginRoute
+  '/portal/milhas': typeof PortalMilhasRoute
   '/portal/pagamento': typeof PortalPagamentoRoute
+  '/portal/passaporte': typeof PortalPassaporteRoute
   '/portal/proposta': typeof PortalPropostaRoute
+  '/portal/roteiro': typeof PortalRoteiroRoute
   '/portal/taxas': typeof PortalTaxasRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -160,13 +195,18 @@ export interface FileRoutesByTo {
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
+  '/console/relatorio': typeof ConsoleRelatorioRoute
   '/portal/agenda': typeof PortalAgendaRoute
+  '/portal/conclusao': typeof PortalConclusaoRoute
   '/portal/contrato': typeof PortalContratoRoute
   '/portal/documentos': typeof PortalDocumentosRoute
   '/portal/ds160': typeof PortalDs160Route
   '/portal/login': typeof PortalLoginRoute
+  '/portal/milhas': typeof PortalMilhasRoute
   '/portal/pagamento': typeof PortalPagamentoRoute
+  '/portal/passaporte': typeof PortalPassaporteRoute
   '/portal/proposta': typeof PortalPropostaRoute
+  '/portal/roteiro': typeof PortalRoteiroRoute
   '/portal/taxas': typeof PortalTaxasRoute
   '/console': typeof ConsoleIndexRoute
   '/portal': typeof PortalIndexRoute
@@ -183,13 +223,18 @@ export interface FileRoutesById {
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
+  '/console/relatorio': typeof ConsoleRelatorioRoute
   '/portal/agenda': typeof PortalAgendaRoute
+  '/portal/conclusao': typeof PortalConclusaoRoute
   '/portal/contrato': typeof PortalContratoRoute
   '/portal/documentos': typeof PortalDocumentosRoute
   '/portal/ds160': typeof PortalDs160Route
   '/portal/login': typeof PortalLoginRoute
+  '/portal/milhas': typeof PortalMilhasRoute
   '/portal/pagamento': typeof PortalPagamentoRoute
+  '/portal/passaporte': typeof PortalPassaporteRoute
   '/portal/proposta': typeof PortalPropostaRoute
+  '/portal/roteiro': typeof PortalRoteiroRoute
   '/portal/taxas': typeof PortalTaxasRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -207,13 +252,18 @@ export interface FileRouteTypes {
     | '/console/auditoria'
     | '/console/janelas'
     | '/console/login'
+    | '/console/relatorio'
     | '/portal/agenda'
+    | '/portal/conclusao'
     | '/portal/contrato'
     | '/portal/documentos'
     | '/portal/ds160'
     | '/portal/login'
+    | '/portal/milhas'
     | '/portal/pagamento'
+    | '/portal/passaporte'
     | '/portal/proposta'
+    | '/portal/roteiro'
     | '/portal/taxas'
     | '/console/'
     | '/portal/'
@@ -227,13 +277,18 @@ export interface FileRouteTypes {
     | '/console/auditoria'
     | '/console/janelas'
     | '/console/login'
+    | '/console/relatorio'
     | '/portal/agenda'
+    | '/portal/conclusao'
     | '/portal/contrato'
     | '/portal/documentos'
     | '/portal/ds160'
     | '/portal/login'
+    | '/portal/milhas'
     | '/portal/pagamento'
+    | '/portal/passaporte'
     | '/portal/proposta'
+    | '/portal/roteiro'
     | '/portal/taxas'
     | '/console'
     | '/portal'
@@ -249,13 +304,18 @@ export interface FileRouteTypes {
     | '/console/auditoria'
     | '/console/janelas'
     | '/console/login'
+    | '/console/relatorio'
     | '/portal/agenda'
+    | '/portal/conclusao'
     | '/portal/contrato'
     | '/portal/documentos'
     | '/portal/ds160'
     | '/portal/login'
+    | '/portal/milhas'
     | '/portal/pagamento'
+    | '/portal/passaporte'
     | '/portal/proposta'
+    | '/portal/roteiro'
     | '/portal/taxas'
     | '/console/'
     | '/portal/'
@@ -314,6 +374,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalTaxasRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/portal/roteiro': {
+      id: '/portal/roteiro'
+      path: '/roteiro'
+      fullPath: '/portal/roteiro'
+      preLoaderRoute: typeof PortalRoteiroRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/portal/proposta': {
       id: '/portal/proposta'
       path: '/proposta'
@@ -321,11 +388,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalPropostaRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/portal/passaporte': {
+      id: '/portal/passaporte'
+      path: '/passaporte'
+      fullPath: '/portal/passaporte'
+      preLoaderRoute: typeof PortalPassaporteRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/portal/pagamento': {
       id: '/portal/pagamento'
       path: '/pagamento'
       fullPath: '/portal/pagamento'
       preLoaderRoute: typeof PortalPagamentoRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/milhas': {
+      id: '/portal/milhas'
+      path: '/milhas'
+      fullPath: '/portal/milhas'
+      preLoaderRoute: typeof PortalMilhasRouteImport
       parentRoute: typeof PortalRoute
     }
     '/portal/login': {
@@ -356,12 +437,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalContratoRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/portal/conclusao': {
+      id: '/portal/conclusao'
+      path: '/conclusao'
+      fullPath: '/portal/conclusao'
+      preLoaderRoute: typeof PortalConclusaoRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/portal/agenda': {
       id: '/portal/agenda'
       path: '/agenda'
       fullPath: '/portal/agenda'
       preLoaderRoute: typeof PortalAgendaRouteImport
       parentRoute: typeof PortalRoute
+    }
+    '/console/relatorio': {
+      id: '/console/relatorio'
+      path: '/relatorio'
+      fullPath: '/console/relatorio'
+      preLoaderRoute: typeof ConsoleRelatorioRouteImport
+      parentRoute: typeof ConsoleRoute
     }
     '/console/login': {
       id: '/console/login'
@@ -420,6 +515,7 @@ interface ConsoleRouteChildren {
   ConsoleAuditoriaRoute: typeof ConsoleAuditoriaRoute
   ConsoleJanelasRoute: typeof ConsoleJanelasRoute
   ConsoleLoginRoute: typeof ConsoleLoginRoute
+  ConsoleRelatorioRoute: typeof ConsoleRelatorioRoute
   ConsoleIndexRoute: typeof ConsoleIndexRoute
   ConsoleClienteIdRoute: typeof ConsoleClienteIdRoute
   ConsoleOrcamentoNovoRoute: typeof ConsoleOrcamentoNovoRoute
@@ -431,6 +527,7 @@ const ConsoleRouteChildren: ConsoleRouteChildren = {
   ConsoleAuditoriaRoute: ConsoleAuditoriaRoute,
   ConsoleJanelasRoute: ConsoleJanelasRoute,
   ConsoleLoginRoute: ConsoleLoginRoute,
+  ConsoleRelatorioRoute: ConsoleRelatorioRoute,
   ConsoleIndexRoute: ConsoleIndexRoute,
   ConsoleClienteIdRoute: ConsoleClienteIdRoute,
   ConsoleOrcamentoNovoRoute: ConsoleOrcamentoNovoRoute,
@@ -442,24 +539,32 @@ const ConsoleRouteWithChildren =
 
 interface PortalRouteChildren {
   PortalAgendaRoute: typeof PortalAgendaRoute
+  PortalConclusaoRoute: typeof PortalConclusaoRoute
   PortalContratoRoute: typeof PortalContratoRoute
   PortalDocumentosRoute: typeof PortalDocumentosRoute
   PortalDs160Route: typeof PortalDs160Route
   PortalLoginRoute: typeof PortalLoginRoute
+  PortalMilhasRoute: typeof PortalMilhasRoute
   PortalPagamentoRoute: typeof PortalPagamentoRoute
+  PortalPassaporteRoute: typeof PortalPassaporteRoute
   PortalPropostaRoute: typeof PortalPropostaRoute
+  PortalRoteiroRoute: typeof PortalRoteiroRoute
   PortalTaxasRoute: typeof PortalTaxasRoute
   PortalIndexRoute: typeof PortalIndexRoute
 }
 
 const PortalRouteChildren: PortalRouteChildren = {
   PortalAgendaRoute: PortalAgendaRoute,
+  PortalConclusaoRoute: PortalConclusaoRoute,
   PortalContratoRoute: PortalContratoRoute,
   PortalDocumentosRoute: PortalDocumentosRoute,
   PortalDs160Route: PortalDs160Route,
   PortalLoginRoute: PortalLoginRoute,
+  PortalMilhasRoute: PortalMilhasRoute,
   PortalPagamentoRoute: PortalPagamentoRoute,
+  PortalPassaporteRoute: PortalPassaporteRoute,
   PortalPropostaRoute: PortalPropostaRoute,
+  PortalRoteiroRoute: PortalRoteiroRoute,
   PortalTaxasRoute: PortalTaxasRoute,
   PortalIndexRoute: PortalIndexRoute,
 }
