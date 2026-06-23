@@ -131,9 +131,17 @@ function PagamentoPage() {
               </li>
             ))}
           </ul>
-          <div className="mt-3 pt-3 border-t border-[var(--color-border)] flex justify-between items-end">
-            <span className="text-xs uppercase tracking-wider text-ink-muted">Total da consultoria</span>
-            <span className="font-display font-extrabold text-navy text-2xl font-mono">{formatBRL(amount)}</span>
+          <div className="mt-3 pt-3 border-t border-[var(--color-border)] space-y-1 text-sm">
+            {(req.data?.combo_discount_cents ?? 0) > 0 && (
+              <div className="flex justify-between text-[var(--color-success-fg)]"><span>Desconto combo ({req.data?.combo_pct ?? 10}%)</span><span className="font-mono">- {formatBRL(req.data!.combo_discount_cents)}</span></div>
+            )}
+            {(req.data?.manual_discount_cents ?? 0) > 0 && (
+              <div className="flex justify-between text-ink-soft"><span>Desconto adicional</span><span className="font-mono">- {formatBRL(req.data!.manual_discount_cents)}</span></div>
+            )}
+            <div className="flex justify-between items-end pt-1">
+              <span className="text-xs uppercase tracking-wider text-ink-muted">Total da consultoria</span>
+              <span className="font-display font-extrabold text-navy text-2xl font-mono">{formatBRL(amount)}</span>
+            </div>
           </div>
         </div>
 

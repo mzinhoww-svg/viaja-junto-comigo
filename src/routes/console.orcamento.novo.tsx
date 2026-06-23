@@ -34,6 +34,8 @@ function NovoOrcamento() {
   const [lead, setLead] = useState({ name: "", email: "", phone: "", isGroup: false, groupName: "" });
   const [travelers, setTravelers] = useState<Traveler[]>([{ name: "", relation: "titular" }]);
   const [items, setItems] = useState<Item[]>([]);
+  const [vistoPlan, setVistoPlan] = useState<string | null>(null);
+  const [manualDiscountCents, setManualDiscountCents] = useState(0);
   const [handoff, setHandoff] = useState<{ request_id: string; access_code: string } | null>(null);
 
   const catalog = useQuery({
@@ -49,11 +51,22 @@ function NovoOrcamento() {
     },
   });
 
+  const plans = useQuery({
+    queryKey: ["visto_plans"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("visto_plans").select("key, label, price").order("price");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const totals = useMemo(() => {
     const sub = items.reduce((s, i) => s + i.qty * i.unit_price_cents, 0);
     const disc = items.reduce((s, i) => s + i.discount_cents, 0);
-    return { sub, disc, total: Math.max(sub - disc, 0) };
-  }, [items]);
+    const combo = items.length >= 2 ? Math.round((sub * 10) / 100) : 0;
+    const manual = Math.max(manualDiscountCents, 0);
+    return { sub, disc, combo, manual, total: Math.max(sub - disc - combo - manual, 0) };
+  }, [items, manualDiscountCents]);
 
   const canStep1 =
     lead.name.trim().length > 1 &&
@@ -71,6 +84,9 @@ function NovoOrcamento() {
         whatsapp_e164: lead.phone.replace(/\D/g, ""),
         is_group: lead.isGroup,
         group_name: lead.groupName,
+        visto_plan: vistoPlan,
+        manual_discount_cents: manualDiscountCents,
+        combo_pct: 10,
         travelers,
         items: items.map((it, idx) => ({ ...it, sort: idx })),
       };
@@ -165,11 +181,40 @@ function NovoOrcamento() {
       {step === 2 && (
         <Card>
           <h2 className="font-display font-bold text-navy">Itens da proposta</h2>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {catalog.data?.map((p) => (
+          {/* Planos de Vistos (Start+ / Pro+ / Premium+) */}
+          <div className="mt-4">
+            <p className="text-xs uppercase tracking-wider text-ink-muted font-bold mb-1.5">Vistos — escolha o plano</p>
+            <div className="flex flex-wrap gap-2">
+              {plans.data?.map((pl) => {
+                const active = vistoPlan === pl.key;
+                const cents = Math.round(Number(pl.price) * 100);
+                return (
+                  <button key={pl.key} type="button"
+                    onClick={() => {
+                      setVistoPlan(pl.key);
+                      setItems((cur) => {
+                        const existing = cur.find((i) => i.product_key === "vistos");
+                        const rest = cur.filter((i) => i.product_key !== "vistos");
+                        return [...rest, {
+                          product_key: "vistos", kind: "visto", label: `Viajaly Vistos · ${pl.label}`,
+                          qty: existing?.qty ?? 1, unit_price_cents: cents, discount_cents: existing?.discount_cents ?? 0,
+                        }];
+                      });
+                    }}
+                    className={`text-xs px-3 py-1.5 rounded-full border ${active ? "border-coral bg-coral/10 text-coral" : "border-[var(--color-border)] hover:border-teal hover:text-teal"}`}>
+                    {pl.label} · {formatBRL(cents)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <p className="mt-4 text-xs uppercase tracking-wider text-ink-muted font-bold mb-1.5">Outros produtos</p>
+          <div className="flex flex-wrap gap-2">
+            {catalog.data?.filter((p) => p.key !== "vistos").map((p) => (
               <button key={p.key} type="button"
                 onClick={() => setItems([...items, {
-                  product_key: p.key, kind: p.key === "vistos" ? "visto" : "consultoria",
+                  product_key: p.key, kind: "consultoria",
                   label: p.name, qty: 1, unit_price_cents: Math.round(Number(p.price) * 100), discount_cents: 0,
                 }])}
                 className="text-xs px-3 py-1.5 rounded-full border border-[var(--color-border)] hover:border-teal hover:text-teal">
@@ -200,6 +245,11 @@ function NovoOrcamento() {
             ))}
           </div>
 
+          <div className="mt-5 flex items-center justify-end gap-2">
+            <Label className="text-xs text-ink-soft">Desconto adicional (R$)</Label>
+            <Input className="w-32" value={(manualDiscountCents / 100).toFixed(2).replace(".", ",")}
+              onChange={(e) => setManualDiscountCents(brlToCents(e.target.value))} />
+          </div>
           <Totals {...totals} />
 
           <Footer>
@@ -274,11 +324,13 @@ function Card({ children }: { children: React.ReactNode }) {
 function Footer({ children }: { children: React.ReactNode }) {
   return <div className="mt-8 flex justify-end gap-2">{children}</div>;
 }
-function Totals({ sub, disc, total }: { sub: number; disc: number; total: number }) {
+function Totals({ sub, disc, combo = 0, manual = 0, total }: { sub: number; disc: number; combo?: number; manual?: number; total: number }) {
   return (
     <div className="mt-6 border-t border-[var(--color-border)] pt-4 space-y-1 text-sm">
       <div className="flex justify-between text-ink-soft"><span>Subtotal</span><span className="font-mono">{formatBRL(sub)}</span></div>
-      <div className="flex justify-between text-ink-soft"><span>Descontos</span><span className="font-mono">- {formatBRL(disc)}</span></div>
+      {disc > 0 && <div className="flex justify-between text-ink-soft"><span>Descontos por item</span><span className="font-mono">- {formatBRL(disc)}</span></div>}
+      {combo > 0 && <div className="flex justify-between text-[var(--color-success-fg)]"><span>Desconto combo (10%)</span><span className="font-mono">- {formatBRL(combo)}</span></div>}
+      {manual > 0 && <div className="flex justify-between text-ink-soft"><span>Desconto adicional</span><span className="font-mono">- {formatBRL(manual)}</span></div>}
       <div className="flex justify-between text-navy font-display font-extrabold text-lg"><span>Total</span><span className="font-mono">{formatBRL(total)}</span></div>
     </div>
   );

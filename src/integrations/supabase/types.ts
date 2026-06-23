@@ -815,6 +815,9 @@ export type Database = {
           client_rating: number | null
           client_signature_ip: string | null
           combo_pct: number
+          combo_discount_cents: number
+          manual_discount_cents: number
+          visto_plan: Database["public"]["Enums"]["visto_plan_t"] | null
           contract_signed: boolean
           created_at: string
           created_by: string | null
@@ -866,6 +869,9 @@ export type Database = {
           client_rating?: number | null
           client_signature_ip?: string | null
           combo_pct?: number
+          combo_discount_cents?: number
+          manual_discount_cents?: number
+          visto_plan?: Database["public"]["Enums"]["visto_plan_t"] | null
           contract_signed?: boolean
           created_at?: string
           created_by?: string | null
@@ -919,6 +925,9 @@ export type Database = {
           client_rating?: number | null
           client_signature_ip?: string | null
           combo_pct?: number
+          combo_discount_cents?: number
+          manual_discount_cents?: number
+          visto_plan?: Database["public"]["Enums"]["visto_plan_t"] | null
           contract_signed?: boolean
           created_at?: string
           created_by?: string | null
@@ -1325,6 +1334,7 @@ export type Database = {
       }
       publish_milhas: { Args: { _request_id: string }; Returns: undefined }
       publish_roteiro: { Args: { _roteiro_id: string }; Returns: undefined }
+      recompute_request_totals: { Args: { _req: string }; Returns: undefined }
       refresh_request_tax_status: {
         Args: { _request_id: string }
         Returns: undefined
@@ -1375,6 +1385,10 @@ export type Database = {
       }
       set_passport_status: {
         Args: { _notes: string; _request_id: string; _status: string }
+        Returns: undefined
+      }
+      set_proposal_adjustments: {
+        Args: { _combo_pct: number; _manual_discount_cents: number; _request_id: string }
         Returns: undefined
       }
       set_visa_outcome: {
