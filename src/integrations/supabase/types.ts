@@ -109,6 +109,56 @@ export type Database = {
         }
         Relationships: []
       }
+      agency_invites: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          agency_id: string
+          email: string
+          expires_at: string
+          id: string
+          invited_at: string
+          invited_by: string | null
+          revoked_at: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          agency_id: string
+          email: string
+          expires_at?: string
+          id?: string
+          invited_at?: string
+          invited_by?: string | null
+          revoked_at?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          token: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          agency_id?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_at?: string
+          invited_by?: string | null
+          revoked_at?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agency_invites_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       atendimentos: {
         Row: {
           agency_id: string
@@ -343,6 +393,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "lead_submissions_log_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      message_templates: {
+        Row: {
+          agency_id: string
+          body: string
+          category: string
+          created_at: string
+          created_by: string | null
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          agency_id: string
+          body: string
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          agency_id?: string
+          body?: string
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_templates_agency_id_fkey"
             columns: ["agency_id"]
             isOneToOne: false
             referencedRelation: "agencies"
@@ -704,6 +795,7 @@ export type Database = {
           access_code_expires_at: string
           agency_id: string
           archived_at: string | null
+          assigned_to: string | null
           client_feedback: string | null
           client_rating: number | null
           client_signature_ip: string | null
@@ -751,6 +843,7 @@ export type Database = {
           access_code_expires_at?: string
           agency_id: string
           archived_at?: string | null
+          assigned_to?: string | null
           client_feedback?: string | null
           client_rating?: number | null
           client_signature_ip?: string | null
@@ -800,6 +893,7 @@ export type Database = {
           access_code_expires_at?: string
           agency_id?: string
           archived_at?: string | null
+          assigned_to?: string | null
           client_feedback?: string | null
           client_rating?: number | null
           client_signature_ip?: string | null
@@ -1100,6 +1194,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_invite: { Args: { _token: string }; Returns: Json }
       admin_set_tax_status: {
         Args: {
           _notes: string
@@ -1111,6 +1206,10 @@ export type Database = {
       archive_request: {
         Args: { _archive: boolean; _request_id: string }
         Returns: undefined
+      }
+      assign_request: {
+        Args: { _assignee: string; _request_id: string }
+        Returns: Json
       }
       complete_briefing: {
         Args: { _product_key: string; _request_id: string }
@@ -1146,7 +1245,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      invite_member: {
+        Args: { _email: string; _role: Database["public"]["Enums"]["app_role"] }
+        Returns: Json
+      }
       is_request_member: { Args: { _request_id: string }; Returns: boolean }
+      log_audit: {
+        Args: { _action: string; _payload?: Json; _target: string }
+        Returns: undefined
+      }
       mark_briefing_reviewed: {
         Args: { _briefing_id: string }
         Returns: undefined
@@ -1167,6 +1274,10 @@ export type Database = {
         Args: { _method: string; _receipt_url: string; _traveler_id: string }
         Returns: undefined
       }
+      render_template: {
+        Args: { _request_id: string; _template_id: string }
+        Returns: string
+      }
       reopen_case: { Args: { _request_id: string }; Returns: undefined }
       reopen_intent: { Args: { _intent_id: string }; Returns: undefined }
       request_code_resend: { Args: { _request_id: string }; Returns: undefined }
@@ -1174,6 +1285,7 @@ export type Database = {
         Args: { _approve: boolean; _doc_id: string; _reason: string }
         Returns: undefined
       }
+      revoke_invite: { Args: { _id: string }; Returns: Json }
       save_briefing: {
         Args: { _payload: Json; _product_key: string; _request_id: string }
         Returns: Json
