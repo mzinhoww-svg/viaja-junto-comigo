@@ -105,7 +105,7 @@ export function DocumentList({
           <div key={t.id} className="bg-white rounded-2xl border border-[var(--color-border)] p-4 md:p-5">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-display font-bold text-navy">{t.name}</h3>
-              {t.is_lead && <span className="text-[10px] uppercase tracking-wider text-teal font-bold">Titular</span>}
+              {t.is_lead && <span className="text-[11px] uppercase tracking-wider text-teal font-bold">Titular</span>}
             </div>
             <ul className="space-y-2">
               {docs.map((d) => (
@@ -180,7 +180,7 @@ function DocRowItem({
           </div>
           <div className="min-w-0">
             <p className="font-semibold text-navy text-sm truncate">{doc.name}</p>
-            <span className={`inline-block mt-1 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full ${STATUS_COLOR[doc.status]}`}>
+            <span className={`inline-block mt-1 text-[11px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full ${STATUS_COLOR[doc.status]}`}>
               {STATUS_LABEL[doc.status]}
             </span>
           </div>

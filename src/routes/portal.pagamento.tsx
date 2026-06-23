@@ -74,7 +74,7 @@ function PagamentoPage() {
         <div className="mt-6">
           <p className="text-xs uppercase tracking-wider text-coral font-bold">Etapa 2 de 7</p>
           <h1 className="mt-1 text-3xl font-display font-extrabold text-navy leading-tight">Pagamento da consultoria</h1>
-          <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-cream border border-coral/30 px-3 py-1 text-[11px] font-semibold text-ink">
+          <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-cream border border-coral/30 px-3 py-1 text-xs font-semibold text-ink">
             <ShieldCheck size={13} className="text-coral" /> Pagamento da consultoria — taxas governamentais à parte
           </div>
         </div>
@@ -112,7 +112,7 @@ function PagamentoPage() {
               <span className="text-xs uppercase tracking-wider text-ink-muted">Total da consultoria</span>
               <span className="font-display font-extrabold text-navy text-2xl font-mono">{formatBRL(amount)}</span>
             </div>
-            <p className="text-[11px] text-ink-muted pt-1">
+            <p className="text-xs text-ink-soft pt-1">
               O mesmo valor é cobrado em Pix ou cartão. Parcelamento disponível no checkout do cartão.
             </p>
           </div>
