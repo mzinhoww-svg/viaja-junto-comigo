@@ -80,13 +80,13 @@ export const addProductToRequest = createServerFn({ method: "POST" })
     z.object({
       request_id: z.string().uuid(),
       traveler_id: z.string().uuid().nullable(),
-      product_key: z.enum(["vistos", "passaporte", "roteiro", "milhas"]),
+      product_key: z.enum(["vistos", "pass", "rot", "mil"]),
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { data: out, error } = await context.supabase.rpc("add_product_to_request", {
       _request_id: data.request_id,
-      _traveler_id: data.traveler_id,
+      _traveler_id: data.traveler_id as unknown as string,
       _product_key: data.product_key,
     });
     if (error) throw new Error(error.message);
