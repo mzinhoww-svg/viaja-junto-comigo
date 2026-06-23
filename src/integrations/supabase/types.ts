@@ -759,11 +759,13 @@ export type Database = {
       }
       proposal_items: {
         Row: {
+          billed_at: string | null
           created_at: string
           discount_cents: number
           id: string
           kind: string
           label: string
+          origin: string | null
           product_key: Database["public"]["Enums"]["product_key_t"] | null
           qty: number
           request_id: string
@@ -771,11 +773,13 @@ export type Database = {
           unit_price_cents: number
         }
         Insert: {
+          billed_at?: string | null
           created_at?: string
           discount_cents?: number
           id?: string
           kind?: string
           label: string
+          origin?: string | null
           product_key?: Database["public"]["Enums"]["product_key_t"] | null
           qty?: number
           request_id: string
@@ -783,11 +787,13 @@ export type Database = {
           unit_price_cents?: number
         }
         Update: {
+          billed_at?: string | null
           created_at?: string
           discount_cents?: number
           id?: string
           kind?: string
           label?: string
+          origin?: string | null
           product_key?: Database["public"]["Enums"]["product_key_t"] | null
           qty?: number
           request_id?: string
@@ -1307,6 +1313,7 @@ export type Database = {
       accept_invite: { Args: { _token: string }; Returns: Json }
       add_product_to_request: {
         Args: {
+          _origin?: string
           _product_key: Database["public"]["Enums"]["product_key_t"]
           _request_id: string
           _traveler_id: string
@@ -1406,6 +1413,16 @@ export type Database = {
           _amount_cents: number
           _payment_intent_id: string
           _payment_method: string
+          _session_id: string
+        }
+        Returns: Json
+      }
+      mark_taxes_paid_from_stripe: {
+        Args: {
+          _amount_cents: number
+          _payment_intent_id: string
+          _payment_method: string
+          _request_id: string
           _session_id: string
         }
         Returns: Json
