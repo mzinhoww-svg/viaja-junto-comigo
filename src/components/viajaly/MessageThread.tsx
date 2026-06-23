@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Send, Lock, Paperclip } from "lucide-react";
 import { toast } from "sonner";
+import { TemplatesPicker } from "@/components/viajaly/TemplatesPicker";
 
 type Attachment = { name: string; path: string };
 
