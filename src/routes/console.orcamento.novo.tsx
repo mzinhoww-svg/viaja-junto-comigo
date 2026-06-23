@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronLeft, Plus, Trash2, Copy, MessageCircle, Check } from "lucide-react";
+import { ChevronLeft, Plus, Trash2, Check } from "lucide-react";
 import { toast } from "sonner";
 import { formatBRL, brlToCents } from "@/lib/money";
-import { buildHandoffMessage, openWhatsApp } from "@/lib/whatsapp";
+import { HandoffCard } from "@/components/viajaly/HandoffCard";
 
 export const Route = createFileRoute("/console/orcamento/novo")({
   ssr: false,
