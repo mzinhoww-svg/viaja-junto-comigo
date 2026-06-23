@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { StatusPill } from "@/components/viajaly/StatusPill";
 import { OutcomeBadge, type VisaOutcome } from "@/components/viajaly/OutcomeBadge";
+import { MessageInbox } from "@/components/viajaly/MessageInbox";
 
 export const Route = createFileRoute("/console/")({
   ssr: false,
