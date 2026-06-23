@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { formatBRL } from "@/lib/money";
+import { LegalDisclaimer } from "@/components/viajaly/LegalDisclaimer";
 import { useSignOut } from "./portal";
 
 export const Route = createFileRoute("/portal/proposta")({
@@ -128,6 +129,10 @@ function PropostaPage() {
           <b className="text-navy">Como funciona:</b> ao aceitar, você faz o pagamento da consultoria
           (Pix ou cartão em até 12x) e em seguida assina o contrato digital. Depois cuidamos do DS-160,
           documentos e agendamento. <b>As taxas governamentais são cobradas à parte.</b>
+        </div>
+
+        <div className="mt-4">
+          <LegalDisclaimer taxes />
         </div>
 
         {accepted && (

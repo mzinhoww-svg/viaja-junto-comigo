@@ -1,6 +1,6 @@
 import { Info } from "lucide-react";
 
-export function LegalDisclaimer({ variant = "soft" }: { variant?: "soft" | "strong" }) {
+export function LegalDisclaimer({ variant = "soft", taxes = false }: { variant?: "soft" | "strong"; taxes?: boolean }) {
   const cls =
     variant === "strong"
       ? "bg-[var(--color-muted)] border-coral/40 text-ink"
@@ -12,6 +12,13 @@ export function LegalDisclaimer({ variant = "soft" }: { variant?: "soft" | "stro
         A Viajaly presta <strong>consultoria de viagem, não jurídica</strong>, e{" "}
         <strong>não garante a aprovação de vistos</strong> — a decisão é exclusiva
         do consulado dos EUA. Nosso papel é preparar você da melhor forma possível.
+        {taxes && (
+          <>
+            {" "}As <strong>taxas governamentais</strong> (MRV/visto, emissão de passaporte e Polícia
+            Federal) são <strong>pagas à parte, diretamente pelo cliente</strong>, e não estão
+            incluídas no valor da consultoria.
+          </>
+        )}
       </p>
     </div>
   );

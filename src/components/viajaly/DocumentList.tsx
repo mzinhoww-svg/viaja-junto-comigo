@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { submitDocument, reviewDocument } from "@/lib/documents.functions";
+import { REJECT_REASONS, REJECT_REASON_OTHER } from "@/lib/reject-reasons";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
@@ -144,7 +145,9 @@ function DocRowItem({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
   const [rejecting, setRejecting] = useState(false);
-  const [reason, setReason] = useState("");
+  const [choice, setChoice] = useState("");
+  const [reasonText, setReasonText] = useState("");
+  const finalReason = choice === REJECT_REASON_OTHER ? reasonText.trim() : choice;
 
   async function handleFile(file: File) {
     if (file.size > 8 * 1024 * 1024) { toast.error("Arquivo maior que 8 MB"); return; }
@@ -228,16 +231,33 @@ function DocRowItem({
       )}
       {rejecting && (
         <div className="mt-3 space-y-2">
-          <Textarea
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder="Motivo (ex: imagem cortada, dados não legíveis)"
-            className="text-sm"
-            maxLength={500}
-          />
+          <select
+            value={choice}
+            onChange={(e) => setChoice(e.target.value)}
+            className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+            aria-label="Motivo da recusa"
+          >
+            <option value="">Selecione o motivo…</option>
+            {REJECT_REASONS.map((r) => <option key={r} value={r}>{r}</option>)}
+            <option value={REJECT_REASON_OTHER}>{REJECT_REASON_OTHER}</option>
+          </select>
+          {choice === REJECT_REASON_OTHER && (
+            <Textarea
+              value={reasonText}
+              onChange={(e) => setReasonText(e.target.value)}
+              placeholder="Descreva o motivo da recusa"
+              className="text-sm"
+              maxLength={500}
+            />
+          )}
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => { setRejecting(false); setReason(""); }}>Cancelar</Button>
-            <Button size="sm" className="bg-coral text-cream hover:bg-[var(--color-coral-hover)]" onClick={() => { onReview(false, reason); setRejecting(false); setReason(""); }}>
+            <Button size="sm" variant="outline" onClick={() => { setRejecting(false); setChoice(""); setReasonText(""); }}>Cancelar</Button>
+            <Button
+              size="sm"
+              className="bg-coral text-cream hover:bg-[var(--color-coral-hover)]"
+              disabled={!finalReason}
+              onClick={() => { onReview(false, finalReason); setRejecting(false); setChoice(""); setReasonText(""); }}
+            >
               Confirmar recusa
             </Button>
           </div>

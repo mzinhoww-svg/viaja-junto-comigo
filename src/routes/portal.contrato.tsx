@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { renderContract } from "@/lib/contract-template";
+import { LegalDisclaimer } from "@/components/viajaly/LegalDisclaimer";
 import { useSignOut } from "./portal";
 import { FileSignature, CheckCircle2 } from "lucide-react";
 
@@ -120,6 +121,10 @@ function ContratoPage() {
           className="mt-6 rounded-2xl bg-white border border-[var(--color-border)] p-5 text-sm text-ink leading-relaxed prose-contract"
           dangerouslySetInnerHTML={{ __html: displayHtml }}
         />
+
+        <div className="mt-4">
+          <LegalDisclaimer taxes />
+        </div>
 
         {signed ? (
           <div className="mt-6 rounded-2xl bg-[var(--color-success-bg)] text-[var(--color-success-fg)] p-4 text-sm">
