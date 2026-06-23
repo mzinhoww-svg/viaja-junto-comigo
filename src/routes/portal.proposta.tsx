@@ -12,6 +12,21 @@ import { Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { formatBRL } from "@/lib/money";
 import { LegalDisclaimer } from "@/components/viajaly/LegalDisclaimer";
+
+type ProductMeta = { color: string; tint: string; dark: string; perGroup: boolean };
+function productMeta(key: string | null | undefined, label: string): ProductMeta {
+  const k = (key ?? "").toLowerCase();
+  const lbl = label.toLowerCase();
+  const isVistos = k.startsWith("visto") || lbl.includes("visto");
+  const isPass = k === "pass" || k === "passaporte" || lbl.includes("passaporte");
+  const isRot = k === "rot" || k === "roteiro" || lbl.includes("roteiro");
+  const isMil = k === "mil" || k === "milhas" || lbl.includes("milha");
+  if (isVistos) return { color: "#FF5A5F", tint: "rgba(255,90,95,0.12)", dark: "#B23036", perGroup: false };
+  if (isPass)   return { color: "#2DB7C9", tint: "rgba(45,183,201,0.14)", dark: "#0F6A78", perGroup: false };
+  if (isRot)    return { color: "#E8A33D", tint: "rgba(232,163,61,0.18)", dark: "#8A5A12", perGroup: true };
+  if (isMil)    return { color: "#1F8A5B", tint: "rgba(31,138,91,0.14)", dark: "#0F5436", perGroup: true };
+  return { color: "#94A3B8", tint: "rgba(148,163,184,0.18)", dark: "#334155", perGroup: false };
+}
 import { useSignOut } from "./portal";
 
 export const Route = createFileRoute("/portal/proposta")({
