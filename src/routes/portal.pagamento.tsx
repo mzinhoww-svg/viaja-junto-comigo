@@ -112,7 +112,7 @@ function PagamentoPage() {
               <span className="text-xs uppercase tracking-wider text-ink-muted">Total da consultoria</span>
               <span className="font-display font-extrabold text-navy text-2xl font-mono">{formatBRL(amount)}</span>
             </div>
-            <p className="text-[11px] text-ink-muted pt-1">
+            <p className="text-xs text-ink-soft pt-1">
               O mesmo valor é cobrado em Pix ou cartão. Parcelamento disponível no checkout do cartão.
             </p>
           </div>
