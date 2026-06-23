@@ -74,7 +74,7 @@ function PagamentoPage() {
         <div className="mt-6">
           <p className="text-xs uppercase tracking-wider text-coral font-bold">Etapa 2 de 7</p>
           <h1 className="mt-1 text-3xl font-display font-extrabold text-navy leading-tight">Pagamento da consultoria</h1>
-          <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-cream border border-coral/30 px-3 py-1 text-[11px] font-semibold text-ink">
+          <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-cream border border-coral/30 px-3 py-1 text-xs font-semibold text-ink">
             <ShieldCheck size={13} className="text-coral" /> Pagamento da consultoria — taxas governamentais à parte
           </div>
         </div>
