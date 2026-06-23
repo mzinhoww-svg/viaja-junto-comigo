@@ -9,7 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as PortalRouteImport } from './routes/portal'
+import { Route as OrcamentoRouteImport } from './routes/orcamento'
 import { Route as ConsoleRouteImport } from './routes/console'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
@@ -27,18 +29,30 @@ import { Route as PortalDocumentosRouteImport } from './routes/portal.documentos
 import { Route as PortalContratoRouteImport } from './routes/portal.contrato'
 import { Route as PortalConclusaoRouteImport } from './routes/portal.conclusao'
 import { Route as PortalAgendaRouteImport } from './routes/portal.agenda'
+import { Route as OrcamentoSucessoRouteImport } from './routes/orcamento.sucesso'
 import { Route as ConsoleRelatorioRouteImport } from './routes/console.relatorio'
 import { Route as ConsoleLoginRouteImport } from './routes/console.login'
 import { Route as ConsoleJanelasRouteImport } from './routes/console.janelas'
+import { Route as ConsoleConfiguracoesRouteImport } from './routes/console.configuracoes'
 import { Route as ConsoleAuditoriaRouteImport } from './routes/console.auditoria'
 import { Route as ConsoleAgendaRouteImport } from './routes/console.agenda'
 import { Route as ConsoleOrcamentoNovoRouteImport } from './routes/console.orcamento.novo'
 import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$id'
 import { Route as ConsoleOrcamentoIdEditarRouteImport } from './routes/console.orcamento.$id.editar'
 
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
   path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrcamentoRoute = OrcamentoRouteImport.update({
+  id: '/orcamento',
+  path: '/orcamento',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConsoleRoute = ConsoleRouteImport.update({
@@ -126,6 +140,11 @@ const PortalAgendaRoute = PortalAgendaRouteImport.update({
   path: '/agenda',
   getParentRoute: () => PortalRoute,
 } as any)
+const OrcamentoSucessoRoute = OrcamentoSucessoRouteImport.update({
+  id: '/sucesso',
+  path: '/sucesso',
+  getParentRoute: () => OrcamentoRoute,
+} as any)
 const ConsoleRelatorioRoute = ConsoleRelatorioRouteImport.update({
   id: '/relatorio',
   path: '/relatorio',
@@ -139,6 +158,11 @@ const ConsoleLoginRoute = ConsoleLoginRouteImport.update({
 const ConsoleJanelasRoute = ConsoleJanelasRouteImport.update({
   id: '/janelas',
   path: '/janelas',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleConfiguracoesRoute = ConsoleConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
   getParentRoute: () => ConsoleRoute,
 } as any)
 const ConsoleAuditoriaRoute = ConsoleAuditoriaRouteImport.update({
@@ -171,12 +195,16 @@ const ConsoleOrcamentoIdEditarRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/console': typeof ConsoleRouteWithChildren
+  '/orcamento': typeof OrcamentoRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
+  '/privacidade': typeof PrivacidadeRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
+  '/console/configuracoes': typeof ConsoleConfiguracoesRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
   '/console/relatorio': typeof ConsoleRelatorioRoute
+  '/orcamento/sucesso': typeof OrcamentoSucessoRoute
   '/portal/agenda': typeof PortalAgendaRoute
   '/portal/conclusao': typeof PortalConclusaoRoute
   '/portal/contrato': typeof PortalContratoRoute
@@ -198,11 +226,15 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/orcamento': typeof OrcamentoRouteWithChildren
+  '/privacidade': typeof PrivacidadeRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
+  '/console/configuracoes': typeof ConsoleConfiguracoesRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
   '/console/relatorio': typeof ConsoleRelatorioRoute
+  '/orcamento/sucesso': typeof OrcamentoSucessoRoute
   '/portal/agenda': typeof PortalAgendaRoute
   '/portal/conclusao': typeof PortalConclusaoRoute
   '/portal/contrato': typeof PortalContratoRoute
@@ -226,12 +258,16 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/console': typeof ConsoleRouteWithChildren
+  '/orcamento': typeof OrcamentoRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
+  '/privacidade': typeof PrivacidadeRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
+  '/console/configuracoes': typeof ConsoleConfiguracoesRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
   '/console/relatorio': typeof ConsoleRelatorioRoute
+  '/orcamento/sucesso': typeof OrcamentoSucessoRoute
   '/portal/agenda': typeof PortalAgendaRoute
   '/portal/conclusao': typeof PortalConclusaoRoute
   '/portal/contrato': typeof PortalContratoRoute
@@ -256,12 +292,16 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/console'
+    | '/orcamento'
     | '/portal'
+    | '/privacidade'
     | '/console/agenda'
     | '/console/auditoria'
+    | '/console/configuracoes'
     | '/console/janelas'
     | '/console/login'
     | '/console/relatorio'
+    | '/orcamento/sucesso'
     | '/portal/agenda'
     | '/portal/conclusao'
     | '/portal/contrato'
@@ -283,11 +323,15 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/orcamento'
+    | '/privacidade'
     | '/console/agenda'
     | '/console/auditoria'
+    | '/console/configuracoes'
     | '/console/janelas'
     | '/console/login'
     | '/console/relatorio'
+    | '/orcamento/sucesso'
     | '/portal/agenda'
     | '/portal/conclusao'
     | '/portal/contrato'
@@ -310,12 +354,16 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/console'
+    | '/orcamento'
     | '/portal'
+    | '/privacidade'
     | '/console/agenda'
     | '/console/auditoria'
+    | '/console/configuracoes'
     | '/console/janelas'
     | '/console/login'
     | '/console/relatorio'
+    | '/orcamento/sucesso'
     | '/portal/agenda'
     | '/portal/conclusao'
     | '/portal/contrato'
@@ -339,16 +387,32 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConsoleRoute: typeof ConsoleRouteWithChildren
+  OrcamentoRoute: typeof OrcamentoRouteWithChildren
   PortalRoute: typeof PortalRouteWithChildren
+  PrivacidadeRoute: typeof PrivacidadeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/portal': {
       id: '/portal'
       path: '/portal'
       fullPath: '/portal'
       preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orcamento': {
+      id: '/orcamento'
+      path: '/orcamento'
+      fullPath: '/orcamento'
+      preLoaderRoute: typeof OrcamentoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/console': {
@@ -470,6 +534,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalAgendaRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/orcamento/sucesso': {
+      id: '/orcamento/sucesso'
+      path: '/sucesso'
+      fullPath: '/orcamento/sucesso'
+      preLoaderRoute: typeof OrcamentoSucessoRouteImport
+      parentRoute: typeof OrcamentoRoute
+    }
     '/console/relatorio': {
       id: '/console/relatorio'
       path: '/relatorio'
@@ -489,6 +560,13 @@ declare module '@tanstack/react-router' {
       path: '/janelas'
       fullPath: '/console/janelas'
       preLoaderRoute: typeof ConsoleJanelasRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/configuracoes': {
+      id: '/console/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/console/configuracoes'
+      preLoaderRoute: typeof ConsoleConfiguracoesRouteImport
       parentRoute: typeof ConsoleRoute
     }
     '/console/auditoria': {
@@ -532,6 +610,7 @@ declare module '@tanstack/react-router' {
 interface ConsoleRouteChildren {
   ConsoleAgendaRoute: typeof ConsoleAgendaRoute
   ConsoleAuditoriaRoute: typeof ConsoleAuditoriaRoute
+  ConsoleConfiguracoesRoute: typeof ConsoleConfiguracoesRoute
   ConsoleJanelasRoute: typeof ConsoleJanelasRoute
   ConsoleLoginRoute: typeof ConsoleLoginRoute
   ConsoleRelatorioRoute: typeof ConsoleRelatorioRoute
@@ -544,6 +623,7 @@ interface ConsoleRouteChildren {
 const ConsoleRouteChildren: ConsoleRouteChildren = {
   ConsoleAgendaRoute: ConsoleAgendaRoute,
   ConsoleAuditoriaRoute: ConsoleAuditoriaRoute,
+  ConsoleConfiguracoesRoute: ConsoleConfiguracoesRoute,
   ConsoleJanelasRoute: ConsoleJanelasRoute,
   ConsoleLoginRoute: ConsoleLoginRoute,
   ConsoleRelatorioRoute: ConsoleRelatorioRoute,
@@ -555,6 +635,18 @@ const ConsoleRouteChildren: ConsoleRouteChildren = {
 
 const ConsoleRouteWithChildren =
   ConsoleRoute._addFileChildren(ConsoleRouteChildren)
+
+interface OrcamentoRouteChildren {
+  OrcamentoSucessoRoute: typeof OrcamentoSucessoRoute
+}
+
+const OrcamentoRouteChildren: OrcamentoRouteChildren = {
+  OrcamentoSucessoRoute: OrcamentoSucessoRoute,
+}
+
+const OrcamentoRouteWithChildren = OrcamentoRoute._addFileChildren(
+  OrcamentoRouteChildren,
+)
 
 interface PortalRouteChildren {
   PortalAgendaRoute: typeof PortalAgendaRoute
@@ -596,7 +688,9 @@ const PortalRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConsoleRoute: ConsoleRouteWithChildren,
+  OrcamentoRoute: OrcamentoRouteWithChildren,
   PortalRoute: PortalRouteWithChildren,
+  PrivacidadeRoute: PrivacidadeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

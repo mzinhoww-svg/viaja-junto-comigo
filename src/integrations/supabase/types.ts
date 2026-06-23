@@ -54,34 +54,58 @@ export type Database = {
       }
       agencies: {
         Row: {
+          bio: string | null
           created_at: string
           emergency_contacts: Json
+          endereco: string | null
           id: string
+          instagram: string | null
+          logo_path: string | null
           name: string
           pix_key: string | null
           pix_key_type: string | null
           pix_merchant_city: string | null
           pix_merchant_name: string | null
+          primary_color: string
+          public_email: string | null
+          public_whatsapp: string | null
+          visa_disclaimer: string
         }
         Insert: {
+          bio?: string | null
           created_at?: string
           emergency_contacts?: Json
+          endereco?: string | null
           id?: string
+          instagram?: string | null
+          logo_path?: string | null
           name: string
           pix_key?: string | null
           pix_key_type?: string | null
           pix_merchant_city?: string | null
           pix_merchant_name?: string | null
+          primary_color?: string
+          public_email?: string | null
+          public_whatsapp?: string | null
+          visa_disclaimer?: string
         }
         Update: {
+          bio?: string | null
           created_at?: string
           emergency_contacts?: Json
+          endereco?: string | null
           id?: string
+          instagram?: string | null
+          logo_path?: string | null
           name?: string
           pix_key?: string | null
           pix_key_type?: string | null
           pix_merchant_city?: string | null
           pix_merchant_name?: string | null
+          primary_color?: string
+          public_email?: string | null
+          public_whatsapp?: string | null
+          visa_disclaimer?: string
         }
         Relationships: []
       }
@@ -290,6 +314,38 @@ export type Database = {
             columns: ["traveler_id"]
             isOneToOne: true
             referencedRelation: "travelers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_submissions_log: {
+        Row: {
+          agency_id: string | null
+          created_at: string
+          email: string | null
+          id: string
+          ip: string | null
+        }
+        Insert: {
+          agency_id?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          ip?: string | null
+        }
+        Update: {
+          agency_id?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          ip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_submissions_log_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
             referencedColumns: ["id"]
           },
         ]
@@ -656,9 +712,13 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          lead_consent_at: string | null
+          lead_consent_text: string | null
           lead_email: string
+          lead_message: string | null
           lead_name: string
           lead_phone: string | null
+          lead_source: string
           passport_notes: string | null
           passport_status: string
           payment_amount_cents: number
@@ -699,9 +759,13 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          lead_consent_at?: string | null
+          lead_consent_text?: string | null
           lead_email: string
+          lead_message?: string | null
           lead_name: string
           lead_phone?: string | null
+          lead_source?: string
           passport_notes?: string | null
           passport_status?: string
           payment_amount_cents?: number
@@ -744,9 +808,13 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          lead_consent_at?: string | null
+          lead_consent_text?: string | null
           lead_email?: string
+          lead_message?: string | null
           lead_name?: string
           lead_phone?: string | null
+          lead_source?: string
           passport_notes?: string | null
           passport_status?: string
           payment_amount_cents?: number
@@ -1171,6 +1239,12 @@ export type Database = {
         Args: { _feedback: string; _rating: number; _request_id: string }
         Returns: undefined
       }
+      submit_lead: {
+        Args: { _client_ip: string; _payload: Json }
+        Returns: Json
+      }
+      update_agency_billing: { Args: { _payload: Json }; Returns: undefined }
+      update_agency_profile: { Args: { _payload: Json }; Returns: undefined }
       update_request_with_items: {
         Args: { _request_id: string; payload: Json }
         Returns: Json

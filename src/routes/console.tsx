@@ -32,6 +32,7 @@ function ConsoleLayout() {
               <Link to="/console/janelas" className="text-ink hover:text-coral" activeProps={{ className: "text-coral" }}>Janelas</Link>
               <Link to="/console/relatorio" className="text-ink hover:text-coral" activeProps={{ className: "text-coral" }}>Relatório</Link>
               <Link to="/console/auditoria" className="text-ink hover:text-coral" activeProps={{ className: "text-coral" }}>Auditoria</Link>
+              <Link to="/console/configuracoes" className="text-ink hover:text-coral" activeProps={{ className: "text-coral" }}>Configurações</Link>
             </nav>
           </div>
           <button

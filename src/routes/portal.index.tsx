@@ -6,6 +6,7 @@ import { Logo } from "@/components/viajaly/Logo";
 import { StepCard } from "@/components/viajaly/StepCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductsHub } from "@/components/viajaly/ProductsHub";
+import { EmptyStateAwaitingProposal } from "@/components/viajaly/EmptyStateAwaitingProposal";
 import { NotificationBell } from "@/components/viajaly/NotificationBell";
 import { useSignOut } from "./portal";
 import { LogOut, MessageSquare } from "lucide-react";
@@ -44,7 +45,8 @@ function PortalHome() {
     if (!r || !journey.data) return;
     const has = (k: string) => journey.data!.some((s) => s.key === k);
     const s = r.proposal_status;
-    if (s === "sent" || s === "viewed" || s === "draft") { nav({ to: "/portal/proposta" }); return; }
+    // 'draft' fica no hub mostrando "aguardando orçamento" — não força navegação
+    if (s === "sent" || s === "viewed") { nav({ to: "/portal/proposta" }); return; }
     if (s === "accepted") {
       if (has("contrato") && !r.contract_signed) { nav({ to: "/portal/contrato" }); return; }
       if (r.payment_status !== "paid") { nav({ to: "/portal/pagamento" }); return; }
@@ -78,6 +80,8 @@ function PortalHome() {
               Você ainda não tem uma proposta ativa. Entre em contato com a Letícia para receber seu orçamento.
             </p>
           </div>
+        ) : req.data.proposal_status === "draft" ? (
+          <EmptyStateAwaitingProposal firstName={req.data.lead_name?.split(" ")[0]} />
         ) : (
           <>
             <div className="mt-6 p-5 rounded-3xl bg-navy text-cream">
