@@ -43,16 +43,28 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          pix_key: string | null
+          pix_key_type: string | null
+          pix_merchant_city: string | null
+          pix_merchant_name: string | null
         }
         Insert: {
           created_at?: string
           id?: string
           name: string
+          pix_key?: string | null
+          pix_key_type?: string | null
+          pix_merchant_city?: string | null
+          pix_merchant_name?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
+          pix_key?: string | null
+          pix_key_type?: string | null
+          pix_merchant_city?: string | null
+          pix_merchant_name?: string | null
         }
         Relationships: []
       }
@@ -123,32 +135,44 @@ export type Database = {
       }
       contracts: {
         Row: {
+          body_html: string | null
           client: string | null
           created_at: string
           id: string
           pdf_url: string | null
           product: string | null
           request_id: string
+          signed_at: string | null
+          signed_ip: string | null
+          signed_name: string | null
           status: Database["public"]["Enums"]["contract_status_t"]
           template: string | null
         }
         Insert: {
+          body_html?: string | null
           client?: string | null
           created_at?: string
           id?: string
           pdf_url?: string | null
           product?: string | null
           request_id: string
+          signed_at?: string | null
+          signed_ip?: string | null
+          signed_name?: string | null
           status?: Database["public"]["Enums"]["contract_status_t"]
           template?: string | null
         }
         Update: {
+          body_html?: string | null
           client?: string | null
           created_at?: string
           id?: string
           pdf_url?: string | null
           product?: string | null
           request_id?: string
+          signed_at?: string | null
+          signed_ip?: string | null
+          signed_name?: string | null
           status?: Database["public"]["Enums"]["contract_status_t"]
           template?: string | null
         }
@@ -540,6 +564,7 @@ export type Database = {
         Row: {
           access_code: string
           agency_id: string
+          client_signature_ip: string | null
           combo_pct: number
           contract_signed: boolean
           created_at: string
@@ -548,7 +573,10 @@ export type Database = {
           lead_email: string
           lead_name: string
           lead_phone: string | null
+          payment_amount_cents: number
+          payment_confirmed_by: string | null
           payment_method: Database["public"]["Enums"]["payment_method_t"] | null
+          payment_paid_at: string | null
           payment_status: Database["public"]["Enums"]["payment_status_t"]
           proposal_accepted_at: string | null
           proposal_decline_reason: string | null
@@ -569,6 +597,7 @@ export type Database = {
         Insert: {
           access_code: string
           agency_id: string
+          client_signature_ip?: string | null
           combo_pct?: number
           contract_signed?: boolean
           created_at?: string
@@ -577,9 +606,12 @@ export type Database = {
           lead_email: string
           lead_name: string
           lead_phone?: string | null
+          payment_amount_cents?: number
+          payment_confirmed_by?: string | null
           payment_method?:
             | Database["public"]["Enums"]["payment_method_t"]
             | null
+          payment_paid_at?: string | null
           payment_status?: Database["public"]["Enums"]["payment_status_t"]
           proposal_accepted_at?: string | null
           proposal_decline_reason?: string | null
@@ -600,6 +632,7 @@ export type Database = {
         Update: {
           access_code?: string
           agency_id?: string
+          client_signature_ip?: string | null
           combo_pct?: number
           contract_signed?: boolean
           created_at?: string
@@ -608,9 +641,12 @@ export type Database = {
           lead_email?: string
           lead_name?: string
           lead_phone?: string | null
+          payment_amount_cents?: number
+          payment_confirmed_by?: string | null
           payment_method?:
             | Database["public"]["Enums"]["payment_method_t"]
             | null
+          payment_paid_at?: string | null
           payment_status?: Database["public"]["Enums"]["payment_status_t"]
           proposal_accepted_at?: string | null
           proposal_decline_reason?: string | null
@@ -819,6 +855,10 @@ export type Database = {
           status: Database["public"]["Enums"]["journey_step_status_t"]
         }[]
       }
+      confirm_payment: {
+        Args: { _paid: boolean; _request_id: string }
+        Returns: undefined
+      }
       create_request_with_travelers: { Args: { payload: Json }; Returns: Json }
       current_agency_id: { Args: never; Returns: string }
       has_role: {
@@ -829,6 +869,15 @@ export type Database = {
         Returns: boolean
       }
       is_request_member: { Args: { _request_id: string }; Returns: boolean }
+      sign_contract: {
+        Args: {
+          _body_html: string
+          _ip: string
+          _name: string
+          _request_id: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "client"
