@@ -14,9 +14,11 @@ import { Route as ConsoleRouteImport } from './routes/console'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as ConsoleIndexRouteImport } from './routes/console.index'
+import { Route as PortalTaxasRouteImport } from './routes/portal.taxas'
 import { Route as PortalPropostaRouteImport } from './routes/portal.proposta'
 import { Route as PortalPagamentoRouteImport } from './routes/portal.pagamento'
 import { Route as PortalLoginRouteImport } from './routes/portal.login'
+import { Route as PortalDs160RouteImport } from './routes/portal.ds160'
 import { Route as PortalDocumentosRouteImport } from './routes/portal.documentos'
 import { Route as PortalContratoRouteImport } from './routes/portal.contrato'
 import { Route as ConsoleLoginRouteImport } from './routes/console.login'
@@ -50,6 +52,11 @@ const ConsoleIndexRoute = ConsoleIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ConsoleRoute,
 } as any)
+const PortalTaxasRoute = PortalTaxasRouteImport.update({
+  id: '/taxas',
+  path: '/taxas',
+  getParentRoute: () => PortalRoute,
+} as any)
 const PortalPropostaRoute = PortalPropostaRouteImport.update({
   id: '/proposta',
   path: '/proposta',
@@ -63,6 +70,11 @@ const PortalPagamentoRoute = PortalPagamentoRouteImport.update({
 const PortalLoginRoute = PortalLoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalDs160Route = PortalDs160RouteImport.update({
+  id: '/ds160',
+  path: '/ds160',
   getParentRoute: () => PortalRoute,
 } as any)
 const PortalDocumentosRoute = PortalDocumentosRouteImport.update({
@@ -110,9 +122,11 @@ export interface FileRoutesByFullPath {
   '/console/login': typeof ConsoleLoginRoute
   '/portal/contrato': typeof PortalContratoRoute
   '/portal/documentos': typeof PortalDocumentosRoute
+  '/portal/ds160': typeof PortalDs160Route
   '/portal/login': typeof PortalLoginRoute
   '/portal/pagamento': typeof PortalPagamentoRoute
   '/portal/proposta': typeof PortalPropostaRoute
+  '/portal/taxas': typeof PortalTaxasRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
@@ -125,9 +139,11 @@ export interface FileRoutesByTo {
   '/console/login': typeof ConsoleLoginRoute
   '/portal/contrato': typeof PortalContratoRoute
   '/portal/documentos': typeof PortalDocumentosRoute
+  '/portal/ds160': typeof PortalDs160Route
   '/portal/login': typeof PortalLoginRoute
   '/portal/pagamento': typeof PortalPagamentoRoute
   '/portal/proposta': typeof PortalPropostaRoute
+  '/portal/taxas': typeof PortalTaxasRoute
   '/console': typeof ConsoleIndexRoute
   '/portal': typeof PortalIndexRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
@@ -143,9 +159,11 @@ export interface FileRoutesById {
   '/console/login': typeof ConsoleLoginRoute
   '/portal/contrato': typeof PortalContratoRoute
   '/portal/documentos': typeof PortalDocumentosRoute
+  '/portal/ds160': typeof PortalDs160Route
   '/portal/login': typeof PortalLoginRoute
   '/portal/pagamento': typeof PortalPagamentoRoute
   '/portal/proposta': typeof PortalPropostaRoute
+  '/portal/taxas': typeof PortalTaxasRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
@@ -162,9 +180,11 @@ export interface FileRouteTypes {
     | '/console/login'
     | '/portal/contrato'
     | '/portal/documentos'
+    | '/portal/ds160'
     | '/portal/login'
     | '/portal/pagamento'
     | '/portal/proposta'
+    | '/portal/taxas'
     | '/console/'
     | '/portal/'
     | '/console/cliente/$id'
@@ -177,9 +197,11 @@ export interface FileRouteTypes {
     | '/console/login'
     | '/portal/contrato'
     | '/portal/documentos'
+    | '/portal/ds160'
     | '/portal/login'
     | '/portal/pagamento'
     | '/portal/proposta'
+    | '/portal/taxas'
     | '/console'
     | '/portal'
     | '/console/cliente/$id'
@@ -194,9 +216,11 @@ export interface FileRouteTypes {
     | '/console/login'
     | '/portal/contrato'
     | '/portal/documentos'
+    | '/portal/ds160'
     | '/portal/login'
     | '/portal/pagamento'
     | '/portal/proposta'
+    | '/portal/taxas'
     | '/console/'
     | '/portal/'
     | '/console/cliente/$id'
@@ -247,6 +271,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleIndexRouteImport
       parentRoute: typeof ConsoleRoute
     }
+    '/portal/taxas': {
+      id: '/portal/taxas'
+      path: '/taxas'
+      fullPath: '/portal/taxas'
+      preLoaderRoute: typeof PortalTaxasRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/portal/proposta': {
       id: '/portal/proposta'
       path: '/proposta'
@@ -266,6 +297,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/portal/login'
       preLoaderRoute: typeof PortalLoginRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/ds160': {
+      id: '/portal/ds160'
+      path: '/ds160'
+      fullPath: '/portal/ds160'
+      preLoaderRoute: typeof PortalDs160RouteImport
       parentRoute: typeof PortalRoute
     }
     '/portal/documentos': {
@@ -344,18 +382,22 @@ const ConsoleRouteWithChildren =
 interface PortalRouteChildren {
   PortalContratoRoute: typeof PortalContratoRoute
   PortalDocumentosRoute: typeof PortalDocumentosRoute
+  PortalDs160Route: typeof PortalDs160Route
   PortalLoginRoute: typeof PortalLoginRoute
   PortalPagamentoRoute: typeof PortalPagamentoRoute
   PortalPropostaRoute: typeof PortalPropostaRoute
+  PortalTaxasRoute: typeof PortalTaxasRoute
   PortalIndexRoute: typeof PortalIndexRoute
 }
 
 const PortalRouteChildren: PortalRouteChildren = {
   PortalContratoRoute: PortalContratoRoute,
   PortalDocumentosRoute: PortalDocumentosRoute,
+  PortalDs160Route: PortalDs160Route,
   PortalLoginRoute: PortalLoginRoute,
   PortalPagamentoRoute: PortalPagamentoRoute,
   PortalPropostaRoute: PortalPropostaRoute,
+  PortalTaxasRoute: PortalTaxasRoute,
   PortalIndexRoute: PortalIndexRoute,
 }
 

@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useJourney, useRequestRealtime } from "@/hooks/useJourney";
 import { StepCard } from "@/components/viajaly/StepCard";
 import { DocumentList } from "@/components/viajaly/DocumentList";
+import { DS160Form } from "@/components/viajaly/DS160Form";
+import { TaxList } from "@/components/viajaly/TaxList";
 import { AccessAuditCard } from "@/components/viajaly/AccessAuditCard";
 import { HandoffCard } from "@/components/viajaly/HandoffCard";
 import { Button } from "@/components/ui/button";
@@ -17,7 +19,7 @@ export const Route = createFileRoute("/console/cliente/$id")({
   component: ConsoleClient,
 });
 
-type Tab = "jornada" | "documentos" | "acesso";
+type Tab = "jornada" | "documentos" | "ds160" | "taxas" | "acesso";
 
 function ConsoleClient() {
   const { id } = Route.useParams();
@@ -67,6 +69,8 @@ function ConsoleClient() {
   const tabs: { key: Tab; label: string }[] = [
     { key: "jornada", label: "Jornada" },
     { key: "documentos", label: "Documentos" },
+    { key: "ds160", label: "DS-160" },
+    { key: "taxas", label: "Taxas" },
     { key: "acesso", label: "Acesso" },
   ];
 
@@ -154,6 +158,19 @@ function ConsoleClient() {
           <DocumentList requestId={id} variant="console" />
         </div>
       )}
+
+      {tab === "ds160" && (
+        <div className="mt-6 max-w-3xl">
+          <DS160Form requestId={id} variant="console" />
+        </div>
+      )}
+
+      {tab === "taxas" && (
+        <div className="mt-6 max-w-3xl">
+          <TaxList requestId={id} variant="console" />
+        </div>
+      )}
+
 
       {tab === "acesso" && (
         <div className="mt-6 max-w-2xl">

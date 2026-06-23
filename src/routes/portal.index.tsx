@@ -8,6 +8,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSignOut } from "./portal";
 import { LogOut } from "lucide-react";
 
+const STEP_TO_ROUTE: Record<string, "/portal/proposta" | "/portal/contrato" | "/portal/pagamento" | "/portal/documentos" | "/portal/ds160" | "/portal/taxas"> = {
+  proposta: "/portal/proposta",
+  contrato: "/portal/contrato",
+  pagamento: "/portal/pagamento",
+  documentos: "/portal/documentos",
+  taxas: "/portal/taxas",
+};
+
 export const Route = createFileRoute("/portal/")({
   ssr: false,
   head: () => ({ meta: [{ title: "Sua jornada — Viajaly" }] }),
@@ -29,8 +37,7 @@ function PortalHome() {
     if (s === "accepted") {
       if (!r.contract_signed) { nav({ to: "/portal/contrato" }); return; }
       if (r.payment_status !== "paid") { nav({ to: "/portal/pagamento" }); return; }
-      // Pago → libera Documentos
-      nav({ to: "/portal/documentos" });
+      // Pago: libera Documentos / DS-160 / Taxas em paralelo (fica no hub).
     }
   }, [req.data, nav]);
 
@@ -68,14 +75,42 @@ function PortalHome() {
               </div>
             </div>
 
+            {req.data.payment_status === "paid" && (
+              <div className="mt-6 grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => nav({ to: "/portal/ds160" })}
+                  className="rounded-2xl border border-[var(--color-border)] bg-white p-3 text-left hover:border-coral transition"
+                >
+                  <p className="text-[10px] uppercase tracking-wider text-ink-muted font-bold">Formulário</p>
+                  <p className="mt-1 font-display font-bold text-navy text-sm">DS-160</p>
+                </button>
+                <button
+                  onClick={() => nav({ to: "/portal/taxas" })}
+                  className="rounded-2xl border border-[var(--color-border)] bg-white p-3 text-left hover:border-coral transition"
+                >
+                  <p className="text-[10px] uppercase tracking-wider text-ink-muted font-bold">Pagamento</p>
+                  <p className="mt-1 font-display font-bold text-navy text-sm">Taxa MRV</p>
+                </button>
+              </div>
+            )}
+
             <h2 className="mt-8 mb-3 text-sm font-display font-bold text-navy uppercase tracking-wider">Etapas</h2>
             {journey.isLoading ? (
               <div className="space-y-2">{Array.from({ length: 7 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-2xl" />)}</div>
             ) : (
               <div className="space-y-2">
-                {journey.data?.map((s) => (
-                  <StepCard key={s.key} idx={s.idx} label={s.label} status={s.status} />
-                ))}
+                {journey.data?.map((s) => {
+                  const target = STEP_TO_ROUTE[s.key];
+                  return (
+                    <StepCard
+                      key={s.key}
+                      idx={s.idx}
+                      label={s.label}
+                      status={s.status}
+                      onClick={target ? () => nav({ to: target }) : undefined}
+                    />
+                  );
+                })}
               </div>
             )}
           </>
