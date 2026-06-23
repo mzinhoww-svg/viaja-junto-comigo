@@ -55,7 +55,7 @@ function PropostaPage() {
         .eq("id", req.data!.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Proposta aceita!"); qc.invalidateQueries({ queryKey: ["my-request"] }); nav({ to: "/portal" }); },
+    onSuccess: () => { toast.success("Proposta aceita! Vamos ao pagamento 🎉"); qc.invalidateQueries({ queryKey: ["my-request"] }); nav({ to: "/portal/pagamento" }); },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -119,8 +119,9 @@ function PropostaPage() {
         </div>
 
         <div className="mt-6 rounded-2xl bg-cream border border-coral/30 p-4 text-sm text-ink">
-          <b className="text-navy">Como funciona:</b> ao aceitar, você assina o contrato digital e
-          desbloqueia o pagamento. Depois cuidamos do DS-160, documentos e agendamento.
+          <b className="text-navy">Como funciona:</b> ao aceitar, você faz o pagamento da consultoria
+          (Pix ou cartão em até 12x) e em seguida assina o contrato digital. Depois cuidamos do DS-160,
+          documentos e agendamento. <b>As taxas governamentais são cobradas à parte.</b>
         </div>
 
         {accepted && (

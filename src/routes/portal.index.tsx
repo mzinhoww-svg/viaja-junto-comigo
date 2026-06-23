@@ -48,8 +48,9 @@ function PortalHome() {
     // 'draft' fica no hub mostrando "aguardando orçamento" — não força navegação
     if (s === "sent" || s === "viewed") { nav({ to: "/portal/proposta" }); return; }
     if (s === "accepted") {
-      if (has("contrato") && !r.contract_signed) { nav({ to: "/portal/contrato" }); return; }
+      // Pagar primeiro, depois contrato
       if (r.payment_status !== "paid") { nav({ to: "/portal/pagamento" }); return; }
+      if (has("contrato") && !r.contract_signed) { nav({ to: "/portal/contrato" }); return; }
     }
   }, [req.data, journey.data, nav]);
 

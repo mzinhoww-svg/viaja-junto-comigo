@@ -829,7 +829,10 @@ export type Database = {
           passport_notes: string | null
           passport_status: string
           payment_amount_cents: number
+          payment_attempts: number
+          payment_card_last4: string | null
           payment_confirmed_by: string | null
+          payment_installments: number | null
           payment_method: Database["public"]["Enums"]["payment_method_t"] | null
           payment_paid_at: string | null
           payment_status: Database["public"]["Enums"]["payment_status_t"]
@@ -877,7 +880,10 @@ export type Database = {
           passport_notes?: string | null
           passport_status?: string
           payment_amount_cents?: number
+          payment_attempts?: number
+          payment_card_last4?: string | null
           payment_confirmed_by?: string | null
+          payment_installments?: number | null
           payment_method?:
             | Database["public"]["Enums"]["payment_method_t"]
             | null
@@ -927,7 +933,10 @@ export type Database = {
           passport_notes?: string | null
           passport_status?: string
           payment_amount_cents?: number
+          payment_attempts?: number
+          payment_card_last4?: string | null
           payment_confirmed_by?: string | null
+          payment_installments?: number | null
           payment_method?:
             | Database["public"]["Enums"]["payment_method_t"]
             | null
@@ -1303,6 +1312,15 @@ export type Database = {
       }
       pay_taxes: {
         Args: { _method?: string; _request_id: string }
+        Returns: Json
+      }
+      pay_with_card: {
+        Args: {
+          _card_last4: string
+          _installments: number
+          _request_id: string
+          _simulate_outcome: string
+        }
         Returns: Json
       }
       publish_milhas: { Args: { _request_id: string }; Returns: undefined }

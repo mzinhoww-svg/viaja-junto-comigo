@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyRequest, useRequestRealtime } from "@/hooks/useJourney";
@@ -27,6 +27,13 @@ function ContratoPage() {
   const signOut = useSignOut();
   const [name, setName] = useState("");
   const [agree, setAgree] = useState(false);
+
+  // Pagar primeiro: contrato só abre depois do pagamento da consultoria
+  useEffect(() => {
+    if (req.data && req.data.payment_status !== "paid" && !req.data.contract_signed) {
+      nav({ to: "/portal/pagamento" });
+    }
+  }, [req.data, nav]);
 
   const items = useQuery({
     queryKey: ["proposal_items", req.data?.id],
@@ -87,7 +94,7 @@ function ContratoPage() {
       toast.success("Contrato assinado!");
       qc.invalidateQueries({ queryKey: ["my-request"] });
       qc.invalidateQueries({ queryKey: ["contract", req.data?.id] });
-      nav({ to: "/portal/pagamento" });
+      nav({ to: "/portal" });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -104,7 +111,7 @@ function ContratoPage() {
         </div>
 
         <div className="mt-6">
-          <p className="text-xs uppercase tracking-wider text-coral font-bold">Etapa 2 de 7</p>
+          <p className="text-xs uppercase tracking-wider text-coral font-bold">Etapa 3 de 7</p>
           <h1 className="mt-1 text-3xl font-display font-extrabold text-navy leading-tight">Contrato</h1>
           <p className="mt-2 text-sm text-ink-soft">Leia com calma e assine digitalmente abaixo.</p>
         </div>
@@ -120,8 +127,8 @@ function ContratoPage() {
             Assinado por <b>{req.data?.sign_name}</b> em{" "}
             {req.data?.signed_at && new Date(req.data.signed_at).toLocaleString("pt-BR")}.
             <div className="mt-3">
-              <Button onClick={() => nav({ to: "/portal/pagamento" })} className="w-full bg-coral text-cream hover:bg-[var(--color-coral-pressed)]">
-                Ir para o pagamento
+              <Button onClick={() => nav({ to: "/portal" })} className="w-full bg-coral text-cream hover:bg-[var(--color-coral-pressed)]">
+                Continuar jornada
               </Button>
             </div>
           </div>
@@ -135,7 +142,7 @@ function ContratoPage() {
             </label>
             <Button
               onClick={() => sign.mutate()}
-              disabled={!agree || name.trim().length < 3 || sign.isPending || !bodyHtml}
+              disabled={!agree || name.trim().length < 4 || sign.isPending || !bodyHtml}
               className="w-full h-12 rounded-full bg-coral hover:bg-[var(--color-coral-pressed)] text-cream font-bold"
             >
               <FileSignature size={18} className="mr-2" /> Assinar contrato
