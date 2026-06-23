@@ -875,6 +875,8 @@ export type Database = {
           sched_window_open: boolean
           sign_name: string | null
           signed_at: string | null
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
           tax_status: Database["public"]["Enums"]["tax_status_t"]
           travel_checklist: Json
           usd_as_of: string | null
@@ -931,6 +933,8 @@ export type Database = {
           sched_window_open?: boolean
           sign_name?: string | null
           signed_at?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
           tax_status?: Database["public"]["Enums"]["tax_status_t"]
           travel_checklist?: Json
           usd_as_of?: string | null
@@ -987,6 +991,8 @@ export type Database = {
           sched_window_open?: boolean
           sign_name?: string | null
           signed_at?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
           tax_status?: Database["public"]["Enums"]["tax_status_t"]
           travel_checklist?: Json
           usd_as_of?: string | null
@@ -1140,6 +1146,38 @@ export type Database = {
           },
         ]
       }
+      stripe_webhook_events: {
+        Row: {
+          id: string
+          payload: Json | null
+          processed_at: string
+          request_id: string | null
+          type: string
+        }
+        Insert: {
+          id: string
+          payload?: Json | null
+          processed_at?: string
+          request_id?: string | null
+          type: string
+        }
+        Update: {
+          id?: string
+          payload?: Json | null
+          processed_at?: string
+          request_id?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stripe_webhook_events_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tax_payments: {
         Row: {
           amount_brl_cents: number
@@ -1286,6 +1324,10 @@ export type Database = {
         Args: { _assignee: string; _request_id: string }
         Returns: Json
       }
+      attach_stripe_session: {
+        Args: { _request_id: string; _session_id: string }
+        Returns: undefined
+      }
       complete_briefing: {
         Args: { _product_key: string; _request_id: string }
         Returns: undefined
@@ -1345,6 +1387,15 @@ export type Database = {
       mark_notification_read: {
         Args: { _notification_id: string }
         Returns: undefined
+      }
+      mark_paid_from_stripe: {
+        Args: {
+          _amount_cents: number
+          _payment_intent_id: string
+          _payment_method: string
+          _session_id: string
+        }
+        Returns: Json
       }
       pay_taxes: {
         Args: { _method?: string; _request_id: string }
