@@ -28,6 +28,7 @@ import { Route as PortalDocumentosRouteImport } from './routes/portal.documentos
 import { Route as PortalContratoRouteImport } from './routes/portal.contrato'
 import { Route as PortalConclusaoRouteImport } from './routes/portal.conclusao'
 import { Route as PortalAgendaRouteImport } from './routes/portal.agenda'
+import { Route as OrcamentoSucessoRouteImport } from './routes/orcamento.sucesso'
 import { Route as ConsoleRelatorioRouteImport } from './routes/console.relatorio'
 import { Route as ConsoleLoginRouteImport } from './routes/console.login'
 import { Route as ConsoleJanelasRouteImport } from './routes/console.janelas'
@@ -132,6 +133,11 @@ const PortalAgendaRoute = PortalAgendaRouteImport.update({
   path: '/agenda',
   getParentRoute: () => PortalRoute,
 } as any)
+const OrcamentoSucessoRoute = OrcamentoSucessoRouteImport.update({
+  id: '/sucesso',
+  path: '/sucesso',
+  getParentRoute: () => OrcamentoRoute,
+} as any)
 const ConsoleRelatorioRoute = ConsoleRelatorioRouteImport.update({
   id: '/relatorio',
   path: '/relatorio',
@@ -177,13 +183,14 @@ const ConsoleOrcamentoIdEditarRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/console': typeof ConsoleRouteWithChildren
-  '/orcamento': typeof OrcamentoRoute
+  '/orcamento': typeof OrcamentoRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
   '/console/relatorio': typeof ConsoleRelatorioRoute
+  '/orcamento/sucesso': typeof OrcamentoSucessoRoute
   '/portal/agenda': typeof PortalAgendaRoute
   '/portal/conclusao': typeof PortalConclusaoRoute
   '/portal/contrato': typeof PortalContratoRoute
@@ -205,12 +212,13 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/orcamento': typeof OrcamentoRoute
+  '/orcamento': typeof OrcamentoRouteWithChildren
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
   '/console/relatorio': typeof ConsoleRelatorioRoute
+  '/orcamento/sucesso': typeof OrcamentoSucessoRoute
   '/portal/agenda': typeof PortalAgendaRoute
   '/portal/conclusao': typeof PortalConclusaoRoute
   '/portal/contrato': typeof PortalContratoRoute
@@ -234,13 +242,14 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/console': typeof ConsoleRouteWithChildren
-  '/orcamento': typeof OrcamentoRoute
+  '/orcamento': typeof OrcamentoRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
   '/console/relatorio': typeof ConsoleRelatorioRoute
+  '/orcamento/sucesso': typeof OrcamentoSucessoRoute
   '/portal/agenda': typeof PortalAgendaRoute
   '/portal/conclusao': typeof PortalConclusaoRoute
   '/portal/contrato': typeof PortalContratoRoute
@@ -272,6 +281,7 @@ export interface FileRouteTypes {
     | '/console/janelas'
     | '/console/login'
     | '/console/relatorio'
+    | '/orcamento/sucesso'
     | '/portal/agenda'
     | '/portal/conclusao'
     | '/portal/contrato'
@@ -299,6 +309,7 @@ export interface FileRouteTypes {
     | '/console/janelas'
     | '/console/login'
     | '/console/relatorio'
+    | '/orcamento/sucesso'
     | '/portal/agenda'
     | '/portal/conclusao'
     | '/portal/contrato'
@@ -328,6 +339,7 @@ export interface FileRouteTypes {
     | '/console/janelas'
     | '/console/login'
     | '/console/relatorio'
+    | '/orcamento/sucesso'
     | '/portal/agenda'
     | '/portal/conclusao'
     | '/portal/contrato'
@@ -351,7 +363,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConsoleRoute: typeof ConsoleRouteWithChildren
-  OrcamentoRoute: typeof OrcamentoRoute
+  OrcamentoRoute: typeof OrcamentoRouteWithChildren
   PortalRoute: typeof PortalRouteWithChildren
 }
 
@@ -490,6 +502,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalAgendaRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/orcamento/sucesso': {
+      id: '/orcamento/sucesso'
+      path: '/sucesso'
+      fullPath: '/orcamento/sucesso'
+      preLoaderRoute: typeof OrcamentoSucessoRouteImport
+      parentRoute: typeof OrcamentoRoute
+    }
     '/console/relatorio': {
       id: '/console/relatorio'
       path: '/relatorio'
@@ -576,6 +595,18 @@ const ConsoleRouteChildren: ConsoleRouteChildren = {
 const ConsoleRouteWithChildren =
   ConsoleRoute._addFileChildren(ConsoleRouteChildren)
 
+interface OrcamentoRouteChildren {
+  OrcamentoSucessoRoute: typeof OrcamentoSucessoRoute
+}
+
+const OrcamentoRouteChildren: OrcamentoRouteChildren = {
+  OrcamentoSucessoRoute: OrcamentoSucessoRoute,
+}
+
+const OrcamentoRouteWithChildren = OrcamentoRoute._addFileChildren(
+  OrcamentoRouteChildren,
+)
+
 interface PortalRouteChildren {
   PortalAgendaRoute: typeof PortalAgendaRoute
   PortalConclusaoRoute: typeof PortalConclusaoRoute
@@ -616,7 +647,7 @@ const PortalRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConsoleRoute: ConsoleRouteWithChildren,
-  OrcamentoRoute: OrcamentoRoute,
+  OrcamentoRoute: OrcamentoRouteWithChildren,
   PortalRoute: PortalRouteWithChildren,
 }
 export const routeTree = rootRouteImport
