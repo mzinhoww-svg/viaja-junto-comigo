@@ -69,6 +69,8 @@ export type Database = {
           primary_color: string
           public_email: string | null
           public_whatsapp: string | null
+          usd_reference_at: string | null
+          usd_reference_rate: number | null
           visa_disclaimer: string
         }
         Insert: {
@@ -87,6 +89,8 @@ export type Database = {
           primary_color?: string
           public_email?: string | null
           public_whatsapp?: string | null
+          usd_reference_at?: string | null
+          usd_reference_rate?: number | null
           visa_disclaimer?: string
         }
         Update: {
@@ -105,6 +109,8 @@ export type Database = {
           primary_color?: string
           public_email?: string | null
           public_whatsapp?: string | null
+          usd_reference_at?: string | null
+          usd_reference_rate?: number | null
           visa_disclaimer?: string
         }
         Relationships: []
@@ -1316,6 +1322,16 @@ export type Database = {
         }
         Returns: undefined
       }
+      apply_usd_rate: {
+        Args: {
+          _as_of: string
+          _force?: boolean
+          _rate: number
+          _request_id: string
+          _source: string
+        }
+        Returns: Json
+      }
       archive_request: {
         Args: { _archive: boolean; _request_id: string }
         Returns: undefined
@@ -1359,6 +1375,7 @@ export type Database = {
       }
       create_request_with_travelers: { Args: { payload: Json }; Returns: Json }
       current_agency_id: { Args: never; Returns: string }
+      get_usd_rate: { Args: { _request_id: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1371,10 +1388,6 @@ export type Database = {
         Returns: Json
       }
       is_request_member: { Args: { _request_id: string }; Returns: boolean }
-      lock_usd_rate: {
-        Args: { _force?: boolean; _request_id: string }
-        Returns: Json
-      }
       log_audit: {
         Args: { _action: string; _payload?: Json; _target: string }
         Returns: undefined
@@ -1399,15 +1412,6 @@ export type Database = {
       }
       pay_taxes: {
         Args: { _method?: string; _request_id: string }
-        Returns: Json
-      }
-      pay_with_card: {
-        Args: {
-          _card_last4: string
-          _installments: number
-          _request_id: string
-          _simulate_outcome: string
-        }
         Returns: Json
       }
       publish_milhas: { Args: { _request_id: string }; Returns: undefined }

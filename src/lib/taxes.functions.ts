@@ -11,13 +11,18 @@ export const lockUsdRate = createServerFn({ method: "POST" })
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { data: out, error } = await context.supabase.rpc("lock_usd_rate", {
-      _request_id: data.request_id,
-      _force: data.force ?? false,
+    // Cotação real via AwesomeAPI (Edge Function). Mantém a trava por requisição:
+    // uma vez gravado em requests.usd_rate, só recotiza se _force=true.
+    const { data: out, error } = await context.supabase.functions.invoke("lock-usd-rate", {
+      body: { request_id: data.request_id, force: data.force ?? false },
     });
     if (error) throw new Error(error.message);
+    if (!out || (out as { error?: string }).error) {
+      throw new Error((out as { error?: string })?.error ?? "usd_rate_unavailable");
+    }
     return out as { rate: number; as_of: string; source: string; cached: boolean };
   });
+
 
 export const payTaxes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
