@@ -41,7 +41,8 @@ function PortalTaxes() {
         </div>
 
         <h1 className="mt-6 text-2xl font-display font-extrabold text-navy">Taxas governamentais</h1>
-        <p className="mt-1 text-ink-soft text-sm">Pague em reais via Pix — a Viajaly recolhe as taxas oficiais.</p>
+        <p className="mt-1 text-ink-soft text-sm">Pague em reais via Pix ou cartão no checkout seguro — a Viajaly recolhe as taxas oficiais.</p>
+
 
         <div className="mt-4">
           <LegalDisclaimer taxes />

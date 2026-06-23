@@ -24,22 +24,6 @@ export const lockUsdRate = createServerFn({ method: "POST" })
   });
 
 
-export const payTaxes = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({
-      request_id: z.string().uuid(),
-      method: z.string().max(40).optional(),
-    }).parse(input),
-  )
-  .handler(async ({ data, context }) => {
-    const { data: out, error } = await context.supabase.rpc("pay_taxes", {
-      _request_id: data.request_id,
-      _method: data.method ?? "pix",
-    });
-    if (error) throw new Error(error.message);
-    return out as { total_brl_cents: number; rate: number; method: string };
-  });
 
 export const confirmTaxPayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -86,6 +70,7 @@ export const addProductToRequest = createServerFn({ method: "POST" })
       request_id: z.string().uuid(),
       traveler_id: z.string().uuid().nullable(),
       product_key: z.enum(["vistos", "pass", "rot", "mil"]),
+      origin: z.enum(["upsell_renovacao"]).optional(),
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -93,7 +78,9 @@ export const addProductToRequest = createServerFn({ method: "POST" })
       _request_id: data.request_id,
       _traveler_id: data.traveler_id as unknown as string,
       _product_key: data.product_key,
-    });
+      _origin: data.origin ?? null,
+    } as never);
     if (error) throw new Error(error.message);
-    return out as { ok: boolean; product_key: string; price_cents: number };
+    return out as { ok: boolean; product_key: string; price_cents: number; origin: string | null };
   });
+

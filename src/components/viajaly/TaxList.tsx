@@ -1,18 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   lockUsdRate,
-  payTaxes,
   confirmTaxPayment,
   adminSetTaxStatus,
 } from "@/lib/taxes.functions";
-import { buildPixPayload } from "@/lib/pix";
+import { createTaxesCheckout } from "@/lib/payments-stripe.functions";
+import { getStripe, getStripeEnvironment, paymentsConfigured } from "@/lib/stripe";
+import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Loader2, CheckCircle2, Clock, ShieldOff, RefreshCcw, Copy } from "lucide-react";
+import { Loader2, CheckCircle2, Clock, ShieldOff, RefreshCcw, CreditCard, QrCode } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Traveler = { id: string; name: string; is_lead: boolean };
 type TaxKind = "consular_mrv" | "passaporte_pf";
@@ -27,11 +29,12 @@ type TaxRow = {
   notes: string | null;
   paid_at: string | null;
 };
-type Agency = {
-  pix_key: string | null;
-  pix_merchant_name: string | null;
-  pix_merchant_city: string | null;
-  usd_rate?: number | null;
+type UpsellItem = {
+  id: string;
+  label: string;
+  qty: number;
+  unit_price_cents: number;
+  discount_cents: number;
 };
 
 const STATUS: Record<TaxStatus, { label: string; cls: string; Icon: typeof Clock }> = {
@@ -51,7 +54,6 @@ const formatBRL = (cents: number) =>
 export function TaxList({ requestId, variant }: { requestId: string; variant: "portal" | "console" }) {
   const qc = useQueryClient();
   const lockFn = useServerFn(lockUsdRate);
-  const payFn = useServerFn(payTaxes);
   const confirmFn = useServerFn(confirmTaxPayment);
   const adminFn = useServerFn(adminSetTaxStatus);
 
@@ -65,13 +67,6 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
         .eq("id", requestId)
         .single();
       if (rErr) throw rErr;
-
-      const { data: agency, error: aErr } = await supabase
-        .from("agencies")
-        .select("pix_key, pix_merchant_name, pix_merchant_city")
-        .eq("id", req.agency_id)
-        .single();
-      if (aErr) throw aErr;
 
       const { data: travelers, error: tErr } = await supabase
         .from("travelers")
@@ -91,11 +86,19 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
         taxes = (data ?? []) as TaxRow[];
       }
 
+      const { data: upsells, error: uErr } = await supabase
+        .from("proposal_items")
+        .select("id, label, qty, unit_price_cents, discount_cents, origin, billed_at")
+        .eq("request_id", requestId)
+        .eq("origin", "upsell_renovacao")
+        .is("billed_at", null);
+      if (uErr) throw uErr;
+
       return {
         request: req,
-        agency: agency as Agency,
         travelers: (travelers ?? []) as Traveler[],
         taxes,
+        upsells: (upsells ?? []) as UpsellItem[],
       };
     },
   });
@@ -113,6 +116,20 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
       .then(() => qc.invalidateQueries({ queryKey: ["taxes", requestId] }))
       .catch(() => {});
   }, [q.data, hasMrvPending, lockFn, qc, requestId]);
+
+  // Após retornar do Stripe (?session_id=…) faz polling até o webhook atualizar.
+  useEffect(() => {
+    if (variant !== "portal") return;
+    const url = new URL(window.location.href);
+    if (!url.searchParams.get("session_id")) return;
+    const id = setInterval(() => {
+      qc.invalidateQueries({ queryKey: ["taxes", requestId] });
+      qc.invalidateQueries({ queryKey: ["journey", requestId] });
+      qc.invalidateQueries({ queryKey: ["request", requestId] });
+    }, 2500);
+    const stop = setTimeout(() => clearInterval(id), 60000);
+    return () => { clearInterval(id); clearTimeout(stop); };
+  }, [variant, qc, requestId]);
 
   const relockMut = useMutation({
     mutationFn: () => lockFn({ data: { request_id: requestId, force: true } }),
@@ -149,10 +166,12 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
   if (q.isError) return <p className="text-coral text-sm">Erro ao carregar taxas.</p>;
   if (!q.data || q.data.travelers.length === 0) return <p className="text-ink-muted text-sm">Sem viajantes.</p>;
 
-  const { request, agency, travelers, taxes } = q.data;
+  const { request, travelers, taxes, upsells } = q.data;
   const totalPendingBrl = taxes.filter((t) => t.status === "pending").reduce((s, t) => s + t.amount_brl_cents, 0);
+  const upsellTotalBrl = upsells.reduce((s, it) => s + (it.qty * it.unit_price_cents - (it.discount_cents ?? 0)), 0);
   const totalAllBrl = taxes.filter((t) => t.status !== "waived").reduce((s, t) => s + t.amount_brl_cents, 0);
-  const allPaid = taxes.length > 0 && taxes.every((t) => t.status !== "pending");
+  const allPaid = taxes.length > 0 && taxes.every((t) => t.status !== "pending") && upsells.length === 0;
+  const grandTotal = totalPendingBrl + upsellTotalBrl;
   const rate = request.usd_rate ? Number(request.usd_rate) : null;
   const asOf = request.usd_as_of ? new Date(request.usd_as_of as string) : null;
   const source = (request.usd_source as string | null) ?? null;
@@ -162,8 +181,8 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
       <div className="rounded-2xl bg-navy text-cream p-4">
         <p className="text-xs uppercase tracking-wider opacity-70">Cobrança de taxas</p>
         <p className="mt-1 text-sm leading-relaxed">
-          A Viajaly paga as taxas oficiais (consulado e Polícia Federal). Você paga a agência <b>via Pix em reais</b>,
-          em uma única transação, com o valor já convertido pela cotação travada abaixo.
+          A Viajaly paga as taxas oficiais (consulado e Polícia Federal). Você paga em reais via Pix ou cartão
+          no checkout seguro abaixo, com o valor já convertido pela cotação travada.
         </p>
         {rate != null && (
           <div className="mt-3 text-xs opacity-90 flex flex-wrap items-center gap-2">
@@ -234,9 +253,24 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
             );
           })}
         </ul>
+        {upsells.length > 0 && (
+          <div className="mt-3 border-t border-[var(--color-border)] pt-3">
+            <p className="text-xs uppercase tracking-wider text-coral font-bold">Renovação de passaporte</p>
+            <ul className="mt-1 space-y-1 text-sm">
+              {upsells.map((u) => (
+                <li key={u.id} className="flex items-center justify-between text-ink-soft">
+                  <span>{u.label} <span className="text-[10px] uppercase tracking-wider text-coral">· preço especial</span></span>
+                  <span className="font-mono text-ink">
+                    {formatBRL(u.qty * u.unit_price_cents - (u.discount_cents ?? 0))}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         <div className="mt-4 border-t border-[var(--color-border)] pt-3 flex justify-between text-navy font-display font-bold">
           <span>Total a pagar</span>
-          <span className="font-mono">{formatBRL(totalPendingBrl)}</span>
+          <span className="font-mono">{formatBRL(grandTotal)}</span>
         </div>
         {totalAllBrl !== totalPendingBrl && (
           <div className="text-xs text-ink-soft flex justify-between mt-1">
@@ -246,22 +280,10 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
         )}
       </div>
 
-      {variant === "portal" && totalPendingBrl > 0 && rate != null && (
-        <PortalPixPanel
-          amountCents={totalPendingBrl}
-          pixKey={agency.pix_key}
-          merchantName={agency.pix_merchant_name}
-          merchantCity={agency.pix_merchant_city}
-          txid={`TX${requestId.slice(0, 8)}`}
-          onPay={async () => {
-            try {
-              await payFn({ data: { request_id: requestId } });
-            } catch (e) {
-              toast.error((e as Error).message);
-            }
-          }}
-        />
+      {variant === "portal" && grandTotal > 0 && (!hasMrvPending || rate != null) && (
+        <TaxesCheckout requestId={requestId} amount={grandTotal} />
       )}
+
 
       {variant === "portal" && allPaid && (
         <p className="text-sm text-vgreen text-center">Todas as taxas estão confirmadas.</p>
@@ -269,7 +291,11 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
 
       {variant === "console" && (
         <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4 md:p-5">
-          <h3 className="font-display font-bold text-navy text-sm">Ações da agência</h3>
+          <h3 className="font-display font-bold text-navy text-sm">Override de admin</h3>
+          <p className="text-xs text-ink-soft mt-1">
+            O caminho principal é o cliente pagar pelo checkout Stripe. Use estes botões só para corrigir
+            manualmente (ex.: pagamento fora do app, isenção).
+          </p>
           <div className="flex flex-wrap gap-2 mt-3">
             <Button
               size="sm"
@@ -277,7 +303,7 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
               onClick={() => confirmMut.mutate(true)}
               disabled={confirmMut.isPending || totalPendingBrl === 0}
             >
-              Confirmar pagamento total
+              Marcar como pago (override)
             </Button>
             <Button
               size="sm"
@@ -295,58 +321,83 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
   );
 }
 
-function PortalPixPanel({
-  amountCents,
-  pixKey,
-  merchantName,
-  merchantCity,
-  txid,
-  onPay,
-}: {
-  amountCents: number;
-  pixKey: string | null;
-  merchantName: string | null;
-  merchantCity: string | null;
-  txid: string;
-  onPay: () => Promise<void>;
-}) {
-  if (!pixKey || !merchantName || !merchantCity) {
+function TaxesCheckout({ requestId, amount }: { requestId: string; amount: number }) {
+  const [method, setMethod] = useState<"pix" | "card">("pix");
+
+  if (!paymentsConfigured()) {
     return (
-      <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-        A agência ainda não configurou a chave Pix. Aguarde contato pelo WhatsApp para finalizar o pagamento.
+      <div className="rounded-2xl bg-[var(--color-danger-bg)] text-[var(--color-danger-fg)] p-5 text-sm">
+        Pagamentos online ainda não configurados. Entre em contato com a Letícia para finalizar o pagamento
+        das taxas.
       </div>
     );
   }
-  const payload = buildPixPayload({
-    pixKey,
-    amountCents,
-    merchantName,
-    merchantCity,
-    txid,
-  });
+
   return (
-    <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4 md:p-5">
-      <h3 className="font-display font-bold text-navy">Pix das taxas</h3>
-      <p className="text-xs text-ink-soft mt-1">
-        Valor: <b className="text-navy">{formatBRL(amountCents)}</b>
-      </p>
-      <div className="mt-3 rounded-lg bg-[var(--color-muted)] p-3 font-mono text-xs break-all">{payload}</div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <Button
-          size="sm"
-          className="rounded-full bg-coral hover:bg-[var(--color-coral-hover)] text-cream"
-          onClick={async () => {
-            await navigator.clipboard.writeText(payload);
-            toast.success("Copiado");
-            onPay();
-          }}
-        >
-          <Copy size={14} className="mr-1.5" /> Copiar Pix
+    <Tabs value={method} onValueChange={(v) => setMethod(v as "pix" | "card")}>
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="pix"><QrCode size={14} className="mr-1.5" /> Pix</TabsTrigger>
+        <TabsTrigger value="card"><CreditCard size={14} className="mr-1.5" /> Cartão</TabsTrigger>
+      </TabsList>
+      <TabsContent value="pix" className="mt-4">
+        <TaxesCheckoutPanel key="pix" requestId={requestId} method="pix" amount={amount} />
+      </TabsContent>
+      <TabsContent value="card" className="mt-4">
+        <TaxesCheckoutPanel key="card" requestId={requestId} method="card" amount={amount} />
+      </TabsContent>
+    </Tabs>
+  );
+}
+
+function TaxesCheckoutPanel({ requestId, method, amount }: { requestId: string; method: "pix" | "card"; amount: number }) {
+  const create = useServerFn(createTaxesCheckout);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchClientSecret = useCallback(async (): Promise<string> => {
+    const result = await create({
+      data: {
+        requestId,
+        method,
+        returnUrl: `${window.location.origin}/portal/taxas`,
+        environment: getStripeEnvironment(),
+      },
+    });
+    if ("error" in result) {
+      setError(result.error);
+      throw new Error(result.error);
+    }
+    if (!result.clientSecret) throw new Error("Stripe não retornou client secret");
+    return result.clientSecret;
+  }, [requestId, method, create]);
+
+  if (error) {
+    return (
+      <div className="rounded-2xl bg-[var(--color-danger-bg)] text-[var(--color-danger-fg)] p-4 text-sm">
+        <p className="font-semibold">Não foi possível abrir o checkout.</p>
+        <p className="mt-1">{error}</p>
+        <Button onClick={() => { setError(null); toast.info("Tente novamente."); }} variant="outline" className="mt-3 h-9">
+          Tentar de novo
         </Button>
       </div>
-      <p className="text-[11px] text-ink-muted mt-3">
-        Após pagar, a equipe confirma a entrada e libera a etapa de agendamento.
-      </p>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-[var(--color-border)] bg-white overflow-hidden">
+      <div className="px-4 py-3 border-b border-[var(--color-border)] bg-cream flex items-center justify-between text-xs">
+        <span className="font-semibold text-navy">
+          {method === "pix" ? "Pix dinâmico · confirmação automática" : "Cartão · até 12x"}
+        </span>
+        <span className="font-mono text-ink">{formatBRL(amount)}</span>
+      </div>
+      <div className="min-h-[420px] relative">
+        <div className="absolute inset-0 flex items-center justify-center text-ink-muted text-xs pointer-events-none">
+          <Loader2 className="animate-spin mr-2" size={14} /> Carregando checkout seguro…
+        </div>
+        <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
+          <EmbeddedCheckout />
+        </EmbeddedCheckoutProvider>
+      </div>
     </div>
   );
 }

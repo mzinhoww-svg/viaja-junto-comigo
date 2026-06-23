@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { saveDs160Draft, submitDs160, validateDs160 } from "@/lib/ds160.functions";
+import { addProductToRequest } from "@/lib/taxes.functions";
+
 import { DS160_SECTIONS, computeCompletion, isFieldVisible, reviewFlags, type Field } from "@/lib/ds160-schema";
 import { maskCPF, maskCEP, maskPhoneBR, normalizeNameMRZ } from "@/lib/format";
 import { buildDs160Package, downloadDs160Package } from "@/lib/ds160-export";
@@ -118,6 +120,7 @@ function TravelerDS160({
   const saveFn = useServerFn(saveDs160Draft);
   const submitFn = useServerFn(submitDs160);
   const validateFn = useServerFn(validateDs160);
+  const addProductFn = useServerFn(addProductToRequest);
 
   const [form, setForm] = useState<Record<string, unknown>>(submission?.form ?? {});
   const [openSection, setOpenSection] = useState<string | null>(DS160_SECTIONS[0].key);
@@ -132,6 +135,22 @@ function TravelerDS160({
   const passportMonths = monthsUntil(form.passport_expiry_date as string | undefined);
   const passportShort = passportMonths !== null && passportMonths < 6;
   const initialRef = useRef(true);
+
+  // Já existe um upsell de renovação para este pedido? Esconde o gatilho se sim.
+  const renovationAlready = useQuery({
+    queryKey: ["upsell_renovacao", requestId],
+    enabled: !!requestId && passportShort,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("proposal_items")
+        .select("id")
+        .eq("request_id", requestId)
+        .eq("origin", "upsell_renovacao")
+        .limit(1);
+      if (error) throw error;
+      return (data ?? []).length > 0;
+    },
+  });
 
   const saveMut = useMutation({
     mutationFn: async (next: Record<string, unknown>) => {
@@ -154,14 +173,22 @@ function TravelerDS160({
 
   const upsellMut = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.rpc("add_product_to_request", {
-        _request_id: requestId, _traveler_id: traveler.id, _product_key: "pass",
+      await addProductFn({
+        data: {
+          request_id: requestId,
+          traveler_id: traveler.id,
+          product_key: "pass",
+          origin: "upsell_renovacao",
+        },
       });
-      if (error) throw error;
     },
-    onSuccess: () => { toast.success("Assessoria de Passaporte adicionada à proposta"); onChange(); },
+    onSuccess: () => {
+      toast.success("Renovação com preço especial adicionada — pague no checkout das Taxas");
+      onChange();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
+
 
   const validateMut = useMutation({
     mutationFn: async (vars: { approve: boolean; reason?: string }) => {
@@ -224,22 +251,31 @@ function TravelerDS160({
         </div>
       )}
 
-      {variant === "portal" && status === "draft" && passportShort && (
+      {variant === "portal" && status === "draft" && passportShort && !renovationAlready.data && (
         <div className="rounded-2xl border border-coral/40 bg-cream p-4 text-sm text-ink space-y-2">
           <div className="flex gap-2">
             <AlertTriangle size={16} className="shrink-0 mt-0.5 text-coral" />
             <div>
               O passaporte precisa de <b>validade mínima de 6 meses</b> para o visto
               {passportMonths !== null && passportMonths < 0 ? " (está vencido)" : ` (faltam ~${passportMonths} meses)`}.
-              Quer que a Viajaly cuide da emissão/renovação?
+              Quer que a Viajaly cuide da <b>renovação com preço especial</b>?
+              <div className="mt-1 text-xs text-ink-soft">
+                Pacote promocional: <b className="text-navy">R$ 259</b> de assessoria + <b className="text-navy">R$ 259</b> de taxa PF (paga no checkout de Taxas).
+              </div>
             </div>
           </div>
           <Button size="sm" className="bg-coral text-cream hover:bg-[var(--color-coral-pressed)]"
             disabled={upsellMut.isPending} onClick={() => upsellMut.mutate()}>
-            Adicionar Passaporte — R$ 390
+            Renovar passaporte — preço especial R$ 259
           </Button>
         </div>
       )}
+      {variant === "portal" && status === "draft" && passportShort && renovationAlready.data && (
+        <div className="rounded-2xl border border-vgreen/30 bg-vgreen/5 p-4 text-sm text-ink">
+          Renovação de passaporte com preço especial já está na sua proposta. Você paga no checkout de Taxas.
+        </div>
+      )}
+
 
       {variant === "portal" && (status === "received" || status === "pending_review") && (
         <div className="rounded-2xl border border-[var(--color-border)] bg-white p-4 text-sm">
