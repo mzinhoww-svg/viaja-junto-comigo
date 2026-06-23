@@ -8,6 +8,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSignOut } from "./portal";
 import { LogOut } from "lucide-react";
 
+const STEP_TO_ROUTE: Record<string, "/portal/proposta" | "/portal/contrato" | "/portal/pagamento" | "/portal/documentos" | "/portal/ds160" | "/portal/taxas"> = {
+  proposta: "/portal/proposta",
+  contrato: "/portal/contrato",
+  pagamento: "/portal/pagamento",
+  documentos: "/portal/documentos",
+  taxas: "/portal/taxas",
+};
+
 export const Route = createFileRoute("/portal/")({
   ssr: false,
   head: () => ({ meta: [{ title: "Sua jornada — Viajaly" }] }),
