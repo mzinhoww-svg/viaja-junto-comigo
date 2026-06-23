@@ -654,7 +654,7 @@ function IntroChip({ icon, title, sub }: { icon: React.ReactNode; title: string;
         {icon}
       </div>
       <p className="mt-1.5 text-sm font-display font-bold text-navy">{title}</p>
-      <p className="text-[11px] text-ink-muted">{sub}</p>
+      <p className="text-xs text-ink-soft">{sub}</p>
     </div>
   );
 }
