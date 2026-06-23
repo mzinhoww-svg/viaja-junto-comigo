@@ -447,7 +447,7 @@ function TravelerDS160({
             type="button"
             onClick={goPrev}
             disabled={step === -1}
-            className="inline-flex items-center gap-1 text-xs font-semibold text-ink-soft hover:text-coral disabled:opacity-40"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-ink-soft hover:text-coral disabled:opacity-40 min-h-10 px-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/60"
           >
             <ChevronLeft size={14} /> Voltar
           </button>
@@ -455,7 +455,7 @@ function TravelerDS160({
             🇺🇸 Mapa DS-160
           </span>
           <span
-            className={`inline-flex items-center gap-1 text-[11px] font-semibold ${
+            className={`inline-flex items-center gap-1 text-xs font-semibold ${
               saveMut.isPending ? "text-amber-700" : "text-vgreen"
             }`}
           >
