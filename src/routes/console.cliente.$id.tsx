@@ -22,6 +22,7 @@ type Tab = "jornada" | "documentos" | "acesso";
 function ConsoleClient() {
   const { id } = Route.useParams();
   const [tab, setTab] = useState<Tab>("jornada");
+  const [showShare, setShowShare] = useState(false);
   const qc = useQueryClient();
   useRequestRealtime(id);
   const req = useQuery({
