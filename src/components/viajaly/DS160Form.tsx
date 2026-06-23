@@ -759,7 +759,7 @@ function DocumentsStep({ requestId }: { requestId: string }) {
           <p className="text-sm text-ink-soft mt-0.5">
             Envie cada item em JPG, PNG ou PDF (até 10 MB). Os condicionais aparecem conforme suas respostas.
           </p>
-          <span className="inline-flex items-center gap-1.5 mt-2 text-[11px] font-semibold text-navy bg-cream border border-coral/20 px-2.5 py-1 rounded-full">
+          <span className="inline-flex items-center gap-1.5 mt-2 text-xs font-semibold text-navy bg-cream border border-coral/20 px-2.5 py-1 rounded-full">
             🇺🇸 Alimenta o DS-160 · Documentos anexos
           </span>
         </div>
