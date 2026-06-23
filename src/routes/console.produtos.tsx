@@ -69,7 +69,7 @@ function ProductRow({ product, onChange }: { product: Product; onChange: () => v
   const save = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from("products_catalog")
-        .update({ name, price: Number(price.replace(",", ".")) || 0, active }).eq("key", product.key);
+        .update({ name, price: Number(price.replace(",", ".")) || 0, active }).eq("key", product.key as never);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Produto salvo"); onChange(); },
