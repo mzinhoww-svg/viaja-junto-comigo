@@ -7,7 +7,7 @@ import { OutcomeBadge, type VisaOutcome } from "@/components/viajaly/OutcomeBadg
 import { MessageInbox } from "@/components/viajaly/MessageInbox";
 import { AssigneeSelect, useStaffMembers } from "@/components/viajaly/AssigneeSelect";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, LayoutGrid, Table2 } from "lucide-react";
 
 export const Route = createFileRoute("/console/")({
   ssr: false,
@@ -17,8 +17,26 @@ export const Route = createFileRoute("/console/")({
 
 type Filter = "ativos" | "finalizados" | "arquivados" | "todos";
 
+const STAGES: { key: string; label: string }[] = [
+  { key: "proposta", label: "Proposta" },
+  { key: "pagamento", label: "Pagamento" },
+  { key: "contrato", label: "Contrato" },
+  { key: "andamento", label: "Em andamento" },
+  { key: "concluido", label: "Concluído" },
+];
+
+/** Estágio do caso derivado dos campos da request (para o kanban). */
+function stageOf(r: { visa_outcome: string | null; proposal_status: string; payment_status: string; contract_signed: boolean | null }): string {
+  if (r.visa_outcome) return "concluido";
+  if (r.proposal_status !== "accepted") return "proposta";
+  if (r.payment_status !== "paid") return "pagamento";
+  if (!r.contract_signed) return "contrato";
+  return "andamento";
+}
+
 function ConsoleHome() {
   const [filter, setFilter] = useState<Filter>("ativos");
+  const [view, setView] = useState<"tabela" | "kanban">("tabela");
   const [mine, setMine] = useState(false);
   const [search, setSearch] = useState("");
   const [me, setMe] = useState<string | null>(null);
@@ -98,9 +116,20 @@ function ConsoleHome() {
         <label className="inline-flex items-center gap-2 text-sm text-ink-soft cursor-pointer">
           <input type="checkbox" checked={mine} onChange={(e) => setMine(e.target.checked)} /> Meus casos
         </label>
+        <div className="inline-flex rounded-lg border border-[var(--color-border)] overflow-hidden">
+          <button onClick={() => setView("tabela")} aria-label="Ver em tabela"
+            className={`px-2.5 h-9 inline-flex items-center gap-1 text-sm ${view === "tabela" ? "bg-navy text-cream" : "text-ink-soft hover:text-navy"}`}>
+            <Table2 size={15} /> Tabela
+          </button>
+          <button onClick={() => setView("kanban")} aria-label="Ver em kanban"
+            className={`px-2.5 h-9 inline-flex items-center gap-1 text-sm ${view === "kanban" ? "bg-navy text-cream" : "text-ink-soft hover:text-navy"}`}>
+            <LayoutGrid size={15} /> Kanban
+          </button>
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-[1fr_320px] gap-6">
+        {view === "tabela" ? (
         <div className="bg-white rounded-2xl border border-[var(--color-border)] overflow-x-auto">
           <table className="w-full text-sm min-w-[720px]">
             <thead className="bg-[var(--color-muted)] text-ink-soft text-xs uppercase tracking-wider">
@@ -151,8 +180,47 @@ function ConsoleHome() {
             </tbody>
           </table>
         </div>
+        ) : (
+          <KanbanBoard rows={rows} />
+        )}
         <MessageInbox />
       </div>
     </section>
+  );
+}
+
+function KanbanBoard({ rows }: { rows: { id: string; lead_name: string | null; lead_email: string | null; access_code: string | null; proposal_status: string; payment_status: string; contract_signed: boolean | null; visa_outcome: string | null; archived_at: string | null }[] }) {
+  return (
+    <div className="overflow-x-auto pb-2">
+      <div className="flex gap-3 min-w-[900px]">
+        {STAGES.map((st) => {
+          const cards = rows.filter((r) => stageOf(r) === st.key);
+          return (
+            <div key={st.key} className="flex-1 min-w-[180px] bg-[var(--color-muted)]/40 rounded-2xl p-2">
+              <div className="px-2 py-1.5 flex items-center justify-between">
+                <span className="text-xs font-display font-bold text-navy uppercase tracking-wider">{st.label}</span>
+                <span className="text-xs text-ink-muted">{cards.length}</span>
+              </div>
+              <div className="space-y-2">
+                {cards.map((r) => (
+                  <Link key={r.id} to="/console/cliente/$id" params={{ id: r.id }}
+                    className={`block bg-white rounded-xl border border-[var(--color-border)] p-3 hover:border-coral transition ${r.archived_at ? "opacity-60" : ""}`}>
+                    <p className="font-semibold text-navy text-sm truncate">{r.lead_name}</p>
+                    <p className="text-[11px] text-ink-soft truncate">{r.lead_email}</p>
+                    <div className="mt-2 flex items-center justify-between">
+                      <span className="font-mono text-[11px] text-ink-muted">{r.access_code}</span>
+                      {r.visa_outcome
+                        ? <OutcomeBadge outcome={r.visa_outcome as VisaOutcome} size="sm" />
+                        : <StatusPill variant={r.payment_status === "paid" ? "done" : r.payment_status === "declined" ? "danger" : "warn"}>{r.payment_status}</StatusPill>}
+                    </div>
+                  </Link>
+                ))}
+                {cards.length === 0 && <p className="px-2 py-3 text-xs text-ink-muted">—</p>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
