@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useJourney, useRequestRealtime } from "@/hooks/useJourney";
 import { StepCard } from "@/components/viajaly/StepCard";
+import { DocumentList } from "@/components/viajaly/DocumentList";
+import { AccessAuditCard } from "@/components/viajaly/AccessAuditCard";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
@@ -13,8 +16,11 @@ export const Route = createFileRoute("/console/cliente/$id")({
   component: ConsoleClient,
 });
 
+type Tab = "jornada" | "documentos" | "acesso";
+
 function ConsoleClient() {
   const { id } = Route.useParams();
+  const [tab, setTab] = useState<Tab>("jornada");
   const qc = useQueryClient();
   useRequestRealtime(id);
   const req = useQuery({
@@ -56,46 +62,75 @@ function ConsoleClient() {
 
   if (!req.data) return <p className="text-ink-muted">Carregando…</p>;
 
+  const tabs: { key: Tab; label: string }[] = [
+    { key: "jornada", label: "Jornada" },
+    { key: "documentos", label: "Documentos" },
+    { key: "acesso", label: "Acesso" },
+  ];
+
   return (
     <section>
       <Link to="/console" className="inline-flex items-center gap-1 text-ink-soft text-sm hover:text-coral">
         <ChevronLeft size={16} /> Pipeline
       </Link>
       <h1 className="mt-2 text-3xl font-display font-extrabold text-navy">{req.data.lead_name}</h1>
-      <p className="text-ink-soft text-sm">{req.data.lead_email} · código <span className="font-mono">{req.data.access_code}</span></p>
+      <p className="text-ink-soft text-sm">
+        {req.data.lead_email} · código <span className="font-mono">{req.data.access_code}</span>
+      </p>
 
-      <div className="grid md:grid-cols-2 gap-6 mt-8">
-        <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5">
-          <h2 className="font-display font-bold text-navy mb-4">Jornada</h2>
-          <div className="space-y-2">
-            {journey.data?.map((s) => <StepCard key={s.key} idx={s.idx} label={s.label} status={s.status} />)}
+      <div className="mt-6 border-b border-[var(--color-border)] flex gap-1">
+        {tabs.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className={`px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition ${
+              tab === t.key
+                ? "border-coral text-coral"
+                : "border-transparent text-ink-soft hover:text-navy"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "jornada" && (
+        <div className="grid md:grid-cols-2 gap-6 mt-6">
+          <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5">
+            <h2 className="font-display font-bold text-navy mb-4">Etapas</h2>
+            <div className="space-y-2">
+              {journey.data?.map((s) => <StepCard key={s.key} idx={s.idx} label={s.label} status={s.status} />)}
+            </div>
           </div>
-        </div>
-
-        <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5 space-y-4">
-          <h2 className="font-display font-bold text-navy">Smoke test do Realtime</h2>
-          <p className="text-xs text-ink-soft">
-            Use os botões abaixo: o portal do cliente reflete em &lt; 2s sem reload.
-          </p>
-          <div className="space-y-2">
-            <div className="flex gap-2">
+          <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5 space-y-4">
+            <h2 className="font-display font-bold text-navy">Controles rápidos</h2>
+            <p className="text-xs text-ink-soft">Atalhos manuais — portal reflete em &lt;2s via realtime.</p>
+            <div className="space-y-2">
               <Button size="sm" variant="outline" onClick={() => flipProposal.mutate(req.data!.proposal_status === "accepted" ? "sent" : "accepted")}>
                 {req.data.proposal_status === "accepted" ? "Marcar proposta como enviada" : "Aceitar proposta"}
               </Button>
-            </div>
-            <div className="flex gap-2">
               <Button size="sm" variant="outline" onClick={() => flipSigned.mutate(!req.data!.contract_signed)}>
                 {req.data.contract_signed ? "Desassinar contrato" : "Assinar contrato"}
               </Button>
-            </div>
-            <div className="flex gap-2">
               <Button size="sm" variant="outline" onClick={() => flipPayment.mutate(req.data!.payment_status !== "paid")}>
                 {req.data.payment_status === "paid" ? "Reverter pagamento" : "Marcar pago"}
               </Button>
             </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {tab === "documentos" && (
+        <div className="mt-6">
+          <DocumentList requestId={id} variant="console" />
+        </div>
+      )}
+
+      {tab === "acesso" && (
+        <div className="mt-6 max-w-2xl">
+          <AccessAuditCard requestId={id} />
+        </div>
+      )}
     </section>
   );
 }
