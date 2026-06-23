@@ -135,7 +135,7 @@ function PlanRow({ plan, onChange }: { plan: Plan; onChange: () => void }) {
   const dirty = label !== plan.label || price !== String(plan.price);
   const save = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("visto_plans").update({ label, price: Number(price.replace(",", ".")) || 0 }).eq("key", plan.key);
+      const { error } = await supabase.from("visto_plans").update({ label, price: Number(price.replace(",", ".")) || 0 }).eq("key", plan.key as never);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Plano salvo"); onChange(); },
