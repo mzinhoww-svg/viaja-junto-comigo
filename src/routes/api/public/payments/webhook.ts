@@ -43,6 +43,27 @@ async function handleConsultancyCheckout(session: any) {
     _amount_cents: amount,
   } as never);
   if (error) console.error("mark_paid_from_stripe error:", error);
+
+  // Aviso por e-mail (no-op seguro se BREVO_API_KEY/EMAIL_ENABLED não estiverem setados)
+  await notifyPaymentConfirmed(session).catch((e) => console.error("notify email error:", e));
+}
+
+async function notifyPaymentConfirmed(session: any) {
+  const email: string | undefined =
+    session?.customer_details?.email ??
+    session?.customer_email ??
+    session?.metadata?.lead_email;
+  if (!email) return;
+  const name: string | undefined =
+    session?.customer_details?.name ?? session?.metadata?.lead_name;
+  const supabase = getSupabase();
+  await supabase.functions.invoke("send-email", {
+    body: {
+      template: "payment_confirmed",
+      to: { email, name },
+      vars: { name, link: "https://viajaly.app/portal" },
+    },
+  });
 }
 
 async function handleTaxesCheckout(session: any) {

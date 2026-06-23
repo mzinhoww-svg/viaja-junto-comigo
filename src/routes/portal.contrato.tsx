@@ -12,7 +12,10 @@ import { toast } from "sonner";
 import { renderContract } from "@/lib/contract-template";
 import { LegalDisclaimer } from "@/components/viajaly/LegalDisclaimer";
 import { useSignOut } from "./portal";
-import { FileSignature, CheckCircle2 } from "lucide-react";
+import { FileSignature, CheckCircle2, Download } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { signContract, setContractPdfPath } from "@/lib/contract.functions";
+import { buildContractPdf, sha256HexBrowser } from "@/lib/contract-pdf";
 
 export const Route = createFileRoute("/portal/contrato")({
   ssr: false,
@@ -102,24 +105,71 @@ function ContratoPage() {
     }, pickTemplate(templates.data ?? [], items.data ?? []));
   }, [req.data, items.data, ctx.data, templates.data]);
 
+  const signFn = useServerFn(signContract);
+  const setPdfFn = useServerFn(setContractPdfPath);
+
   const sign = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.rpc("sign_contract", {
-        _request_id: req.data!.id, _name: name.trim(), _body_html: bodyHtml, _ip: "",
+      if (!req.data || !bodyHtml) throw new Error("contrato_indisponivel");
+      const bodyHash = await sha256HexBrowser(bodyHtml);
+      const out = await signFn({
+        data: {
+          request_id: req.data.id,
+          name: name.trim(),
+          body_html: bodyHtml,
+          body_sha256: bodyHash,
+          accepted_terms: true,
+          cpf: null,
+        },
       });
-      if (error) throw error;
+      // Gera PDF com a trilha forense devolvida pelo servidor
+      const pdfBlob = buildContractPdf({
+        agencyName: ctx.data?.agencyName ?? "Viajaly",
+        bodyHtml,
+        audit: {
+          signerName: name.trim(),
+          signerCpf: null,
+          signedAtISO: out.signed_at,
+          ip: out.ip,
+          userAgent: out.user_agent,
+          bodySha256: out.body_sha256,
+          acceptedTermsAtISO: out.signed_at,
+        },
+      });
+      const path = `contratos/${req.data.id}/${out.contract_id}.pdf`;
+      const { error: upErr } = await supabase.storage
+        .from("documents")
+        .upload(path, pdfBlob, { contentType: "application/pdf", upsert: true });
+      if (upErr) throw upErr;
+      await setPdfFn({ data: { contract_id: out.contract_id, path } });
+      return { contract_id: out.contract_id, path };
     },
     onSuccess: () => {
-      toast.success("Contrato assinado!");
+      toast.success("Contrato assinado e PDF arquivado!");
       qc.invalidateQueries({ queryKey: ["my-request"] });
       qc.invalidateQueries({ queryKey: ["contract", req.data?.id] });
-      nav({ to: "/portal" });
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const signed = req.data?.contract_signed;
   const displayHtml = existing.data?.body_html || bodyHtml;
+
+  async function downloadPdf() {
+    const path = existing.data?.pdf_path;
+    if (!path) {
+      toast.error("PDF ainda não disponível.");
+      return;
+    }
+    const { data: signed, error } = await supabase.storage
+      .from("documents")
+      .createSignedUrl(path, 300);
+    if (error || !signed) {
+      toast.error("Não consegui gerar o link do PDF.");
+      return;
+    }
+    window.open(signed.signedUrl, "_blank", "noopener");
+  }
 
   return (
     <PhoneFrame>
@@ -149,7 +199,15 @@ function ContratoPage() {
             <CheckCircle2 className="inline mr-2" size={18} />
             Assinado por <b>{req.data?.sign_name}</b> em{" "}
             {req.data?.signed_at && new Date(req.data.signed_at).toLocaleString("pt-BR")}.
-            <div className="mt-3">
+            <div className="mt-3 grid grid-cols-1 gap-2">
+              <Button
+                onClick={downloadPdf}
+                disabled={!existing.data?.pdf_path}
+                variant="outline"
+                className="w-full"
+              >
+                <Download size={16} className="mr-2" /> Baixar PDF assinado
+              </Button>
               <Button onClick={() => nav({ to: "/portal" })} className="w-full bg-coral text-cream hover:bg-[var(--color-coral-pressed)]">
                 Continuar jornada
               </Button>
