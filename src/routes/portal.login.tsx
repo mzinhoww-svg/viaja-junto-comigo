@@ -120,6 +120,8 @@ function PortalLogin() {
       submittedRef.current = "";
     },
   });
+  codeMutRef.current = (c: string) => codeMut.mutate(c);
+
 
   const resendMut = useMutation({
     mutationFn: async () => {
