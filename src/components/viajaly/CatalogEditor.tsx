@@ -90,7 +90,7 @@ function PlanRow({ plan, onSaved }: { plan: Plan; onSaved: () => void }) {
   const save = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from("visto_plans")
-        .update({ label, price: Number(price.replace(",", ".")) || 0 }).eq("key", plan.key);
+        .update({ label, price: Number(price.replace(",", ".")) || 0 }).eq("key", plan.key as never);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Plano atualizado"); onSaved(); },
