@@ -8,9 +8,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ProductsHub } from "@/components/viajaly/ProductsHub";
 import { NotificationBell } from "@/components/viajaly/NotificationBell";
 import { useSignOut } from "./portal";
-import { LogOut } from "lucide-react";
+import { LogOut, MessageSquare } from "lucide-react";
 
-const STEP_TO_ROUTE: Record<string, "/portal/proposta" | "/portal/contrato" | "/portal/pagamento" | "/portal/documentos" | "/portal/ds160" | "/portal/taxas" | "/portal/agenda" | "/portal/conclusao"> = {
+const STEP_TO_ROUTE: Record<string, "/portal/proposta" | "/portal/contrato" | "/portal/pagamento" | "/portal/documentos" | "/portal/ds160" | "/portal/taxas" | "/portal/agenda" | "/portal/conclusao" | "/portal/passaporte" | "/portal/roteiro" | "/portal/milhas"> = {
   proposta: "/portal/proposta",
   contrato: "/portal/contrato",
   pagamento: "/portal/pagamento",
@@ -18,6 +18,12 @@ const STEP_TO_ROUTE: Record<string, "/portal/proposta" | "/portal/contrato" | "/
   taxas: "/portal/taxas",
   agenda: "/portal/agenda",
   conclusao: "/portal/conclusao",
+  briefing_passaporte: "/portal/passaporte",
+  entrega_passaporte: "/portal/passaporte",
+  briefing_roteiro: "/portal/roteiro",
+  entrega_roteiro: "/portal/roteiro",
+  briefing_milhas: "/portal/milhas",
+  entrega_milhas: "/portal/milhas",
 };
 
 export const Route = createFileRoute("/portal/")({
@@ -35,18 +41,19 @@ function PortalHome() {
 
   useEffect(() => {
     const r = req.data;
-    if (!r) return;
+    if (!r || !journey.data) return;
+    const has = (k: string) => journey.data!.some((s) => s.key === k);
     const s = r.proposal_status;
     if (s === "sent" || s === "viewed" || s === "draft") { nav({ to: "/portal/proposta" }); return; }
     if (s === "accepted") {
-      if (!r.contract_signed) { nav({ to: "/portal/contrato" }); return; }
+      if (has("contrato") && !r.contract_signed) { nav({ to: "/portal/contrato" }); return; }
       if (r.payment_status !== "paid") { nav({ to: "/portal/pagamento" }); return; }
-      // Pago: libera Documentos / DS-160 / Taxas em paralelo (fica no hub).
     }
-  }, [req.data, nav]);
+  }, [req.data, journey.data, nav]);
 
+  const total = journey.data?.length ?? 7;
   const done = journey.data?.filter((s) => s.status === "done").length ?? 0;
-  const pct = Math.round((done / 7) * 100);
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
   const next = journey.data?.find((s) => s.status === "active")?.label;
 
   return (
@@ -55,6 +62,9 @@ function PortalHome() {
         <div className="flex items-center justify-between">
           <Logo size={32} />
           <div className="flex items-center">
+            <button onClick={() => nav({ to: "/portal/mensagens" })} className="text-ink-muted hover:text-coral p-2" aria-label="Mensagens">
+              <MessageSquare size={18} />
+            </button>
             <NotificationBell />
             <button onClick={signOut} className="text-ink-muted hover:text-coral p-2" aria-label="Sair">
               <LogOut size={18} />

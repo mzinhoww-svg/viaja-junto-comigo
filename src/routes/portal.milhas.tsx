@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { PhoneFrame } from "@/components/viajaly/PhoneFrame";
 import { MilhasCardPortal } from "@/components/viajaly/MilhasCard";
+import { BriefingForm } from "@/components/viajaly/BriefingForm";
 import { useMyRequest, useRequestRealtime } from "@/hooks/useJourney";
 import { ChevronLeft } from "lucide-react";
 
@@ -14,6 +16,7 @@ function PortalMilhas() {
   const nav = useNavigate();
   const req = useMyRequest();
   useRequestRealtime(req.data?.id);
+  const [tab, setTab] = useState<"briefing" | "entrega">("briefing");
   if (!req.data) return null;
   return (
     <PhoneFrame>
@@ -21,7 +24,17 @@ function PortalMilhas() {
         <button onClick={() => nav({ to: "/portal" })} className="inline-flex items-center gap-1 text-ink-soft text-sm hover:text-coral mb-4">
           <ChevronLeft size={16} /> Hub
         </button>
-        <MilhasCardPortal requestId={req.data.id} />
+        <h1 className="text-2xl font-display font-extrabold text-navy mb-4">Milhas</h1>
+        <div className="flex gap-1 border-b border-[var(--color-border)] mb-4">
+          {(["briefing","entrega"] as const).map((t) => (
+            <button key={t} onClick={() => setTab(t)}
+              className={`px-4 py-2 text-sm font-semibold border-b-2 -mb-px ${tab===t ? "border-coral text-coral" : "border-transparent text-ink-soft"}`}>
+              {t === "briefing" ? "Briefing" : "Entrega"}
+            </button>
+          ))}
+        </div>
+        {tab === "briefing" && <BriefingForm requestId={req.data.id} productKey="milhas" />}
+        {tab === "entrega" && <MilhasCardPortal requestId={req.data.id} />}
       </div>
     </PhoneFrame>
   );

@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { StatusPill } from "@/components/viajaly/StatusPill";
 import { OutcomeBadge, type VisaOutcome } from "@/components/viajaly/OutcomeBadge";
+import { MessageInbox } from "@/components/viajaly/MessageInbox";
 
 export const Route = createFileRoute("/console/")({
   ssr: false,
@@ -65,41 +66,44 @@ function ConsoleHome() {
         ))}
       </div>
 
-      <div className="bg-white rounded-2xl border border-[var(--color-border)] overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-[var(--color-muted)] text-ink-soft text-xs uppercase tracking-wider">
-            <tr>
-              <th className="text-left px-4 py-3 font-semibold">Cliente</th>
-              <th className="text-left px-4 py-3 font-semibold">E-mail</th>
-              <th className="text-left px-4 py-3 font-semibold">Código</th>
-              <th className="text-left px-4 py-3 font-semibold">Proposta</th>
-              <th className="text-left px-4 py-3 font-semibold">Pagamento</th>
-              <th className="text-left px-4 py-3 font-semibold">Resultado</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {q.isLoading && <tr><td colSpan={7} className="p-8 text-center text-ink-muted">Carregando…</td></tr>}
-            {rows.length === 0 && (
-              <tr><td colSpan={7} className="p-8 text-center text-ink-muted">Nenhum caso neste filtro.</td></tr>
-            )}
-            {rows.map((r) => (
-              <tr key={r.id} className={`border-t border-[var(--color-border)] hover:bg-[var(--color-muted)]/50 ${r.archived_at ? "opacity-60" : ""}`}>
-                <td className="px-4 py-3 font-semibold text-navy">{r.lead_name}</td>
-                <td className="px-4 py-3 text-ink-soft">{r.lead_email}</td>
-                <td className="px-4 py-3 font-mono text-ink">{r.access_code}</td>
-                <td className="px-4 py-3"><StatusPill variant={r.proposal_status === "accepted" ? "done" : "info"}>{r.proposal_status}</StatusPill></td>
-                <td className="px-4 py-3"><StatusPill variant={r.payment_status === "paid" ? "done" : r.payment_status === "declined" ? "danger" : "warn"}>{r.payment_status}</StatusPill></td>
-                <td className="px-4 py-3">
-                  {r.visa_outcome ? <OutcomeBadge outcome={r.visa_outcome as VisaOutcome} size="sm" /> : <span className="text-xs text-ink-muted">—</span>}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <Link to="/console/cliente/$id" params={{ id: r.id }} className="text-coral font-semibold hover:underline">Abrir →</Link>
-                </td>
+      <div className="grid lg:grid-cols-[1fr_320px] gap-6">
+        <div className="bg-white rounded-2xl border border-[var(--color-border)] overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-[var(--color-muted)] text-ink-soft text-xs uppercase tracking-wider">
+              <tr>
+                <th className="text-left px-4 py-3 font-semibold">Cliente</th>
+                <th className="text-left px-4 py-3 font-semibold">E-mail</th>
+                <th className="text-left px-4 py-3 font-semibold">Código</th>
+                <th className="text-left px-4 py-3 font-semibold">Proposta</th>
+                <th className="text-left px-4 py-3 font-semibold">Pagamento</th>
+                <th className="text-left px-4 py-3 font-semibold">Resultado</th>
+                <th />
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {q.isLoading && <tr><td colSpan={7} className="p-8 text-center text-ink-muted">Carregando…</td></tr>}
+              {rows.length === 0 && (
+                <tr><td colSpan={7} className="p-8 text-center text-ink-muted">Nenhum caso neste filtro.</td></tr>
+              )}
+              {rows.map((r) => (
+                <tr key={r.id} className={`border-t border-[var(--color-border)] hover:bg-[var(--color-muted)]/50 ${r.archived_at ? "opacity-60" : ""}`}>
+                  <td className="px-4 py-3 font-semibold text-navy">{r.lead_name}</td>
+                  <td className="px-4 py-3 text-ink-soft">{r.lead_email}</td>
+                  <td className="px-4 py-3 font-mono text-ink">{r.access_code}</td>
+                  <td className="px-4 py-3"><StatusPill variant={r.proposal_status === "accepted" ? "done" : "info"}>{r.proposal_status}</StatusPill></td>
+                  <td className="px-4 py-3"><StatusPill variant={r.payment_status === "paid" ? "done" : r.payment_status === "declined" ? "danger" : "warn"}>{r.payment_status}</StatusPill></td>
+                  <td className="px-4 py-3">
+                    {r.visa_outcome ? <OutcomeBadge outcome={r.visa_outcome as VisaOutcome} size="sm" /> : <span className="text-xs text-ink-muted">—</span>}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <Link to="/console/cliente/$id" params={{ id: r.id }} className="text-coral font-semibold hover:underline">Abrir →</Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <MessageInbox />
       </div>
     </section>
   );

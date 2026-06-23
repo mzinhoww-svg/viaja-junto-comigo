@@ -296,23 +296,32 @@ export type Database = {
       }
       messages: {
         Row: {
+          attachments: Json
           created_at: string
           from: Database["public"]["Enums"]["msg_from_t"]
           id: string
+          internal: boolean
+          read_at: string | null
           request_id: string
           text: string
         }
         Insert: {
+          attachments?: Json
           created_at?: string
           from: Database["public"]["Enums"]["msg_from_t"]
           id?: string
+          internal?: boolean
+          read_at?: string | null
           request_id: string
           text: string
         }
         Update: {
+          attachments?: Json
           created_at?: string
           from?: Database["public"]["Enums"]["msg_from_t"]
           id?: string
+          internal?: boolean
+          read_at?: string | null
           request_id?: string
           text?: string
         }
@@ -422,6 +431,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "notifications_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_briefings: {
+        Row: {
+          created_at: string
+          id: string
+          payload: Json
+          product_key: string
+          request_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          payload?: Json
+          product_key: string
+          request_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payload?: Json
+          product_key?: string
+          request_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_briefings_request_id_fkey"
             columns: ["request_id"]
             isOneToOne: false
             referencedRelation: "requests"
@@ -988,6 +1044,10 @@ export type Database = {
         Args: { _archive: boolean; _request_id: string }
         Returns: undefined
       }
+      complete_briefing: {
+        Args: { _product_key: string; _request_id: string }
+        Returns: undefined
+      }
       compute_journey_steps: {
         Args: { _request_id: string }
         Returns: {
@@ -1019,6 +1079,11 @@ export type Database = {
         Returns: boolean
       }
       is_request_member: { Args: { _request_id: string }; Returns: boolean }
+      mark_briefing_reviewed: {
+        Args: { _briefing_id: string }
+        Returns: undefined
+      }
+      mark_messages_read: { Args: { _request_id: string }; Returns: undefined }
       mark_notification_read: {
         Args: { _notification_id: string }
         Returns: undefined
@@ -1041,6 +1106,10 @@ export type Database = {
         Args: { _approve: boolean; _doc_id: string; _reason: string }
         Returns: undefined
       }
+      save_briefing: {
+        Args: { _payload: Json; _product_key: string; _request_id: string }
+        Returns: Json
+      }
       save_ds160_draft: {
         Args: { _completion_pct: number; _form: Json; _traveler_id: string }
         Returns: undefined
@@ -1058,6 +1127,15 @@ export type Database = {
       save_travel_checklist: {
         Args: { _items: Json; _request_id: string }
         Returns: undefined
+      }
+      send_message: {
+        Args: {
+          _attachments: Json
+          _body: string
+          _internal: boolean
+          _request_id: string
+        }
+        Returns: Json
       }
       set_passport_status: {
         Args: { _notes: string; _request_id: string; _status: string }
@@ -1079,6 +1157,10 @@ export type Database = {
           _request_id: string
         }
         Returns: Json
+      }
+      submit_briefing: {
+        Args: { _product_key: string; _request_id: string }
+        Returns: undefined
       }
       submit_document: {
         Args: { _doc_id: string; _file_url: string }

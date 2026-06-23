@@ -15,6 +15,8 @@ import { RoteiroCardConsole } from "@/components/viajaly/RoteiroCard";
 import { MilhasCardConsole } from "@/components/viajaly/MilhasCard";
 import { PassportStatusEditor } from "@/components/viajaly/PassportStatusEditor";
 import { EmergencyContactsEditor } from "@/components/viajaly/EmergencyContactsEditor";
+import { BriefingReadOnly } from "@/components/viajaly/BriefingForm";
+import { MessageThread } from "@/components/viajaly/MessageThread";
 import { OutcomeBadge, type VisaOutcome } from "@/components/viajaly/OutcomeBadge";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Pencil, Share2 } from "lucide-react";
@@ -26,7 +28,7 @@ export const Route = createFileRoute("/console/cliente/$id")({
   component: ConsoleClient,
 });
 
-type Tab = "jornada" | "documentos" | "ds160" | "taxas" | "agenda" | "passaporte" | "roteiro" | "milhas" | "conclusao" | "acesso";
+type Tab = "jornada" | "documentos" | "ds160" | "taxas" | "agenda" | "passaporte" | "roteiro" | "milhas" | "mensagens" | "conclusao" | "acesso";
 
 function ConsoleClient() {
   const { id } = Route.useParams();
@@ -82,6 +84,7 @@ function ConsoleClient() {
     { key: "passaporte", label: "Passaporte" },
     { key: "roteiro", label: "Roteiro" },
     { key: "milhas", label: "Milhas" },
+    { key: "mensagens", label: "Mensagens" },
     { key: "conclusao", label: "Conclusão" },
     { key: "acesso", label: "Acesso" },
   ];
@@ -196,20 +199,29 @@ function ConsoleClient() {
 
 
       {tab === "passaporte" && (
-        <div className="mt-6 max-w-2xl">
+        <div className="mt-6 max-w-2xl space-y-4">
           <PassportStatusEditor requestId={id} status={req.data.passport_status ?? "coletando"} notes={req.data.passport_notes ?? null} />
+          <BriefingReadOnly requestId={id} productKey="passaporte" />
         </div>
       )}
 
       {tab === "roteiro" && (
-        <div className="mt-6 max-w-3xl">
+        <div className="mt-6 max-w-3xl space-y-4">
           <RoteiroCardConsole requestId={id} />
+          <BriefingReadOnly requestId={id} productKey="roteiro" />
         </div>
       )}
 
       {tab === "milhas" && (
-        <div className="mt-6 max-w-3xl">
+        <div className="mt-6 max-w-3xl space-y-4">
           <MilhasCardConsole requestId={id} />
+          <BriefingReadOnly requestId={id} productKey="milhas" />
+        </div>
+      )}
+
+      {tab === "mensagens" && (
+        <div className="mt-6 max-w-3xl">
+          <MessageThread requestId={id} isAdmin={true} />
         </div>
       )}
 
