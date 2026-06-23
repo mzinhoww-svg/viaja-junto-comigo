@@ -7,14 +7,17 @@ import { loginWithCode, requestCodeResend } from "@/lib/auth.functions";
 import { PhoneFrame } from "@/components/viajaly/PhoneFrame";
 import { Logo } from "@/components/viajaly/Logo";
 import { OTPInput } from "@/components/viajaly/OTPInput";
+import { LegalDisclaimer } from "@/components/viajaly/LegalDisclaimer";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { AlertCircle, RefreshCw } from "lucide-react";
+import { AlertCircle, RefreshCw, Mail } from "lucide-react";
 
 import { z } from "zod";
 
 const loginSearch = z.object({
   code: z.string().regex(/^\d{6}$/).optional(),
+  name: z.string().min(1).max(80).optional(),
 });
 
 export const Route = createFileRoute("/portal/login")({
@@ -26,8 +29,10 @@ export const Route = createFileRoute("/portal/login")({
 
 const COOLDOWN_KEY = "viajaly:login:cooldown";
 const RESEND_KEY = "viajaly:login:resendAt";
+const NAME_KEY = "viajaly:login:firstName";
 
 type ErrorState = { kind: "INVALID" | "EXPIRED" | "BLOCKED" | "OTHER"; message: string };
+type Mode = "code" | "magic";
 
 function readCooldown(): number {
   if (typeof window === "undefined") return 0;
@@ -49,16 +54,35 @@ function clearCooldown() {
   window.localStorage.removeItem(COOLDOWN_KEY);
 }
 
+function readSavedName(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(NAME_KEY);
+  } catch {
+    return null;
+  }
+}
+
 function PortalLogin() {
   const search = Route.useSearch();
+  const [mode, setMode] = useState<Mode>("code");
   const [code, setCode] = useState(search.code ?? "");
+  const [email, setEmail] = useState("");
   const [err, setErr] = useState<ErrorState | null>(null);
   const [lockSecs, setLockSecs] = useState(readCooldown());
   const [resendSecs, setResendSecs] = useState(0);
+  const [magicSent, setMagicSent] = useState(false);
   const submittedRef = useRef<string>(""); // evita re-submit do mesmo código
   const nav = useNavigate();
   const codeLogin = useServerFn(loginWithCode);
   const resendFn = useServerFn(requestCodeResend);
+
+  // Primeiro nome para saudação personalizada (query string ou cache de login anterior)
+  const firstName = (() => {
+    const raw = search.name || readSavedName() || "";
+    const first = raw.trim().split(/\s+/)[0];
+    return first && first.length > 1 ? first : "";
+  })();
 
   // Se chegou com ?code= já preenchido e não bloqueado, dispara o login.
   useEffect(() => {
@@ -146,6 +170,32 @@ function PortalLogin() {
     },
   });
 
+  const magicMut = useMutation({
+    mutationFn: async () => {
+      const value = email.trim().toLowerCase();
+      if (!/^\S+@\S+\.\S+$/.test(value)) throw new Error("INVALID_EMAIL");
+      const { error } = await supabase.auth.signInWithOtp({
+        email: value,
+        options: {
+          shouldCreateUser: false,
+          emailRedirectTo: `${window.location.origin}/portal`,
+        },
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      setMagicSent(true);
+      toast.success("Link mágico enviado. Confira seu e-mail.");
+    },
+    onError: (e: Error) => {
+      if (e.message === "INVALID_EMAIL") {
+        toast.error("Digite um e-mail válido.");
+      } else {
+        toast.error("Não conseguimos enviar o link agora. Tente o código.");
+      }
+    },
+  });
+
   function handleComplete(v: string) {
     if (lockSecs > 0) return;
     if (v === submittedRef.current) return;
@@ -165,68 +215,149 @@ function PortalLogin() {
     <PhoneFrame showNav={false}>
       <div className="px-6 pt-10 pb-8 anim-vfade">
         <Logo size={40} />
-        <h1 className="mt-8 text-2xl font-display font-extrabold text-navy">Bem-vindo de volta</h1>
+        <h1 className="mt-8 text-2xl font-display font-extrabold text-navy">
+          {firstName ? `Olá, ${firstName}.` : "Olá!"}
+        </h1>
         <p className="mt-1 text-ink-soft text-sm">
-          Digite o código de 6 dígitos que enviamos pelo WhatsApp.
+          Sua consultora preparou tudo pra sua viagem aos EUA. Acesse com o código que ela te enviou.
         </p>
 
-        <div className="mt-8">
-          <OTPInput
-            value={code}
-            onChange={(v) => { setCode(v); if (err) setErr(null); }}
-            onComplete={handleComplete}
-            disabled={blocked || codeMut.isPending}
-            autoFocus
-          />
+        {/* Segmented control Código / Magic link */}
+        <div
+          role="tablist"
+          aria-label="Forma de acesso"
+          className="mt-6 grid grid-cols-2 gap-1 p-1 rounded-full bg-white border border-[var(--color-border)]"
+        >
+          {(["code", "magic"] as const).map((m) => {
+            const active = mode === m;
+            return (
+              <button
+                key={m}
+                role="tab"
+                aria-selected={active}
+                onClick={() => { setMode(m); setErr(null); }}
+                className={`h-9 rounded-full text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/60 ${
+                  active
+                    ? "bg-navy text-cream shadow-sm"
+                    : "bg-transparent text-navy hover:bg-cream"
+                }`}
+              >
+                {m === "code" ? "Código" : "Magic link"}
+              </button>
+            );
+          })}
         </div>
 
-        {err && (
-          <div
-            role="alert"
-            className={`mt-4 flex items-start gap-2 p-3 rounded-xl text-sm ${
-              err.kind === "BLOCKED"
-                ? "bg-coral/10 text-coral"
-                : err.kind === "EXPIRED"
-                ? "bg-amber-50 text-amber-700 border border-amber-200"
-                : "bg-coral/10 text-coral"
-            }`}
-          >
-            <AlertCircle size={16} className="mt-0.5 shrink-0" />
-            <span>{err.message}</span>
-          </div>
+        {mode === "code" ? (
+          <>
+            <label
+              htmlFor="otp-code"
+              className="mt-6 block text-[11px] font-bold tracking-wider text-ink-muted uppercase"
+            >
+              Código de acesso
+            </label>
+            <div className="mt-2">
+              <OTPInput
+                value={code}
+                onChange={(v) => { setCode(v); if (err) setErr(null); }}
+                onComplete={handleComplete}
+                disabled={blocked || codeMut.isPending}
+                autoFocus
+              />
+            </div>
+            <p className="mt-2 text-[11px] text-ink-muted">
+              Código de 6 dígitos gerado pela sua consultora.
+            </p>
+
+            {err && (
+              <div
+                role="alert"
+                className={`mt-4 flex items-start gap-2 p-3 rounded-xl text-sm ${
+                  err.kind === "BLOCKED"
+                    ? "bg-coral/10 text-coral"
+                    : err.kind === "EXPIRED"
+                    ? "bg-amber-50 text-amber-700 border border-amber-200"
+                    : "bg-coral/10 text-coral"
+                }`}
+              >
+                <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                <span>{err.message}</span>
+              </div>
+            )}
+
+            {blocked && (
+              <p className="mt-3 text-center text-sm text-ink-soft">
+                Tente novamente em <b className="text-navy font-mono">{fmt(lockSecs)}</b>
+              </p>
+            )}
+
+            <Button
+              className="mt-6 w-full h-12 rounded-full bg-coral hover:bg-[var(--color-coral-hover)] text-cream font-semibold"
+              disabled={codeMut.isPending || code.length !== 6 || blocked}
+              onClick={() => handleComplete(code)}
+            >
+              {codeMut.isPending ? "Entrando…" : "Entrar"}
+            </Button>
+
+            <button
+              type="button"
+              onClick={() => resendMut.mutate()}
+              disabled={resendMut.isPending || resendSecs > 0 || code.length !== 6}
+              className="mt-4 w-full flex items-center justify-center gap-2 text-sm font-semibold text-teal hover:text-navy disabled:text-ink-muted disabled:cursor-not-allowed transition"
+            >
+              <RefreshCw size={14} className={resendMut.isPending ? "animate-spin" : ""} />
+              {resendSecs > 0
+                ? `Reenviar código (${fmt(resendSecs)})`
+                : resendMut.isPending
+                  ? "Enviando pedido…"
+                  : "Não recebi — reenviar código"}
+            </button>
+          </>
+        ) : (
+          <>
+            <label
+              htmlFor="magic-email"
+              className="mt-6 block text-[11px] font-bold tracking-wider text-ink-muted uppercase"
+            >
+              Seu e-mail ou WhatsApp
+            </label>
+            <Input
+              id="magic-email"
+              type="email"
+              autoComplete="email"
+              placeholder="voce@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-2 h-11"
+            />
+            <p className="mt-2 text-[11px] text-ink-muted">
+              Mandamos um link de acesso direto. Por enquanto, apenas por e-mail.
+            </p>
+
+            <Button
+              className="mt-6 w-full h-12 rounded-full bg-coral hover:bg-[var(--color-coral-hover)] text-cream font-semibold"
+              disabled={magicMut.isPending || !email}
+              onClick={() => magicMut.mutate()}
+            >
+              <Mail size={16} className="mr-2" />
+              {magicMut.isPending ? "Enviando…" : "Enviar link mágico"}
+            </Button>
+
+            {magicSent && (
+              <p className="mt-3 text-center text-sm text-[var(--color-success-fg)]">
+                Pronto! Verifique sua caixa de entrada.
+              </p>
+            )}
+          </>
         )}
-
-        {blocked && (
-          <p className="mt-3 text-center text-sm text-ink-soft">
-            Tente novamente em <b className="text-navy font-mono">{fmt(lockSecs)}</b>
-          </p>
-        )}
-
-        <Button
-          className="mt-6 w-full h-12 rounded-full bg-coral hover:bg-[var(--color-coral-hover)] text-cream font-semibold"
-          disabled={codeMut.isPending || code.length !== 6 || blocked}
-          onClick={() => handleComplete(code)}
-        >
-          {codeMut.isPending ? "Entrando…" : "Entrar"}
-        </Button>
-
-        <button
-          type="button"
-          onClick={() => resendMut.mutate()}
-          disabled={resendMut.isPending || resendSecs > 0 || code.length !== 6}
-          className="mt-4 w-full flex items-center justify-center gap-2 text-sm font-semibold text-teal hover:text-navy disabled:text-ink-muted disabled:cursor-not-allowed transition"
-        >
-          <RefreshCw size={14} className={resendMut.isPending ? "animate-spin" : ""} />
-          {resendSecs > 0
-            ? `Reenviar código (${fmt(resendSecs)})`
-            : resendMut.isPending
-              ? "Enviando pedido…"
-              : "Não recebi — reenviar código"}
-        </button>
 
         <p className="mt-8 text-xs text-ink-muted text-center">
           É administrador? <Link to="/console/login" className="text-teal font-semibold">Acessar console</Link>
         </p>
+
+        <div className="mt-6">
+          <LegalDisclaimer />
+        </div>
       </div>
     </PhoneFrame>
   );

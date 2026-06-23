@@ -195,21 +195,31 @@ function ContratoPage() {
         </div>
 
         {signed ? (
-          <div className="mt-6 rounded-2xl bg-[var(--color-success-bg)] text-[var(--color-success-fg)] p-4 text-sm">
-            <CheckCircle2 className="inline mr-2" size={18} />
-            Assinado por <b>{req.data?.sign_name}</b> em{" "}
-            {req.data?.signed_at && new Date(req.data.signed_at).toLocaleString("pt-BR")}.
-            <div className="mt-3 grid grid-cols-1 gap-2">
+          <div className="mt-6 rounded-2xl bg-[var(--color-success-bg)] border border-[color-mix(in_oklab,var(--color-success-fg)_25%,transparent)] p-6 text-center">
+            <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-white shadow-sm">
+              <CheckCircle2 className="text-[var(--color-success-fg)]" size={36} strokeWidth={2.4} />
+            </div>
+            <h2 className="mt-4 font-display font-extrabold text-navy text-xl">Contrato assinado</h2>
+            <p className="mt-1 text-sm text-ink-soft">
+              Assinado digitalmente por <b className="text-navy">{req.data?.sign_name}</b>
+              {req.data?.signed_at && (
+                <> em {new Date(req.data.signed_at).toLocaleDateString("pt-BR")}</>
+              )}.
+            </p>
+            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-2">
               <Button
                 onClick={downloadPdf}
                 disabled={!existing.data?.pdf_path}
                 variant="outline"
-                className="w-full"
+                className="w-full min-h-11"
               >
                 <Download size={16} className="mr-2" /> Baixar PDF assinado
               </Button>
-              <Button onClick={() => nav({ to: "/portal" })} className="w-full bg-coral text-cream hover:bg-[var(--color-coral-pressed)]">
-                Continuar jornada
+              <Button
+                onClick={() => nav({ to: "/portal" })}
+                className="w-full min-h-11 bg-navy text-cream hover:bg-[var(--color-navy-light)] font-semibold"
+              >
+                Continuar jornada →
               </Button>
             </div>
           </div>

@@ -12,6 +12,21 @@ import { Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { formatBRL } from "@/lib/money";
 import { LegalDisclaimer } from "@/components/viajaly/LegalDisclaimer";
+
+type ProductMeta = { color: string; tint: string; dark: string; perGroup: boolean };
+function productMeta(key: string | null | undefined, label: string): ProductMeta {
+  const k = (key ?? "").toLowerCase();
+  const lbl = label.toLowerCase();
+  const isVistos = k.startsWith("visto") || lbl.includes("visto");
+  const isPass = k === "pass" || k === "passaporte" || lbl.includes("passaporte");
+  const isRot = k === "rot" || k === "roteiro" || lbl.includes("roteiro");
+  const isMil = k === "mil" || k === "milhas" || lbl.includes("milha");
+  if (isVistos) return { color: "#FF5A5F", tint: "rgba(255,90,95,0.12)", dark: "#B23036", perGroup: false };
+  if (isPass)   return { color: "#2DB7C9", tint: "rgba(45,183,201,0.14)", dark: "#0F6A78", perGroup: false };
+  if (isRot)    return { color: "#E8A33D", tint: "rgba(232,163,61,0.18)", dark: "#8A5A12", perGroup: true };
+  if (isMil)    return { color: "#1F8A5B", tint: "rgba(31,138,91,0.14)", dark: "#0F5436", perGroup: true };
+  return { color: "#94A3B8", tint: "rgba(148,163,184,0.18)", dark: "#334155", perGroup: false };
+}
 import { useSignOut } from "./portal";
 
 export const Route = createFileRoute("/portal/proposta")({
@@ -94,18 +109,38 @@ function PropostaPage() {
 
         <div className="mt-6 rounded-2xl bg-white border border-[var(--color-border)] p-5">
           <ul className="divide-y divide-[var(--color-border)]">
-            {items.data?.map((it) => (
-              <li key={it.id} className="py-3 flex justify-between items-start gap-3">
-                <div>
-                  <div className="font-semibold text-navy">{it.label}</div>
-                  <div className="text-xs text-ink-muted">
-                    {it.qty}× {formatBRL(it.unit_price_cents)}
-                    {it.discount_cents > 0 && <> · desc. {formatBRL(it.discount_cents)}</>}
+            {items.data?.map((it) => {
+              const meta = productMeta(it.product_key, it.label);
+              const leadFirst = r?.lead_name?.trim().split(/\s+/)[0] ?? "";
+              const scopeLabel = meta.perGroup ? "grupo" : (leadFirst || "titular");
+              return (
+                <li key={it.id} className="py-3 flex justify-between items-start gap-3">
+                  <div className="flex min-w-0 items-start gap-2.5">
+                    <span
+                      aria-hidden
+                      className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ background: meta.color }}
+                    />
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-semibold text-navy truncate">{it.label}</span>
+                        <span
+                          className="inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide"
+                          style={{ background: meta.tint, color: meta.dark }}
+                        >
+                          {scopeLabel}
+                        </span>
+                      </div>
+                      <div className="text-xs text-ink-muted">
+                        {it.qty}× {formatBRL(it.unit_price_cents)}
+                        {it.discount_cents > 0 && <> · desc. {formatBRL(it.discount_cents)}</>}
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="font-mono text-ink">{formatBRL(it.qty * it.unit_price_cents - it.discount_cents)}</div>
-              </li>
-            ))}
+                  <div className="font-mono text-ink shrink-0">{formatBRL(it.qty * it.unit_price_cents - it.discount_cents)}</div>
+                </li>
+              );
+            })}
           </ul>
 
           <div className="mt-4 pt-4 border-t border-[var(--color-border)] space-y-1 text-sm">
