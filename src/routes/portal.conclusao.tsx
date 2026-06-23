@@ -8,7 +8,8 @@ import { LegalDisclaimer } from "@/components/viajaly/LegalDisclaimer";
 import { TravelChecklist } from "@/components/viajaly/TravelChecklist";
 import { FeedbackForm } from "@/components/viajaly/FeedbackForm";
 import { useMyRequest, useRequestRealtime } from "@/hooks/useJourney";
-import { ChevronLeft, Phone } from "lucide-react";
+import { generateTravelKitPDF } from "@/lib/travel-kit-pdf";
+import { ChevronLeft, Phone, Download } from "lucide-react";
 
 export const Route = createFileRoute("/portal/conclusao")({
   ssr: false,
