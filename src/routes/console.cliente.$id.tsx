@@ -17,8 +17,11 @@ import { PassportStatusEditor } from "@/components/viajaly/PassportStatusEditor"
 import { EmergencyContactsEditor } from "@/components/viajaly/EmergencyContactsEditor";
 import { BriefingReadOnly } from "@/components/viajaly/BriefingForm";
 import { MessageThread } from "@/components/viajaly/MessageThread";
+import { ContractPanel } from "@/components/viajaly/ContractPanel";
 import { OutcomeBadge, type VisaOutcome } from "@/components/viajaly/OutcomeBadge";
+import { StatusPill } from "@/components/viajaly/StatusPill";
 import { Button } from "@/components/ui/button";
+import { formatBRL } from "@/lib/money";
 import { ChevronLeft, Pencil, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -28,7 +31,7 @@ export const Route = createFileRoute("/console/cliente/$id")({
   component: ConsoleClient,
 });
 
-type Tab = "jornada" | "documentos" | "ds160" | "taxas" | "agenda" | "passaporte" | "roteiro" | "milhas" | "mensagens" | "conclusao" | "acesso";
+type Tab = "jornada" | "pagamentos" | "contrato" | "documentos" | "ds160" | "taxas" | "agenda" | "passaporte" | "roteiro" | "milhas" | "mensagens" | "historico" | "conclusao" | "acesso";
 
 function ConsoleClient() {
   const { id } = Route.useParams();
@@ -45,6 +48,21 @@ function ConsoleClient() {
     },
   });
   const journey = useJourney(id);
+
+  const ds160Review = useQuery({
+    queryKey: ["ds160-review", id],
+    queryFn: async () => {
+      const { data: travelers } = await supabase.from("travelers").select("id").eq("request_id", id);
+      const ids = (travelers ?? []).map((t) => t.id);
+      if (ids.length === 0) return 0;
+      const { count } = await supabase
+        .from("ds160_submission")
+        .select("traveler_id", { count: "exact", head: true })
+        .in("traveler_id", ids)
+        .eq("status", "pending_review");
+      return count ?? 0;
+    },
+  });
 
   const flipProposal = useMutation({
     mutationFn: async (status: "accepted" | "sent") => {
@@ -77,6 +95,8 @@ function ConsoleClient() {
 
   const tabs: { key: Tab; label: string }[] = [
     { key: "jornada", label: "Jornada" },
+    { key: "pagamentos", label: "Pagamentos" },
+    { key: "contrato", label: "Contrato" },
     { key: "documentos", label: "Documentos" },
     { key: "ds160", label: "DS-160" },
     { key: "taxas", label: "Taxas" },
@@ -85,6 +105,7 @@ function ConsoleClient() {
     { key: "roteiro", label: "Roteiro" },
     { key: "milhas", label: "Milhas" },
     { key: "mensagens", label: "Mensagens" },
+    { key: "historico", label: "Histórico" },
     { key: "conclusao", label: "Conclusão" },
     { key: "acesso", label: "Acesso" },
   ];
@@ -100,6 +121,11 @@ function ConsoleClient() {
             <h1 className="text-3xl font-display font-extrabold text-navy">{req.data.lead_name}</h1>
             <OutcomeBadge outcome={req.data.visa_outcome as VisaOutcome} size="sm" />
             {req.data.archived_at && <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">Arquivado</span>}
+            {(ds160Review.data ?? 0) > 0 && (
+              <button onClick={() => setTab("ds160")} className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 hover:bg-amber-200">
+                DS-160 aguardando revisão
+              </button>
+            )}
           </div>
           <p className="text-ink-soft text-sm">
             {req.data.lead_email} · código <span className="font-mono">{req.data.access_code}</span>
@@ -172,6 +198,22 @@ function ConsoleClient() {
         </div>
       )}
 
+      {tab === "pagamentos" && (
+        <div className="mt-6 max-w-2xl">
+          <PaymentsPanel
+            request={req.data}
+            pending={flipPayment.isPending}
+            onToggle={() => flipPayment.mutate(req.data!.payment_status !== "paid")}
+          />
+        </div>
+      )}
+
+      {tab === "contrato" && (
+        <div className="mt-6 max-w-3xl">
+          <ContractPanel requestId={id} request={req.data} />
+        </div>
+      )}
+
       {tab === "documentos" && (
         <div className="mt-6">
           <DocumentList requestId={id} variant="console" />
@@ -225,6 +267,12 @@ function ConsoleClient() {
         </div>
       )}
 
+      {tab === "historico" && (
+        <div className="mt-6 max-w-3xl">
+          <HistoryTimeline requestId={id} />
+        </div>
+      )}
+
       {tab === "conclusao" && (
         <div className="mt-6 max-w-3xl space-y-6">
           <ConclusionPanel request={{
@@ -246,5 +294,69 @@ function ConsoleClient() {
         </div>
       )}
     </section>
+  );
+}
+
+function PaymentsPanel({
+  request,
+  pending,
+  onToggle,
+}: {
+  request: { payment_status: string; payment_method?: string | null; payment_installments?: number | null; payment_card_last4?: string | null; payment_attempts?: number | null; proposal_total_cents?: number | null };
+  pending: boolean;
+  onToggle: () => void;
+}) {
+  const paid = request.payment_status === "paid";
+  const method = request.payment_method === "card" ? "Cartão" : request.payment_method === "pix" ? "Pix" : "—";
+  return (
+    <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5 space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="font-display font-bold text-navy">Pagamento da consultoria</h2>
+        <StatusPill variant={paid ? "done" : request.payment_status === "declined" ? "danger" : "warn"}>{request.payment_status}</StatusPill>
+      </div>
+      <dl className="grid grid-cols-2 gap-y-3 text-sm">
+        <dt className="text-ink-soft">Valor</dt><dd className="text-navy font-semibold font-mono">{formatBRL(request.proposal_total_cents ?? 0)}</dd>
+        <dt className="text-ink-soft">Método</dt><dd className="text-ink">{method}</dd>
+        {request.payment_installments ? (<><dt className="text-ink-soft">Parcelas</dt><dd className="text-ink">{request.payment_installments}x</dd></>) : null}
+        {request.payment_card_last4 ? (<><dt className="text-ink-soft">Final do cartão</dt><dd className="text-ink font-mono">•••• {request.payment_card_last4}</dd></>) : null}
+        <dt className="text-ink-soft">Tentativas</dt><dd className="text-ink">{request.payment_attempts ?? 0}</dd>
+      </dl>
+      <Button size="sm" variant="outline" disabled={pending} onClick={onToggle}>
+        {paid ? "Reverter pagamento" : "Marcar como pago"}
+      </Button>
+    </div>
+  );
+}
+
+function HistoryTimeline({ requestId }: { requestId: string }) {
+  const q = useQuery({
+    queryKey: ["history", requestId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("notifications")
+        .select("id, kind, title, body, created_at, audience")
+        .eq("request_id", requestId)
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return data;
+    },
+  });
+  if (q.isLoading) return <p className="text-ink-muted text-sm">Carregando histórico…</p>;
+  if (!q.data || q.data.length === 0) return <p className="text-ink-muted text-sm">Sem eventos registrados ainda.</p>;
+  return (
+    <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5">
+      <h2 className="font-display font-bold text-navy mb-4">Histórico do caso</h2>
+      <ol className="relative border-l border-[var(--color-border)] ml-2 space-y-4">
+        {q.data.map((n) => (
+          <li key={n.id} className="ml-4">
+            <span className="absolute -left-[5px] mt-1.5 w-2.5 h-2.5 rounded-full bg-coral" />
+            <p className="text-sm font-semibold text-navy">{n.title}</p>
+            {n.body && <p className="text-xs text-ink-soft">{n.body}</p>}
+            <p className="text-[11px] text-ink-muted mt-0.5">{new Date(n.created_at).toLocaleString("pt-BR")} · {n.audience}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }

@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useMyRequest, useJourney, useRequestRealtime } from "@/hooks/useJourney";
 import { PhoneFrame } from "@/components/viajaly/PhoneFrame";
 import { Logo } from "@/components/viajaly/Logo";
@@ -9,7 +9,7 @@ import { ProductsHub } from "@/components/viajaly/ProductsHub";
 import { EmptyStateAwaitingProposal } from "@/components/viajaly/EmptyStateAwaitingProposal";
 import { NotificationBell } from "@/components/viajaly/NotificationBell";
 import { useSignOut } from "./portal";
-import { LogOut, MessageSquare } from "lucide-react";
+import { LogOut, MessageSquare, ChevronDown } from "lucide-react";
 
 const STEP_TO_ROUTE: Record<string, "/portal/proposta" | "/portal/contrato" | "/portal/pagamento" | "/portal/documentos" | "/portal/ds160" | "/portal/taxas" | "/portal/agenda" | "/portal/conclusao" | "/portal/passaporte" | "/portal/roteiro" | "/portal/milhas"> = {
   proposta: "/portal/proposta",
@@ -39,6 +39,7 @@ function PortalHome() {
   const journey = useJourney(req.data?.id);
   const signOut = useSignOut();
   const nav = useNavigate();
+  const [stepsOpen, setStepsOpen] = useState(false);
 
   useEffect(() => {
     const r = req.data;
@@ -125,25 +126,37 @@ function PortalHome() {
 
             <ProductsHub requestId={req.data.id} />
 
-            <h2 className="mt-8 mb-3 text-sm font-display font-bold text-navy uppercase tracking-wider">Etapas</h2>
-            {journey.isLoading ? (
-              <div className="space-y-2">{Array.from({ length: 7 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-2xl" />)}</div>
-            ) : (
-              <div className="space-y-2">
-                {journey.data?.map((s) => {
-                  const target = STEP_TO_ROUTE[s.key];
-                  return (
-                    <StepCard
-                      key={s.key}
-                      idx={s.idx}
-                      label={s.label}
-                      status={s.status}
-                      onClick={target ? () => nav({ to: target }) : undefined}
-                    />
-                  );
-                })}
-              </div>
-            )}
+            <button
+              type="button"
+              onClick={() => setStepsOpen((v) => !v)}
+              className="mt-8 mb-3 w-full flex items-center justify-between text-sm font-display font-bold text-navy uppercase tracking-wider"
+              aria-expanded={stepsOpen}
+            >
+              <span>
+                Etapas{" "}
+                {total > 0 && <span className="text-ink-muted normal-case font-semibold">· {done}/{total}</span>}
+              </span>
+              <ChevronDown size={18} className={`text-ink-muted transition-transform ${stepsOpen ? "rotate-180" : ""}`} />
+            </button>
+            {stepsOpen &&
+              (journey.isLoading ? (
+                <div className="space-y-2">{Array.from({ length: 7 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-2xl" />)}</div>
+              ) : (
+                <div className="space-y-2">
+                  {journey.data?.map((s) => {
+                    const target = STEP_TO_ROUTE[s.key];
+                    return (
+                      <StepCard
+                        key={s.key}
+                        idx={s.idx}
+                        label={s.label}
+                        status={s.status}
+                        onClick={target ? () => nav({ to: target }) : undefined}
+                      />
+                    );
+                  })}
+                </div>
+              ))}
           </>
         )}
       </div>

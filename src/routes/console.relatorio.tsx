@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { OutcomeBadge, type VisaOutcome } from "@/components/viajaly/OutcomeBadge";
 import { Button } from "@/components/ui/button";
 import { toCSV, downloadCSV } from "@/lib/csv";
+import { formatBRL } from "@/lib/money";
 import { Star, Download } from "lucide-react";
 
 export const Route = createFileRoute("/console/relatorio")({
@@ -18,7 +19,7 @@ function Relatorio() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("requests")
-        .select("id, lead_name, visa_outcome, visa_decision_at, archived_at, client_rating, client_feedback, created_at");
+        .select("id, lead_name, visa_outcome, visa_decision_at, archived_at, client_rating, client_feedback, created_at, proposal_total_cents, payment_status, proposal_status");
       if (error) throw error;
       return data ?? [];
     },
@@ -29,6 +30,11 @@ function Relatorio() {
   const byOutcome: Record<string, number> = {};
   list.forEach((r) => { if (r.visa_outcome) byOutcome[r.visa_outcome] = (byOutcome[r.visa_outcome] ?? 0) + 1; });
   const arquivados = list.filter((r) => r.archived_at).length;
+
+  const paidCents = list.filter((r) => r.payment_status === "paid").reduce((a, r) => a + (r.proposal_total_cents ?? 0), 0);
+  const openCents = list.filter((r) => r.payment_status !== "paid" && r.proposal_status === "accepted").reduce((a, r) => a + (r.proposal_total_cents ?? 0), 0);
+  const paidCount = list.filter((r) => r.payment_status === "paid").length;
+  const ticket = paidCount ? Math.round(paidCents / paidCount) : 0;
 
   const ratings = list.map((r) => r.client_rating).filter((x): x is number => !!x);
   const nps = ratings.length ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1) : "—";
@@ -78,6 +84,15 @@ function Relatorio() {
         <Stat label="Tempo médio (dias)" value={tempoMedio ?? "—"} />
         <Stat label="NPS médio" value={nps} />
       </div>
+
+      <h2 className="mt-10 mb-3 text-sm font-display font-bold text-navy uppercase tracking-wider">Financeiro (consultoria)</h2>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Stat label="Receita confirmada" value={formatBRL(paidCents)} />
+        <Stat label="Em aberto (aceitos não pagos)" value={formatBRL(openCents)} />
+        <Stat label="Pagamentos confirmados" value={paidCount} />
+        <Stat label="Ticket médio" value={formatBRL(ticket)} />
+      </div>
+      <p className="mt-2 text-xs text-ink-muted">Valores da consultoria (proposta). Taxas governamentais são pagas à parte e não entram aqui.</p>
 
       <h2 className="mt-10 mb-3 text-sm font-display font-bold text-navy uppercase tracking-wider">Últimos feedbacks</h2>
       <div className="space-y-2">

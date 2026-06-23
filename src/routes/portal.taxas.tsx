@@ -4,6 +4,7 @@ import { useMyRequest, useRequestRealtime } from "@/hooks/useJourney";
 import { PhoneFrame } from "@/components/viajaly/PhoneFrame";
 import { Logo } from "@/components/viajaly/Logo";
 import { TaxList } from "@/components/viajaly/TaxList";
+import { LegalDisclaimer } from "@/components/viajaly/LegalDisclaimer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSignOut } from "./portal";
 import { ChevronLeft, LogOut } from "lucide-react";
@@ -42,7 +43,11 @@ function PortalTaxes() {
         <h1 className="mt-6 text-2xl font-display font-extrabold text-navy">Taxas governamentais</h1>
         <p className="mt-1 text-ink-soft text-sm">Pague em reais via Pix — a Viajaly recolhe as taxas oficiais.</p>
 
-        <div className="mt-6">
+        <div className="mt-4">
+          <LegalDisclaimer taxes />
+        </div>
+
+        <div className="mt-4">
           {!req.data ? <Skeleton className="h-40 rounded-2xl" /> : <TaxList requestId={req.data.id} variant="portal" />}
         </div>
       </div>
