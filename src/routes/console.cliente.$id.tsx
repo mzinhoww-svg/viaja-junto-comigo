@@ -199,20 +199,29 @@ function ConsoleClient() {
 
 
       {tab === "passaporte" && (
-        <div className="mt-6 max-w-2xl">
+        <div className="mt-6 max-w-2xl space-y-4">
           <PassportStatusEditor requestId={id} status={req.data.passport_status ?? "coletando"} notes={req.data.passport_notes ?? null} />
+          <BriefingReadOnly requestId={id} productKey="passaporte" />
         </div>
       )}
 
       {tab === "roteiro" && (
-        <div className="mt-6 max-w-3xl">
+        <div className="mt-6 max-w-3xl space-y-4">
           <RoteiroCardConsole requestId={id} />
+          <BriefingReadOnly requestId={id} productKey="roteiro" />
         </div>
       )}
 
       {tab === "milhas" && (
-        <div className="mt-6 max-w-3xl">
+        <div className="mt-6 max-w-3xl space-y-4">
           <MilhasCardConsole requestId={id} />
+          <BriefingReadOnly requestId={id} productKey="milhas" />
+        </div>
+      )}
+
+      {tab === "mensagens" && (
+        <div className="mt-6 max-w-3xl">
+          <MessageThread requestId={id} isAdmin={true} />
         </div>
       )}
 
