@@ -84,6 +84,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:description", content: "Portal Viajaly: consultoria especializada para vistos, passaporte, roteiros e milhas." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Viajaly — Consultoria de viagem" },
+      { name: "twitter:description", content: "Portal Viajaly: consultoria especializada para vistos, passaporte, roteiros e milhas." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/033c9c04-6f00-46b5-9289-9c8d70a4c67d/id-preview-b99d15b1--a357c84b-f9f7-4cb0-8d4e-a9798a04ecbd.lovable.app-1782181634618.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/033c9c04-6f00-46b5-9289-9c8d70a4c67d/id-preview-b99d15b1--a357c84b-f9f7-4cb0-8d4e-a9798a04ecbd.lovable.app-1782181634618.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
