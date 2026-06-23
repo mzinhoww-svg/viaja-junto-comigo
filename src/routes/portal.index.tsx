@@ -22,9 +22,15 @@ function PortalHome() {
   const nav = useNavigate();
 
   useEffect(() => {
-    const s = req.data?.proposal_status;
-    if (s === "sent" || s === "viewed") nav({ to: "/portal/proposta" });
-  }, [req.data?.proposal_status, nav]);
+    const r = req.data;
+    if (!r) return;
+    const s = r.proposal_status;
+    if (s === "sent" || s === "viewed" || s === "draft") { nav({ to: "/portal/proposta" }); return; }
+    if (s === "accepted") {
+      if (!r.contract_signed) { nav({ to: "/portal/contrato" }); return; }
+      if (r.payment_status !== "paid") { nav({ to: "/portal/pagamento" }); return; }
+    }
+  }, [req.data, nav]);
 
   const done = journey.data?.filter((s) => s.status === "done").length ?? 0;
   const pct = Math.round((done / 7) * 100);

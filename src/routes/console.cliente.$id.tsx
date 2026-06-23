@@ -46,11 +46,12 @@ function ConsoleClient() {
   });
 
   const flipPayment = useMutation({
-    mutationFn: async (status: "paid" | "pending") => {
-      const { error } = await supabase.from("requests").update({ payment_status: status }).eq("id", id);
+    mutationFn: async (paid: boolean) => {
+      const { error } = await supabase.rpc("confirm_payment", { _request_id: id, _paid: paid });
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["request", id] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["request", id] }); toast.success("Pagamento atualizado"); },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   if (!req.data) return <p className="text-ink-muted">Carregando…</p>;
@@ -88,7 +89,7 @@ function ConsoleClient() {
               </Button>
             </div>
             <div className="flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => flipPayment.mutate(req.data!.payment_status === "paid" ? "pending" : "paid")}>
+              <Button size="sm" variant="outline" onClick={() => flipPayment.mutate(req.data!.payment_status !== "paid")}>
                 {req.data.payment_status === "paid" ? "Reverter pagamento" : "Marcar pago"}
               </Button>
             </div>
