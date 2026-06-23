@@ -44,6 +44,7 @@ import { Route as ConsoleAceitarConviteRouteImport } from './routes/console.acei
 import { Route as ConsoleOrcamentoNovoRouteImport } from './routes/console.orcamento.novo'
 import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$id'
 import { Route as ConsoleOrcamentoIdEditarRouteImport } from './routes/console.orcamento.$id.editar'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
   id: '/privacidade',
@@ -221,6 +222,12 @@ const ConsoleOrcamentoIdEditarRoute =
     path: '/orcamento/$id/editar',
     getParentRoute: () => ConsoleRoute,
   } as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -257,6 +264,7 @@ export interface FileRoutesByFullPath {
   '/portal/': typeof PortalIndexRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
   '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/console/orcamento/$id/editar': typeof ConsoleOrcamentoIdEditarRoute
 }
 export interface FileRoutesByTo {
@@ -292,6 +300,7 @@ export interface FileRoutesByTo {
   '/portal': typeof PortalIndexRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
   '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/console/orcamento/$id/editar': typeof ConsoleOrcamentoIdEditarRoute
 }
 export interface FileRoutesById {
@@ -330,6 +339,7 @@ export interface FileRoutesById {
   '/portal/': typeof PortalIndexRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
   '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/console/orcamento/$id/editar': typeof ConsoleOrcamentoIdEditarRoute
 }
 export interface FileRouteTypes {
@@ -369,6 +379,7 @@ export interface FileRouteTypes {
     | '/portal/'
     | '/console/cliente/$id'
     | '/console/orcamento/novo'
+    | '/api/public/payments/webhook'
     | '/console/orcamento/$id/editar'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -404,6 +415,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/console/cliente/$id'
     | '/console/orcamento/novo'
+    | '/api/public/payments/webhook'
     | '/console/orcamento/$id/editar'
   id:
     | '__root__'
@@ -441,6 +453,7 @@ export interface FileRouteTypes {
     | '/portal/'
     | '/console/cliente/$id'
     | '/console/orcamento/novo'
+    | '/api/public/payments/webhook'
     | '/console/orcamento/$id/editar'
   fileRoutesById: FileRoutesById
 }
@@ -450,6 +463,7 @@ export interface RootRouteChildren {
   OrcamentoRoute: typeof OrcamentoRouteWithChildren
   PortalRoute: typeof PortalRouteWithChildren
   PrivacidadeRoute: typeof PrivacidadeRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -699,6 +713,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleOrcamentoIdEditarRouteImport
       parentRoute: typeof ConsoleRoute
     }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -796,6 +817,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrcamentoRoute: OrcamentoRouteWithChildren,
   PortalRoute: PortalRouteWithChildren,
   PrivacidadeRoute: PrivacidadeRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
