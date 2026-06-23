@@ -284,55 +284,27 @@ function Totals({ sub, disc, total }: { sub: number; disc: number; total: number
   );
 }
 
+
 function Handoff({ name, phone, data }: { name: string; phone: string; data: { request_id: string; access_code: string } }) {
-  const link = `${window.location.origin}/portal/login`;
-  const msg = buildHandoffMessage({ name, link, code: data.access_code });
   return (
     <section className="max-w-xl mx-auto">
-      <div className="bg-white rounded-3xl border border-[var(--color-border)] p-8 text-center">
+      <div className="text-center mb-6">
         <div className="w-14 h-14 mx-auto rounded-full bg-[var(--color-success-bg)] grid place-items-center text-[var(--color-success-fg)]">
           <Check size={28} />
         </div>
-        <h1 className="mt-4 text-2xl font-display font-extrabold text-navy">Caso criado</h1>
-        <p className="mt-1 text-ink-soft text-sm">Envie esses dados para {name.split(" ")[0]} acessar o portal.</p>
+        <h1 className="mt-4 text-2xl font-display font-extrabold text-navy">Orçamento criado</h1>
+        <p className="mt-1 text-ink-soft text-sm">Compartilhe o link personalizado abaixo com {name.split(" ")[0]}.</p>
+      </div>
 
-        <div className="mt-6 grid gap-3 text-left">
-          <Field label="Link do portal" value={link} />
-          <Field label="Código de acesso" value={data.access_code} mono big />
-        </div>
+      <HandoffCard clientName={name} accessCode={data.access_code} phone={phone} />
 
-        <div className="mt-6 flex flex-wrap gap-2 justify-center">
-          <Button onClick={() => { navigator.clipboard.writeText(msg); toast.success("Mensagem copiada"); }} variant="outline">
-            <Copy size={16} className="mr-1" /> Copiar mensagem
-          </Button>
-          <Button onClick={() => openWhatsApp(phone, msg)} className="bg-[#25D366] hover:bg-[#1ebe5b] text-white">
-            <MessageCircle size={16} className="mr-1" /> Abrir WhatsApp
-          </Button>
-        </div>
-
-        <div className="mt-8 flex justify-center gap-3 text-sm">
-          <Link to="/console/cliente/$id" params={{ id: data.request_id }} className="text-coral font-semibold hover:underline">
-            Abrir ficha →
-          </Link>
-          <span className="text-ink-muted">·</span>
-          <Link to="/console" className="text-ink-soft hover:text-navy">Voltar ao pipeline</Link>
-        </div>
+      <div className="mt-6 flex justify-center gap-3 text-sm">
+        <Link to="/console/cliente/$id" params={{ id: data.request_id }} className="text-coral font-semibold hover:underline">
+          Abrir ficha do cliente →
+        </Link>
+        <span className="text-ink-muted">·</span>
+        <Link to="/console" className="text-ink-soft hover:text-navy">Voltar ao pipeline</Link>
       </div>
     </section>
-  );
-}
-
-function Field({ label, value, mono, big }: { label: string; value: string; mono?: boolean; big?: boolean }) {
-  return (
-    <div className="rounded-xl bg-[var(--color-muted)] px-4 py-3 flex items-center justify-between gap-3">
-      <div className="min-w-0">
-        <div className="text-xs text-ink-muted uppercase tracking-wider">{label}</div>
-        <div className={`truncate ${mono ? "font-mono" : ""} ${big ? "text-2xl font-bold text-navy" : "text-ink"}`}>{value}</div>
-      </div>
-      <Button size="icon" variant="ghost" aria-label="Copiar"
-        onClick={() => { navigator.clipboard.writeText(value); toast.success("Copiado"); }}>
-        <Copy size={16} />
-      </Button>
-    </div>
   );
 }
