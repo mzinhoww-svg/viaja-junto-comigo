@@ -24,22 +24,6 @@ export const lockUsdRate = createServerFn({ method: "POST" })
   });
 
 
-export const payTaxes = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({
-      request_id: z.string().uuid(),
-      method: z.string().max(40).optional(),
-    }).parse(input),
-  )
-  .handler(async ({ data, context }) => {
-    const { data: out, error } = await context.supabase.rpc("pay_taxes", {
-      _request_id: data.request_id,
-      _method: data.method ?? "pix",
-    });
-    if (error) throw new Error(error.message);
-    return out as { total_brl_cents: number; rate: number; method: string };
-  });
 
 export const confirmTaxPayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
