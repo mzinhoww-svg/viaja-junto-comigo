@@ -80,6 +80,8 @@ function PortalHome() {
               Você ainda não tem uma proposta ativa. Entre em contato com a Letícia para receber seu orçamento.
             </p>
           </div>
+        ) : req.data.proposal_status === "draft" ? (
+          <EmptyStateAwaitingProposal firstName={req.data.lead_name?.split(" ")[0]} />
         ) : (
           <>
             <div className="mt-6 p-5 rounded-3xl bg-navy text-cream">
