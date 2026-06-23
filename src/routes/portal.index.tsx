@@ -8,9 +8,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ProductsHub } from "@/components/viajaly/ProductsHub";
 import { NotificationBell } from "@/components/viajaly/NotificationBell";
 import { useSignOut } from "./portal";
-import { LogOut } from "lucide-react";
+import { LogOut, MessageSquare } from "lucide-react";
 
-const STEP_TO_ROUTE: Record<string, "/portal/proposta" | "/portal/contrato" | "/portal/pagamento" | "/portal/documentos" | "/portal/ds160" | "/portal/taxas" | "/portal/agenda" | "/portal/conclusao"> = {
+const STEP_TO_ROUTE: Record<string, "/portal/proposta" | "/portal/contrato" | "/portal/pagamento" | "/portal/documentos" | "/portal/ds160" | "/portal/taxas" | "/portal/agenda" | "/portal/conclusao" | "/portal/passaporte" | "/portal/roteiro" | "/portal/milhas"> = {
   proposta: "/portal/proposta",
   contrato: "/portal/contrato",
   pagamento: "/portal/pagamento",
@@ -18,6 +18,12 @@ const STEP_TO_ROUTE: Record<string, "/portal/proposta" | "/portal/contrato" | "/
   taxas: "/portal/taxas",
   agenda: "/portal/agenda",
   conclusao: "/portal/conclusao",
+  briefing_passaporte: "/portal/passaporte",
+  entrega_passaporte: "/portal/passaporte",
+  briefing_roteiro: "/portal/roteiro",
+  entrega_roteiro: "/portal/roteiro",
+  briefing_milhas: "/portal/milhas",
+  entrega_milhas: "/portal/milhas",
 };
 
 export const Route = createFileRoute("/portal/")({
