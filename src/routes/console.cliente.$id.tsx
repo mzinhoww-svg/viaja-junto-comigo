@@ -7,6 +7,7 @@ import { StepCard } from "@/components/viajaly/StepCard";
 import { DocumentList } from "@/components/viajaly/DocumentList";
 import { DS160Form } from "@/components/viajaly/DS160Form";
 import { TaxList } from "@/components/viajaly/TaxList";
+import { ScheduleList } from "@/components/viajaly/ScheduleList";
 import { AccessAuditCard } from "@/components/viajaly/AccessAuditCard";
 import { HandoffCard } from "@/components/viajaly/HandoffCard";
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,7 @@ export const Route = createFileRoute("/console/cliente/$id")({
   component: ConsoleClient,
 });
 
-type Tab = "jornada" | "documentos" | "ds160" | "taxas" | "acesso";
+type Tab = "jornada" | "documentos" | "ds160" | "taxas" | "agenda" | "acesso";
 
 function ConsoleClient() {
   const { id } = Route.useParams();
@@ -71,6 +72,7 @@ function ConsoleClient() {
     { key: "documentos", label: "Documentos" },
     { key: "ds160", label: "DS-160" },
     { key: "taxas", label: "Taxas" },
+    { key: "agenda", label: "Agenda" },
     { key: "acesso", label: "Acesso" },
   ];
 
@@ -170,6 +172,13 @@ function ConsoleClient() {
           <TaxList requestId={id} variant="console" />
         </div>
       )}
+
+      {tab === "agenda" && (
+        <div className="mt-6 max-w-3xl">
+          <ScheduleList requestId={id} variant="console" />
+        </div>
+      )}
+
 
 
       {tab === "acesso" && (

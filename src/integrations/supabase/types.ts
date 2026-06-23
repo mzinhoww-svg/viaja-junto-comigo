@@ -736,32 +736,47 @@ export type Database = {
         Row: {
           confirmed_by: string | null
           confirmed_date: string | null
+          consulate: string | null
           created_at: string
           id: string
+          notes: string | null
           service: Database["public"]["Enums"]["sched_service_t"]
           status: Database["public"]["Enums"]["sched_status_t"]
           traveler_id: string
+          updated_at: string
           wish: string | null
+          wish_dates: string[]
+          wish_period: string | null
         }
         Insert: {
           confirmed_by?: string | null
           confirmed_date?: string | null
+          consulate?: string | null
           created_at?: string
           id?: string
+          notes?: string | null
           service: Database["public"]["Enums"]["sched_service_t"]
           status?: Database["public"]["Enums"]["sched_status_t"]
           traveler_id: string
+          updated_at?: string
           wish?: string | null
+          wish_dates?: string[]
+          wish_period?: string | null
         }
         Update: {
           confirmed_by?: string | null
           confirmed_date?: string | null
+          consulate?: string | null
           created_at?: string
           id?: string
+          notes?: string | null
           service?: Database["public"]["Enums"]["sched_service_t"]
           status?: Database["public"]["Enums"]["sched_status_t"]
           traveler_id?: string
+          updated_at?: string
           wish?: string | null
+          wish_dates?: string[]
+          wish_period?: string | null
         }
         Relationships: [
           {
@@ -930,6 +945,14 @@ export type Database = {
           status: Database["public"]["Enums"]["journey_step_status_t"]
         }[]
       }
+      confirm_intent: {
+        Args: {
+          _confirmed_date: string
+          _consulate: string
+          _intent_id: string
+        }
+        Returns: undefined
+      }
       confirm_payment: {
         Args: { _paid: boolean; _request_id: string }
         Returns: undefined
@@ -953,6 +976,7 @@ export type Database = {
         Args: { _method: string; _receipt_url: string; _traveler_id: string }
         Returns: undefined
       }
+      reopen_intent: { Args: { _intent_id: string }; Returns: undefined }
       request_code_resend: { Args: { _request_id: string }; Returns: undefined }
       review_document: {
         Args: { _approve: boolean; _doc_id: string; _reason: string }
@@ -960,6 +984,16 @@ export type Database = {
       }
       save_ds160_draft: {
         Args: { _completion_pct: number; _form: Json; _traveler_id: string }
+        Returns: undefined
+      }
+      save_intent_wish: {
+        Args: {
+          _consulate: string
+          _intent_id: string
+          _notes: string
+          _wish_dates: string[]
+          _wish_period: string
+        }
         Returns: undefined
       }
       sign_contract: {
@@ -979,6 +1013,10 @@ export type Database = {
       update_request_with_items: {
         Args: { _request_id: string; payload: Json }
         Returns: Json
+      }
+      upsert_schedule_window: {
+        Args: { _released: Json; _slots: Json }
+        Returns: undefined
       }
       validate_ds160: {
         Args: { _approve: boolean; _reason: string; _traveler_id: string }

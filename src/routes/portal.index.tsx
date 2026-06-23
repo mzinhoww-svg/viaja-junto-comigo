@@ -8,12 +8,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSignOut } from "./portal";
 import { LogOut } from "lucide-react";
 
-const STEP_TO_ROUTE: Record<string, "/portal/proposta" | "/portal/contrato" | "/portal/pagamento" | "/portal/documentos" | "/portal/ds160" | "/portal/taxas"> = {
+const STEP_TO_ROUTE: Record<string, "/portal/proposta" | "/portal/contrato" | "/portal/pagamento" | "/portal/documentos" | "/portal/ds160" | "/portal/taxas" | "/portal/agenda"> = {
   proposta: "/portal/proposta",
   contrato: "/portal/contrato",
   pagamento: "/portal/pagamento",
   documentos: "/portal/documentos",
   taxas: "/portal/taxas",
+  agenda: "/portal/agenda",
 };
 
 export const Route = createFileRoute("/portal/")({
@@ -76,7 +77,7 @@ function PortalHome() {
             </div>
 
             {req.data.payment_status === "paid" && (
-              <div className="mt-6 grid grid-cols-2 gap-2">
+              <div className="mt-6 grid grid-cols-3 gap-2">
                 <button
                   onClick={() => nav({ to: "/portal/ds160" })}
                   className="rounded-2xl border border-[var(--color-border)] bg-white p-3 text-left hover:border-coral transition"
@@ -90,6 +91,13 @@ function PortalHome() {
                 >
                   <p className="text-[10px] uppercase tracking-wider text-ink-muted font-bold">Pagamento</p>
                   <p className="mt-1 font-display font-bold text-navy text-sm">Taxa MRV</p>
+                </button>
+                <button
+                  onClick={() => nav({ to: "/portal/agenda" })}
+                  className="rounded-2xl border border-[var(--color-border)] bg-white p-3 text-left hover:border-coral transition"
+                >
+                  <p className="text-[10px] uppercase tracking-wider text-ink-muted font-bold">Datas</p>
+                  <p className="mt-1 font-display font-bold text-navy text-sm">Agendamentos</p>
                 </button>
               </div>
             )}

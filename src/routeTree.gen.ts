@@ -21,8 +21,11 @@ import { Route as PortalLoginRouteImport } from './routes/portal.login'
 import { Route as PortalDs160RouteImport } from './routes/portal.ds160'
 import { Route as PortalDocumentosRouteImport } from './routes/portal.documentos'
 import { Route as PortalContratoRouteImport } from './routes/portal.contrato'
+import { Route as PortalAgendaRouteImport } from './routes/portal.agenda'
 import { Route as ConsoleLoginRouteImport } from './routes/console.login'
+import { Route as ConsoleJanelasRouteImport } from './routes/console.janelas'
 import { Route as ConsoleAuditoriaRouteImport } from './routes/console.auditoria'
+import { Route as ConsoleAgendaRouteImport } from './routes/console.agenda'
 import { Route as ConsoleOrcamentoNovoRouteImport } from './routes/console.orcamento.novo'
 import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$id'
 import { Route as ConsoleOrcamentoIdEditarRouteImport } from './routes/console.orcamento.$id.editar'
@@ -87,14 +90,29 @@ const PortalContratoRoute = PortalContratoRouteImport.update({
   path: '/contrato',
   getParentRoute: () => PortalRoute,
 } as any)
+const PortalAgendaRoute = PortalAgendaRouteImport.update({
+  id: '/agenda',
+  path: '/agenda',
+  getParentRoute: () => PortalRoute,
+} as any)
 const ConsoleLoginRoute = ConsoleLoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => ConsoleRoute,
 } as any)
+const ConsoleJanelasRoute = ConsoleJanelasRouteImport.update({
+  id: '/janelas',
+  path: '/janelas',
+  getParentRoute: () => ConsoleRoute,
+} as any)
 const ConsoleAuditoriaRoute = ConsoleAuditoriaRouteImport.update({
   id: '/auditoria',
   path: '/auditoria',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleAgendaRoute = ConsoleAgendaRouteImport.update({
+  id: '/agenda',
+  path: '/agenda',
   getParentRoute: () => ConsoleRoute,
 } as any)
 const ConsoleOrcamentoNovoRoute = ConsoleOrcamentoNovoRouteImport.update({
@@ -118,8 +136,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/console': typeof ConsoleRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
+  '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
+  '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
+  '/portal/agenda': typeof PortalAgendaRoute
   '/portal/contrato': typeof PortalContratoRoute
   '/portal/documentos': typeof PortalDocumentosRoute
   '/portal/ds160': typeof PortalDs160Route
@@ -135,8 +156,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
+  '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
+  '/portal/agenda': typeof PortalAgendaRoute
   '/portal/contrato': typeof PortalContratoRoute
   '/portal/documentos': typeof PortalDocumentosRoute
   '/portal/ds160': typeof PortalDs160Route
@@ -155,8 +179,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/console': typeof ConsoleRouteWithChildren
   '/portal': typeof PortalRouteWithChildren
+  '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
+  '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
+  '/portal/agenda': typeof PortalAgendaRoute
   '/portal/contrato': typeof PortalContratoRoute
   '/portal/documentos': typeof PortalDocumentosRoute
   '/portal/ds160': typeof PortalDs160Route
@@ -176,8 +203,11 @@ export interface FileRouteTypes {
     | '/'
     | '/console'
     | '/portal'
+    | '/console/agenda'
     | '/console/auditoria'
+    | '/console/janelas'
     | '/console/login'
+    | '/portal/agenda'
     | '/portal/contrato'
     | '/portal/documentos'
     | '/portal/ds160'
@@ -193,8 +223,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/console/agenda'
     | '/console/auditoria'
+    | '/console/janelas'
     | '/console/login'
+    | '/portal/agenda'
     | '/portal/contrato'
     | '/portal/documentos'
     | '/portal/ds160'
@@ -212,8 +245,11 @@ export interface FileRouteTypes {
     | '/'
     | '/console'
     | '/portal'
+    | '/console/agenda'
     | '/console/auditoria'
+    | '/console/janelas'
     | '/console/login'
+    | '/portal/agenda'
     | '/portal/contrato'
     | '/portal/documentos'
     | '/portal/ds160'
@@ -320,6 +356,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalContratoRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/portal/agenda': {
+      id: '/portal/agenda'
+      path: '/agenda'
+      fullPath: '/portal/agenda'
+      preLoaderRoute: typeof PortalAgendaRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/console/login': {
       id: '/console/login'
       path: '/login'
@@ -327,11 +370,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleLoginRouteImport
       parentRoute: typeof ConsoleRoute
     }
+    '/console/janelas': {
+      id: '/console/janelas'
+      path: '/janelas'
+      fullPath: '/console/janelas'
+      preLoaderRoute: typeof ConsoleJanelasRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
     '/console/auditoria': {
       id: '/console/auditoria'
       path: '/auditoria'
       fullPath: '/console/auditoria'
       preLoaderRoute: typeof ConsoleAuditoriaRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/agenda': {
+      id: '/console/agenda'
+      path: '/agenda'
+      fullPath: '/console/agenda'
+      preLoaderRoute: typeof ConsoleAgendaRouteImport
       parentRoute: typeof ConsoleRoute
     }
     '/console/orcamento/novo': {
@@ -359,7 +416,9 @@ declare module '@tanstack/react-router' {
 }
 
 interface ConsoleRouteChildren {
+  ConsoleAgendaRoute: typeof ConsoleAgendaRoute
   ConsoleAuditoriaRoute: typeof ConsoleAuditoriaRoute
+  ConsoleJanelasRoute: typeof ConsoleJanelasRoute
   ConsoleLoginRoute: typeof ConsoleLoginRoute
   ConsoleIndexRoute: typeof ConsoleIndexRoute
   ConsoleClienteIdRoute: typeof ConsoleClienteIdRoute
@@ -368,7 +427,9 @@ interface ConsoleRouteChildren {
 }
 
 const ConsoleRouteChildren: ConsoleRouteChildren = {
+  ConsoleAgendaRoute: ConsoleAgendaRoute,
   ConsoleAuditoriaRoute: ConsoleAuditoriaRoute,
+  ConsoleJanelasRoute: ConsoleJanelasRoute,
   ConsoleLoginRoute: ConsoleLoginRoute,
   ConsoleIndexRoute: ConsoleIndexRoute,
   ConsoleClienteIdRoute: ConsoleClienteIdRoute,
@@ -380,6 +441,7 @@ const ConsoleRouteWithChildren =
   ConsoleRoute._addFileChildren(ConsoleRouteChildren)
 
 interface PortalRouteChildren {
+  PortalAgendaRoute: typeof PortalAgendaRoute
   PortalContratoRoute: typeof PortalContratoRoute
   PortalDocumentosRoute: typeof PortalDocumentosRoute
   PortalDs160Route: typeof PortalDs160Route
@@ -391,6 +453,7 @@ interface PortalRouteChildren {
 }
 
 const PortalRouteChildren: PortalRouteChildren = {
+  PortalAgendaRoute: PortalAgendaRoute,
   PortalContratoRoute: PortalContratoRoute,
   PortalDocumentosRoute: PortalDocumentosRoute,
   PortalDs160Route: PortalDs160Route,
