@@ -62,6 +62,9 @@ function PortalHome() {
         <div className="flex items-center justify-between">
           <Logo size={32} />
           <div className="flex items-center">
+            <button onClick={() => nav({ to: "/portal/mensagens" })} className="text-ink-muted hover:text-coral p-2" aria-label="Mensagens">
+              <MessageSquare size={18} />
+            </button>
             <NotificationBell />
             <button onClick={signOut} className="text-ink-muted hover:text-coral p-2" aria-label="Sair">
               <LogOut size={18} />
