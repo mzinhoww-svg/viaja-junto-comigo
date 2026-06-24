@@ -2,6 +2,9 @@ import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { StepStatus } from "@/components/viajaly/StepCard";
+import type { Database } from "@/integrations/supabase/types";
+
+type RequestRow = Database["public"]["Tables"]["requests"]["Row"];
 
 export type JourneyStep = {
   idx: number;
