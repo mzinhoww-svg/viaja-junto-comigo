@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Milhas — Viajaly | Voe gastando muito menos</title>
+<meta name="description" content="Consultoria digital de viagem. Cuidamos do DS-160 e da preparação de entrevista do visto americano — e seguimos até passaporte, roteiro e milhas otimizadas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   VIAJALY — Landing
+   Estratégia de cor: COMMITTED (navy ~60% · areia ~30% · coral ~10% · azul-céu detalhe)
+   Tipografia: Sora (voz) + Inter (detalhe) — identidade de marca preservada
+   ============================================================ */
+:root{
+  /* OKLCH — ancorado nas cores de marca já em produção */
+  --navy:        oklch(0.276 0.083 268);   /* #10204A */
+  --navy-700:    oklch(0.346 0.090 268);
+  --navy-600:    oklch(0.420 0.095 268);
+  --coral:       oklch(0.701 0.171 22);     /* #FF5A5F */
+  --coral-600:   oklch(0.640 0.176 24);
+  --sky:         oklch(0.726 0.108 213);    /* #2DB7C9 */
+  --sky-300:     oklch(0.820 0.080 210);
+  --sand:        oklch(0.974 0.018 70);     /* #FFF6ED */
+  --sand-deep:   oklch(0.946 0.026 68);
+  --green:       oklch(0.545 0.108 158);    /* #1F8A5B */
+  --amber:       oklch(0.745 0.124 75);     /* #E8A33D */
+
+  --ink:         oklch(0.276 0.083 268);    /* navy = texto principal */
+  --ink-soft:    oklch(0.470 0.045 262);    /* #5A6A86 ~ */
+  --ink-faint:   oklch(0.620 0.030 260);
+  --line:        oklch(0.912 0.012 262);    /* #E6E9F0 */
+  --line-strong: oklch(0.860 0.018 262);
+  --white:       #ffffff;
+
+  /* texto sobre navy */
+  --on-navy:        oklch(0.974 0.018 70);
+  --on-navy-soft:   oklch(0.840 0.030 240);
+  --on-navy-faint:  oklch(0.700 0.040 240);
+
+  --radius: 20px;
+  --radius-sm: 12px;
+  --radius-lg: 28px;
+  --shadow-sm: 0 1px 2px oklch(0.276 0.083 268 / 0.06), 0 2px 8px oklch(0.276 0.083 268 / 0.05);
+  --shadow-md: 0 4px 16px oklch(0.276 0.083 268 / 0.08), 0 12px 32px oklch(0.276 0.083 268 / 0.07);
+  --shadow-lg: 0 8px 30px oklch(0.276 0.083 268 / 0.14), 0 30px 60px oklch(0.276 0.083 268 / 0.12);
+  --shadow-coral: 0 6px 20px oklch(0.701 0.171 22 / 0.32);
+
+  --z-sticky: 100;
+  --z-nav: 200;
+  --z-modal: 400;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);          /* out-quint */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  color:var(--ink);
+  background:var(--sand);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+::selection{background:var(--coral);color:#fff}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+h1,h2,h3,h4{font-family:'Sora',sans-serif;font-weight:800;letter-spacing:-0.03em;line-height:1.05;color:var(--navy);text-wrap:balance}
+h2{font-size:clamp(1.9rem,1.1rem + 3vw,3.2rem)}
+h3{font-size:clamp(1.3rem,1rem + 1.2vw,1.9rem);letter-spacing:-0.025em}
+p{text-wrap:pretty}
+
+.wrap{width:100%;max-width:1180px;margin-inline:auto;padding-inline:clamp(20px,5vw,40px)}
+.eyebrow{font-family:'Inter';font-weight:600;font-size:0.78rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--sky)}
+.eyebrow--coral{color:var(--coral-600)}
+
+/* ===== Stamp logo (carimbo-avião) ===== */
+.stamp{display:inline-flex;width:34px;height:34px;border-radius:50%;background:var(--coral);align-items:center;justify-content:center;flex:none;box-shadow:var(--shadow-coral)}
+.stamp svg{width:19px;height:19px}
+.wordmark{font-family:'Sora';font-weight:800;font-size:1.32rem;letter-spacing:-0.04em;color:var(--navy)}
+.wordmark .ly{color:var(--sky)}
+.wordmark .dot{color:var(--coral)}
+.on-navy .wordmark{color:var(--on-navy)}
+
+/* ================= NAV ================= */
+.nav{position:fixed;top:0;left:0;right:0;z-index:var(--z-nav);background:oklch(0.974 0.018 70 / 0.72);backdrop-filter:saturate(140%) blur(12px);-webkit-backdrop-filter:saturate(140%) blur(12px);border-bottom:1px solid transparent;transition:background .4s var(--ease-out),box-shadow .4s var(--ease-out),border-color .4s}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:24px;height:72px}
+.nav.scrolled{background:oklch(0.974 0.018 70 / 0.92);backdrop-filter:saturate(150%) blur(16px);-webkit-backdrop-filter:saturate(150%) blur(16px);border-bottom-color:var(--line);box-shadow:0 1px 20px oklch(0.276 0.083 268 / 0.06)}
+.nav-brand{display:flex;align-items:center;gap:11px;flex:none}
+.nav-brand .wordmark{white-space:nowrap}
+.nav-links{display:flex;align-items:center;gap:34px;font-size:0.93rem;font-weight:500;color:var(--ink-soft)}
+.nav-links a{position:relative;transition:color .2s;padding-block:4px}
+.nav-links a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:2px;background:var(--coral);transition:right .3s var(--ease-out)}
+.nav-links a:hover{color:var(--navy)}
+.nav-links a:hover::after{right:0}
+.nav-cta{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:var(--on-navy);padding:11px 20px;border-radius:999px;font-weight:600;font-size:0.9rem;transition:transform .25s var(--ease-out),box-shadow .25s,background .25s}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);background:var(--navy-700)}
+.nav-burger{display:none;width:44px;height:44px;border-radius:12px;align-items:center;justify-content:center;color:var(--navy)}
+@media(max-width:860px){
+  .nav-links{display:none}
+  .nav-cta{display:none}
+  .nav-burger{display:inline-flex}
+}
+
+/* ================= HERO ================= */
+.hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;isolation:isolate;overflow:hidden}
+.hero-bg{position:absolute;inset:0;z-index:-2}
+.hero-bg img{width:100%;height:100%;object-fit:cover;object-position:center 38%}
+.hero-bg::after{/* overlay navy de marca */
+  content:"";position:absolute;inset:0;
+  background:
+    linear-gradient(180deg, oklch(0.276 0.083 268 / 0.30) 0%, oklch(0.276 0.083 268 / 0.10) 32%, oklch(0.276 0.083 268 / 0.72) 78%, oklch(0.230 0.080 268 / 0.95) 100%),
+    linear-gradient(90deg, oklch(0.276 0.083 268 / 0.55) 0%, transparent 60%);
+}
+.hero-grain{position:absolute;inset:0;z-index:-1;opacity:0.5;pointer-events:none;
+  background-image:radial-gradient(oklch(1 0 0 / 0.05) 1px, transparent 1px);background-size:3px 3px;mix-blend-mode:overlay}
+.hero-content{padding-block:0 clamp(48px,7vh,88px);max-width:760px}
+.hero h1{
+  color:var(--on-navy);font-size:clamp(2.6rem,1.2rem + 5.6vw,5.4rem);line-height:0.98;letter-spacing:-0.04em;
+  text-shadow:0 2px 30px oklch(0.230 0.080 268 / 0.4);
+}
+.hero h1 .accent{color:var(--sky-300)}
+.hero h1 .stamp-dot{color:var(--coral);font-family:'Sora'}
+.hero-sub{margin-top:24px;font-size:clamp(1.05rem,0.95rem + 0.6vw,1.32rem);color:var(--on-navy-soft);max-width:54ch;line-height:1.55;font-weight:400}
+.hero-actions{margin-top:38px;display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.hero-meta{margin-top:30px;display:flex;flex-wrap:wrap;gap:10px 26px;color:var(--on-navy-faint);font-size:0.88rem}
+.hero-meta span{display:inline-flex;align-items:center;gap:8px}
+.hero-meta svg{width:15px;height:15px;color:var(--sky-300)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;font-family:'Inter';font-weight:600;border-radius:999px;transition:transform .25s var(--ease-out),box-shadow .3s var(--ease-out),background .25s,color .25s;white-space:nowrap}
+.btn svg{width:18px;height:18px;transition:transform .3s var(--ease-out)}
+.btn-lg{padding:16px 28px;font-size:1rem}
+.btn-md{padding:12px 22px;font-size:0.92rem}
+.btn-coral{background:var(--coral);color:#fff;box-shadow:var(--shadow-coral)}
+.btn-coral:hover{background:var(--coral-600);transform:translateY(-3px);box-shadow:0 10px 28px oklch(0.701 0.171 22 / 0.42)}
+.btn-coral:hover svg{transform:translateX(4px) translateY(-4px)}
+.btn-ghost-light{background:oklch(1 0 0 / 0.08);color:var(--on-navy);border:1.5px solid oklch(1 0 0 / 0.28);backdrop-filter:blur(6px)}
+.btn-ghost-light:hover{background:oklch(1 0 0 / 0.16);transform:translateY(-3px);border-color:oklch(1 0 0 / 0.5)}
+.btn-navy{background:var(--navy);color:var(--on-navy);box-shadow:var(--shadow-sm)}
+.btn-navy:hover{background:var(--navy-700);transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.btn-navy:hover svg{transform:translateX(4px)}
+.btn-outline{background:transparent;color:var(--navy);border:1.5px solid var(--line-strong)}
+.btn-outline:hover{border-color:var(--navy);background:var(--white);transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+
+/* ============== ANSIEDADE → ALÍVIO (problema) ============== */
+.relief{background:var(--sand);padding-block:clamp(72px,10vh,128px)}
+.relief-head{max-width:680px;margin-bottom:clamp(40px,6vh,64px)}
+.relief-head h2{margin-top:14px}
+.relief-head p{margin-top:18px;font-size:1.1rem;color:var(--ink-soft);max-width:58ch}
+.relief-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:clamp(18px,2.5vw,28px)}
+.relief-item{padding:30px 28px;border-radius:var(--radius);background:var(--white);border:1px solid var(--line);box-shadow:var(--shadow-sm);transition:transform .4s var(--ease-out),box-shadow .4s}
+.relief-item:hover{transform:translateY(-5px);box-shadow:var(--shadow-md)}
+.relief-num{font-family:'Sora';font-weight:800;font-size:1rem;color:var(--coral);letter-spacing:-0.02em}
+.relief-item h4{font-family:'Sora';font-weight:700;font-size:1.18rem;margin:16px 0 10px;color:var(--navy);letter-spacing:-0.02em;line-height:1.2}
+.relief-item p{color:var(--ink-soft);font-size:0.97rem;line-height:1.55}
+.relief-item .fix{margin-top:16px;display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:0.9rem;color:var(--green)}
+.relief-item .fix svg{width:16px;height:16px}
+
+/* ============== CARRO-CHEFE: VISTO ============== */
+.flagship{position:relative;background:var(--navy);color:var(--on-navy);padding-block:clamp(80px,11vh,140px);overflow:hidden}
+.flagship-route{position:absolute;inset:0;z-index:0;opacity:0.5;pointer-events:none}
+.flagship .wrap{position:relative;z-index:1}
+.flagship-top{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;flex-wrap:wrap;margin-bottom:54px}
+.flagship-top .lead{max-width:620px}
+.flagship-top h2{color:var(--on-navy);margin-top:16px}
+.flagship-top p{margin-top:18px;color:var(--on-navy-soft);font-size:1.12rem;max-width:54ch}
+.flagship-badge{display:inline-flex;align-items:center;gap:9px;background:oklch(0.701 0.171 22 / 0.16);border:1px solid oklch(0.701 0.171 22 / 0.4);color:oklch(0.82 0.10 30);padding:8px 16px;border-radius:999px;font-weight:600;font-size:0.82rem;letter-spacing:0.02em}
+.flagship-badge .stamp{width:22px;height:22px;box-shadow:none}
+.flagship-badge .stamp svg{width:13px;height:13px}
+
+.visa-layout{display:grid;grid-template-columns:1.05fr 0.95fr;gap:clamp(28px,4vw,60px);align-items:center}
+@media(max-width:880px){.visa-layout{grid-template-columns:1fr;gap:36px}}
+.visa-steps{display:flex;flex-direction:column;gap:6px}
+.visa-step{display:flex;gap:18px;padding:20px 22px;border-radius:var(--radius-sm);transition:background .3s var(--ease-out)}
+.visa-step:hover{background:oklch(1 0 0 / 0.05)}
+.visa-step-ico{flex:none;width:48px;height:48px;border-radius:14px;background:oklch(1 0 0 / 0.07);border:1px solid oklch(1 0 0 / 0.12);display:grid;place-items:center;color:var(--sky-300)}
+.visa-step-ico svg{width:22px;height:22px}
+.visa-step h4{font-family:'Sora';font-weight:700;font-size:1.1rem;color:var(--on-navy);letter-spacing:-0.02em;margin-bottom:5px}
+.visa-step p{color:var(--on-navy-soft);font-size:0.95rem;line-height:1.5}
+.visa-step b{color:var(--sky-300);font-weight:600}
+
+.visa-card{position:relative;border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-lg);isolation:isolate}
+.visa-card img{width:100%;aspect-ratio:4/5;object-fit:cover}
+.visa-card::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,oklch(0.230 0.080 268 / 0.85) 100%)}
+.visa-card-body{position:absolute;left:0;right:0;bottom:0;padding:26px;z-index:1}
+.visa-card-body .tag{display:inline-block;background:var(--coral);color:#fff;font-weight:700;font-size:0.74rem;letter-spacing:0.06em;text-transform:uppercase;padding:6px 12px;border-radius:7px;margin-bottom:12px}
+.visa-card-body h4{font-family:'Sora';font-weight:800;color:#fff;font-size:1.5rem;letter-spacing:-0.03em;line-height:1.1}
+.visa-card-body p{color:oklch(0.9 0.02 240);font-size:0.92rem;margin-top:8px}
+.visa-fee{margin-top:30px;padding:22px 24px;border-radius:var(--radius-sm);background:oklch(1 0 0 / 0.05);border:1px solid oklch(1 0 0 / 0.1);display:flex;gap:14px;align-items:flex-start}
+.visa-fee svg{flex:none;width:20px;height:20px;color:var(--amber);margin-top:2px}
+.visa-fee p{font-size:0.88rem;color:var(--on-navy-soft);line-height:1.5}
+.visa-fee b{color:var(--on-navy)}
+
+/* ============== OUTROS PRODUTOS (cross/upsell) ============== */
+.suite{padding-block:clamp(72px,10vh,128px);background:var(--sand)}
+.suite-head{max-width:640px;margin-bottom:clamp(36px,5vh,56px)}
+.suite-head h2{margin-top:14px}
+.suite-head p{margin-top:16px;color:var(--ink-soft);font-size:1.08rem}
+.suite-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2vw,22px)}
+@media(max-width:880px){.suite-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.suite-grid{grid-template-columns:1fr}}
+.prod{position:relative;border-radius:var(--radius);overflow:hidden;background:var(--white);border:1px solid var(--line);box-shadow:var(--shadow-sm);display:flex;flex-direction:column;transition:transform .4s var(--ease-out),box-shadow .4s}
+.prod:hover{transform:translateY(-6px);box-shadow:var(--shadow-md)}
+.prod-media{position:relative;aspect-ratio:16/11;overflow:hidden}
+.prod-media img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease-out)}
+.prod:hover .prod-media img{transform:scale(1.06)}
+.prod-media::after{content:"";position:absolute;inset:0;background:linear-gradient(160deg,oklch(0.276 0.083 268 / 0.10),oklch(0.276 0.083 268 / 0.35))}
+.prod-scope{position:absolute;top:14px;left:14px;z-index:1;background:oklch(0.974 0.018 70 / 0.92);backdrop-filter:blur(4px);color:var(--navy);font-weight:600;font-size:0.72rem;letter-spacing:0.04em;text-transform:uppercase;padding:5px 11px;border-radius:7px}
+.prod-body{padding:24px 24px 26px;display:flex;flex-direction:column;flex:1}
+.prod-body h3{font-size:1.32rem;color:var(--navy)}
+.prod-body p{margin-top:9px;color:var(--ink-soft);font-size:0.95rem;line-height:1.55;flex:1}
+.prod-link{margin-top:18px;display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:0.92rem;color:var(--coral-600);transition:gap .3s var(--ease-out)}
+.prod-link svg{width:16px;height:16px;transition:transform .3s var(--ease-out)}
+.prod:hover .prod-link{gap:12px}
+.prod:hover .prod-link svg{transform:translateX(3px)}
+/* card adjacente: eyebrow temática + ligação + inclusos */
+.prod-body{padding:24px 24px 26px;display:flex;flex-direction:column;flex:1}
+.prod-kicker{font-family:'Inter';font-weight:700;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:9px}
+.prod-kicker.k-pass{color:var(--sky)}
+.prod-kicker.k-route{color:var(--coral-600)}
+.prod-kicker.k-miles{color:var(--green)}
+.prod-tie{margin-top:9px;color:var(--ink-soft);font-size:0.94rem;line-height:1.5}
+.prod-tie b{color:var(--navy);font-weight:600}
+.prod-incl{list-style:none;margin:16px 0 0;padding:15px 0 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:9px;flex:1}
+.prod-incl li{display:flex;gap:9px;align-items:flex-start;font-size:0.88rem;color:var(--ink-soft);line-height:1.4}
+.prod-incl svg{flex:none;width:15px;height:15px;margin-top:2px}
+.prod-incl.i-pass svg{color:var(--sky)}
+.prod-incl.i-route svg{color:var(--coral-600)}
+.prod-incl.i-miles svg{color:var(--green)}
+
+/* combo strip */
+.combo{margin-top:clamp(28px,4vh,44px);border-radius:var(--radius);background:linear-gradient(120deg,var(--navy),var(--navy-600));color:var(--on-navy);padding:clamp(26px,4vw,40px);display:flex;align-items:center;justify-content:space-between;gap:28px;flex-wrap:wrap;position:relative;overflow:hidden;box-shadow:var(--shadow-md)}
+.combo::before{content:"";position:absolute;right:-40px;top:-40px;width:220px;height:220px;border-radius:50%;background:radial-gradient(oklch(0.701 0.171 22 / 0.35),transparent 70%)}
+.combo-txt{position:relative;max-width:60ch}
+.combo-txt .pill{display:inline-flex;align-items:center;gap:8px;background:oklch(0.545 0.108 158 / 0.2);border:1px solid oklch(0.545 0.108 158 / 0.45);color:oklch(0.82 0.12 158);font-weight:600;font-size:0.78rem;padding:5px 13px;border-radius:999px;margin-bottom:14px}
+.combo-txt h3{color:#fff;font-size:clamp(1.3rem,1rem + 1vw,1.7rem)}
+.combo-txt p{margin-top:8px;color:var(--on-navy-soft);font-size:0.98rem}
+.combo-txt b{color:var(--sky-300)}
+
+/* ============== COMO FUNCIONA (jornada) ============== */
+.how{padding-block:clamp(72px,10vh,128px);background:var(--white)}
+.how-head{text-align:center;max-width:620px;margin:0 auto clamp(44px,6vh,68px)}
+.how-head h2{margin-top:14px}
+.how-head p{margin-top:16px;color:var(--ink-soft);font-size:1.08rem}
+.timeline{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
+.timeline::before{content:"";position:absolute;top:27px;left:8%;right:8%;height:2px;background:repeating-linear-gradient(90deg,var(--line-strong) 0 8px,transparent 8px 16px);z-index:0}
+@media(max-width:780px){.timeline{grid-template-columns:1fr;gap:0}.timeline::before{left:27px;right:auto;top:8%;bottom:8%;width:2px;height:auto;background:repeating-linear-gradient(180deg,var(--line-strong) 0 8px,transparent 8px 16px)}}
+.tl-step{position:relative;z-index:1;text-align:center}
+@media(max-width:780px){.tl-step{text-align:left;display:flex;gap:20px;padding-block:18px}}
+.tl-dot{width:56px;height:56px;border-radius:50%;background:var(--white);border:2px solid var(--line-strong);display:grid;place-items:center;margin:0 auto 18px;color:var(--navy);font-family:'Sora';font-weight:800;font-size:1.1rem;transition:transform .3s var(--ease-out),border-color .3s,background .3s,color .3s}
+@media(max-width:780px){.tl-dot{margin:0;flex:none}}
+.tl-step:hover .tl-dot{background:var(--coral);border-color:var(--coral);color:#fff;transform:scale(1.08)}
+.tl-step h4{font-family:'Sora';font-weight:700;font-size:1.08rem;color:var(--navy);letter-spacing:-0.02em;margin-bottom:7px}
+.tl-step p{color:var(--ink-soft);font-size:0.92rem;line-height:1.5;max-width:30ch;margin-inline:auto}
+@media(max-width:780px){.tl-step p{margin-inline:0}}
+.tl-pay{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:0.78rem;font-weight:600;color:var(--sky);background:oklch(0.726 0.108 213 / 0.12);padding:3px 9px;border-radius:6px}
+
+/* ============== PROVA / DIFERENCIAL ============== */
+.why{padding-block:clamp(72px,10vh,128px);background:var(--sand-deep)}
+.why-layout{display:grid;grid-template-columns:0.9fr 1.1fr;gap:clamp(32px,5vw,72px);align-items:center}
+@media(max-width:900px){.why-layout{grid-template-columns:1fr;gap:40px}}
+.why-photo{border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-lg);position:relative}
+.why-photo img{width:100%;aspect-ratio:5/6;object-fit:cover}
+.why-stamp{position:absolute;bottom:22px;right:22px;background:var(--coral);color:#fff;width:88px;height:88px;border-radius:50%;display:grid;place-items:center;text-align:center;box-shadow:var(--shadow-coral);transform:rotate(-8deg)}
+.why-stamp span{font-family:'Sora';font-weight:800;font-size:0.7rem;line-height:1.15;letter-spacing:0.02em}
+.why-head h2{margin-top:14px}
+.why-head > p{margin-top:16px;color:var(--ink-soft);font-size:1.06rem;max-width:50ch}
+.why-list{margin-top:30px;display:flex;flex-direction:column;gap:6px}
+.why-row{display:flex;gap:16px;padding:18px 0;border-bottom:1px solid var(--line)}
+.why-row:last-child{border-bottom:none}
+.why-row-ico{flex:none;width:42px;height:42px;border-radius:12px;background:var(--white);border:1px solid var(--line);display:grid;place-items:center;color:var(--coral-600);box-shadow:var(--shadow-sm)}
+.why-row-ico svg{width:20px;height:20px}
+.why-row h4{font-family:'Sora';font-weight:700;font-size:1.06rem;color:var(--navy);letter-spacing:-0.02em;margin-bottom:4px}
+.why-row p{color:var(--ink-soft);font-size:0.94rem;line-height:1.5}
+
+/* ============== CTA FINAL ============== */
+.final{position:relative;background:var(--navy);color:var(--on-navy);padding-block:clamp(80px,12vh,150px);overflow:hidden;isolation:isolate}
+.final-glow{position:absolute;z-index:-1;width:680px;height:680px;border-radius:50%;background:radial-gradient(oklch(0.701 0.171 22 / 0.28),transparent 65%);top:-200px;left:50%;transform:translateX(-50%);filter:blur(20px)}
+.final-route{position:absolute;inset:0;z-index:-1;opacity:0.4}
+.final-inner{text-align:center;max-width:720px;margin:0 auto}
+.final h2{color:#fff;font-size:clamp(2.1rem,1.2rem + 3.6vw,3.6rem)}
+.final h2 .accent{color:var(--sky-300)}
+.final h2 .dot{color:var(--coral)}
+.final p{margin-top:20px;font-size:1.12rem;color:var(--on-navy-soft);max-width:52ch;margin-inline:auto}
+.final-actions{margin-top:40px;display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+.final-note{margin-top:26px;font-size:0.86rem;color:var(--on-navy-faint)}
+
+/* ============== FOOTER ============== */
+.footer{background:oklch(0.230 0.080 268);color:var(--on-navy-soft);padding-block:60px 36px}
+.footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:40px;margin-bottom:44px}
+@media(max-width:720px){.footer-grid{grid-template-columns:1fr;gap:32px}}
+.footer-brand .wordmark{font-size:1.5rem;color:var(--on-navy)}
+.footer-brand p{margin-top:16px;font-size:0.92rem;max-width:38ch;line-height:1.6;color:var(--on-navy-faint)}
+.footer-col h5{font-family:'Sora';font-weight:700;font-size:0.82rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--on-navy);margin-bottom:16px}
+.footer-col a{display:block;padding:6px 0;font-size:0.92rem;color:var(--on-navy-soft);transition:color .2s,padding-left .2s}
+.footer-col a:hover{color:var(--sky-300);padding-left:5px}
+.footer-disclaimer{border-top:1px solid oklch(1 0 0 / 0.1);padding-top:28px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+.footer-disclaimer p{font-size:0.8rem;color:var(--on-navy-faint);max-width:62ch;line-height:1.55}
+.footer-disclaimer .copy{font-size:0.8rem;color:var(--on-navy-faint)}
+
+/* ===== WhatsApp float ===== */
+.wa-float{position:fixed;bottom:24px;right:24px;z-index:var(--z-sticky);width:60px;height:60px;border-radius:50%;background:var(--green);display:grid;place-items:center;box-shadow:0 8px 24px oklch(0.545 0.108 158 / 0.45);transition:transform .3s var(--ease-out),box-shadow .3s;animation:wa-pop .6s var(--ease-out) 1.2s both}
+.wa-float svg{width:30px;height:30px;color:#fff}
+.wa-float:hover{transform:scale(1.1) translateY(-2px);box-shadow:0 12px 30px oklch(0.545 0.108 158 / 0.55)}
+.wa-float::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--green);animation:wa-ring 2.4s ease-out infinite}
+@keyframes wa-ring{0%{transform:scale(1);opacity:0.6}100%{transform:scale(1.7);opacity:0}}
+@keyframes wa-pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* ===== Reveal on scroll ===== */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease-out),transform .8s var(--ease-out)}
+.reveal.in{opacity:1;transform:none}
+.reveal[data-d="1"]{transition-delay:.08s}
+.reveal[data-d="2"]{transition-delay:.16s}
+.reveal[data-d="3"]{transition-delay:.24s}
+
+/* ================= PLANOS / PREÇOS ================= */
+.plans{padding-block:clamp(72px,10vh,128px)}
+.plans--visa{background:var(--sand-deep)}
+.plans--suite{background:var(--white)}
+.plans-head{max-width:680px;margin-bottom:clamp(36px,5vh,56px)}
+.plans-head h2{margin-top:14px}
+.plans-head p{margin-top:16px;color:var(--ink-soft);font-size:1.08rem;max-width:56ch}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,2.4vw,26px);align-items:stretch}
+@media(max-width:860px){.plans-grid{grid-template-columns:1fr;max-width:480px}}
+
+.plan{position:relative;display:flex;flex-direction:column;background:var(--white);border:1px solid var(--line);border-radius:var(--radius-lg);padding:32px 30px 30px;box-shadow:var(--shadow-sm);transition:transform .4s var(--ease-out),box-shadow .4s,border-color .4s}
+.plan:hover{transform:translateY(-6px);box-shadow:var(--shadow-md)}
+.plan--featured{border-color:transparent;background:var(--navy);color:var(--on-navy);box-shadow:var(--shadow-lg)}
+.plan--featured:hover{box-shadow:0 14px 44px oklch(0.276 0.083 268 / 0.22)}
+.plan-flag{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--coral);color:#fff;font-family:'Inter';font-weight:700;font-size:0.72rem;letter-spacing:0.06em;text-transform:uppercase;padding:6px 16px;border-radius:999px;white-space:nowrap;box-shadow:var(--shadow-coral)}
+.plan-scope{font-family:'Inter';font-weight:600;font-size:0.74rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--sky)}
+.plan--featured .plan-scope{color:var(--sky-300)}
+.plan-name{font-family:'Sora';font-weight:800;font-size:1.5rem;letter-spacing:-0.03em;color:var(--navy);margin:10px 0 4px}
+.plan--featured .plan-name{color:#fff}
+.plan-for{font-size:0.92rem;color:var(--ink-soft)}
+.plan--featured .plan-for{color:var(--on-navy-soft)}
+.plan-price{margin:22px 0 4px;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.plan-price .from{font-size:0.86rem;color:var(--ink-faint);font-weight:500}
+.plan--featured .plan-price .from{color:var(--on-navy-faint)}
+.plan-price .cur{font-family:'Sora';font-weight:700;font-size:1.2rem;color:var(--navy);align-self:flex-start;margin-top:6px}
+.plan--featured .plan-price .cur{color:var(--sky-300)}
+.plan-price .val{font-family:'Sora';font-weight:800;font-size:2.7rem;letter-spacing:-0.04em;line-height:1;color:var(--navy)}
+.plan--featured .plan-price .val{color:#fff}
+.plan-price .per{font-size:0.92rem;color:var(--ink-soft);font-weight:500}
+.plan--featured .plan-price .per{color:var(--on-navy-soft)}
+.plan-save{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:0.82rem;font-weight:600;color:var(--green);background:oklch(0.545 0.108 158 / 0.1);padding:4px 11px;border-radius:7px;align-self:flex-start}
+.plan--featured .plan-save{color:oklch(0.82 0.12 158);background:oklch(0.545 0.108 158 / 0.2)}
+.plan-feats{list-style:none;margin:24px 0 0;padding:22px 0 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:13px;flex:1}
+.plan--featured .plan-feats{border-top-color:oklch(1 0 0 / 0.14)}
+.plan-feats li{display:flex;gap:11px;font-size:0.94rem;color:var(--ink-soft);line-height:1.45}
+.plan--featured .plan-feats li{color:var(--on-navy-soft)}
+.plan-feats svg{flex:none;width:18px;height:18px;color:var(--green);margin-top:2px}
+.plan--featured .plan-feats svg{color:var(--sky-300)}
+.plan-feats b{color:var(--navy);font-weight:600}
+.plan--featured .plan-feats b{color:#fff}
+.plan-cta{margin-top:26px}
+.plan-cta .btn{width:100%}
+
+/* nota de taxas governamentais sob os planos */
+.plans-note{margin-top:clamp(26px,4vh,40px);display:flex;gap:14px;align-items:flex-start;padding:22px 24px;border-radius:var(--radius);background:var(--white);border:1px dashed var(--line-strong);max-width:720px}
+.plans--suite .plans-note{background:var(--sand)}
+.plans-note svg{flex:none;width:20px;height:20px;color:var(--amber);margin-top:2px}
+.plans-note p{font-size:0.9rem;color:var(--ink-soft);line-height:1.55}
+.plans-note b{color:var(--navy)}
+.plans-disc{margin-top:16px;font-size:0.82rem;color:var(--ink-faint);max-width:640px;line-height:1.5}
+
+/* ================= PROVA SOCIAL ================= */
+.proof{padding-block:clamp(72px,10vh,128px);background:var(--white)}
+.proof-head{max-width:680px;margin-bottom:clamp(36px,5vh,56px)}
+.proof-head h2{margin-top:14px}
+.proof-head p{margin-top:16px;color:var(--ink-soft);font-size:1.08rem;max-width:58ch}
+
+/* Bloco A — vídeos verticais 9:16 */
+.vids-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,2.4vw,26px)}
+@media(max-width:860px){.vids-grid{grid-template-columns:1fr 1fr;gap:16px}}
+@media(max-width:560px){.vids-grid{grid-template-columns:1fr;max-width:360px}}
+.vid{display:flex;flex-direction:column;gap:13px}
+.vid-frame{position:relative;aspect-ratio:9/16;border-radius:var(--radius);overflow:hidden;background:var(--navy);box-shadow:var(--shadow-md);border:1px solid var(--line)}
+.vid-frame video{width:100%;height:100%;object-fit:cover;display:block}
+/* estado vazio elegante (placeholder até o upload) */
+.vid-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:linear-gradient(160deg, var(--navy), oklch(0.346 0.090 268));color:var(--on-navy);text-align:center;padding:24px}
+.vid-empty .play{width:62px;height:62px;border-radius:999px;background:var(--coral);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-coral);transition:transform .3s var(--ease-out)}
+.vid-frame:hover .vid-empty .play{transform:scale(1.08)}
+.vid-empty .play svg{width:26px;height:26px;color:#fff;margin-left:3px}
+.vid-empty small{font-size:0.8rem;color:var(--on-navy-soft);letter-spacing:0.02em;max-width:80%}
+.vid-empty b{font-family:'Sora';font-weight:700;font-size:0.95rem;color:#fff}
+.vid-cap{padding-inline:2px}
+.vid-cap strong{display:block;font-weight:600;font-size:0.96rem;color:var(--navy)}
+.vid-cap span{font-size:0.86rem;color:var(--ink-faint)}
+
+/* Bloco B — prints de WhatsApp */
+.waproof{margin-top:clamp(56px,8vh,90px)}
+.waproof-head{max-width:600px;margin-bottom:clamp(28px,4vh,44px)}
+.waproof-head h3{font-family:'Sora';font-weight:800;font-size:clamp(1.4rem,3vw,1.9rem);letter-spacing:-0.03em;color:var(--navy)}
+.waproof-head p{margin-top:12px;color:var(--ink-soft);font-size:1rem}
+.waproof-grid{columns:3;column-gap:clamp(16px,2vw,22px)}
+@media(max-width:860px){.waproof-grid{columns:2}}
+@media(max-width:520px){.waproof-grid{columns:1;max-width:420px}}
+.wacard{break-inside:avoid;margin-bottom:clamp(16px,2vw,22px);border-radius:var(--radius-sm);overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid var(--line);background:var(--white)}
+.wacard img{width:100%;display:block}
+/* placeholder de print (mock de tela WhatsApp) */
+.wacard-ph{position:relative;background:#E5DDD5;padding:14px 12px 16px;min-height:200px;display:flex;flex-direction:column;gap:9px}
+.wacard-ph .wa-bar{display:flex;align-items:center;gap:9px;padding:8px 10px;margin:-14px -12px 6px;background:#075E54;color:#fff}
+.wacard-ph .wa-bar .av{width:26px;height:26px;border-radius:999px;background:oklch(0.726 0.108 213);flex:none}
+.wacard-ph .wa-bar small{font-size:0.78rem;font-weight:600}
+.wabub{max-width:82%;padding:8px 11px;border-radius:10px;font-size:0.84rem;line-height:1.4;color:#111b21;box-shadow:0 1px 1px rgba(0,0,0,.08)}
+.wabub.in{align-self:flex-start;background:#fff;border-top-left-radius:3px}
+.wabub.out{align-self:flex-end;background:#DCF8C6;border-top-right-radius:3px}
+.wabub .t{display:block;text-align:right;font-size:0.64rem;color:#667781;margin-top:3px}
+.proof-note{margin-top:clamp(28px,4vh,40px);display:flex;gap:12px;align-items:flex-start;padding:16px 20px;border-radius:var(--radius);background:var(--sand);border:1px dashed var(--line-strong);max-width:680px}
+.proof-note svg{flex:none;width:18px;height:18px;color:var(--sky);margin-top:2px}
+.proof-note p{font-size:0.84rem;color:var(--ink-soft);line-height:1.5}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}
+  .reveal{opacity:1;transform:none}
+  .wa-float::after{display:none}
+}
+
+/* ============================================================
+   PÁGINA MILHAS — acento green + componentes da LP profunda
+   ============================================================ */
+:root{
+  --accent:        var(--green);
+  --accent-deep:   oklch(0.480 0.108 158);
+  --accent-soft:   oklch(0.880 0.070 158);
+  --accent-tint:   oklch(0.966 0.022 158);
+}
+.nav-links a.is-active{color:var(--navy)}
+.nav-links a.is-active::after{right:0}
+
+/* ----- HERO de produto (assimétrico: texto + foto vertical) ----- */
+.phero{position:relative;padding-top:118px;padding-bottom:clamp(48px,7vh,86px);overflow:hidden;background:
+  radial-gradient(120% 90% at 88% 0%, var(--accent-tint), transparent 60%),
+  var(--sand)}
+.phero-grid{display:grid;grid-template-columns:1.05fr 0.95fr;gap:clamp(28px,5vw,68px);align-items:center}
+@media(max-width:880px){.phero-grid{grid-template-columns:1fr;gap:32px}}
+.phero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Inter';font-weight:600;font-size:0.82rem;color:var(--accent-deep);background:var(--accent-tint);border:1px solid var(--accent-soft);padding:7px 14px;border-radius:999px;margin-bottom:22px}
+.phero-eyebrow svg{width:15px;height:15px}
+.phero h1{font-family:'Sora';font-weight:800;font-size:clamp(2.3rem,5.6vw,4rem);line-height:1.02;letter-spacing:-0.04em;color:var(--navy);text-wrap:balance}
+.phero h1 em{font-style:normal;color:var(--accent-deep)}
+.phero-sub{margin-top:20px;font-size:clamp(1.05rem,1.5vw,1.2rem);color:var(--ink-soft);line-height:1.55;max-width:54ch}
+.phero-ctas{margin-top:30px;display:flex;flex-wrap:wrap;gap:14px}
+.phero-proof{margin-top:30px;display:flex;flex-wrap:wrap;gap:10px 22px}
+.phero-proof span{display:inline-flex;align-items:center;gap:8px;font-size:0.9rem;color:var(--ink-soft)}
+.phero-proof svg{flex:none;width:17px;height:17px;color:var(--accent-deep)}
+.phero-media{position:relative}
+.phero-media img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:var(--radius-lg);box-shadow:var(--shadow-lg)}
+.phero-badge{position:absolute;left:-14px;bottom:26px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:14px 18px;display:flex;align-items:center;gap:12px;max-width:240px}
+.phero-badge .pb-ic{flex:none;width:38px;height:38px;border-radius:11px;background:var(--accent-tint);display:grid;place-items:center;color:var(--accent-deep)}
+.phero-badge .pb-ic svg{width:20px;height:20px}
+.phero-badge strong{display:block;font-size:0.92rem;color:var(--navy);font-weight:700;font-family:'Sora'}
+.phero-badge span{font-size:0.8rem;color:var(--ink-faint)}
+@media(max-width:880px){.phero-badge{left:14px}}
+
+/* ----- PROBLEMA / virada (não-card: 3 colunas com régua à esquerda do bloco) ----- */
+.prob{padding-block:clamp(64px,9vh,110px)}
+.prob-head{max-width:680px;margin-bottom:clamp(34px,5vh,52px)}
+.prob-head h2{font-family:'Sora';font-weight:800;font-size:clamp(1.7rem,3.6vw,2.5rem);letter-spacing:-0.035em;color:var(--navy);text-wrap:balance}
+.prob-head p{margin-top:14px;color:var(--ink-soft);font-size:1.08rem;max-width:58ch}
+.prob-list{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,3vw,38px)}
+@media(max-width:780px){.prob-list{grid-template-columns:1fr;gap:26px}}
+.prob-item{padding-top:20px;border-top:2px solid var(--accent)}
+.prob-item h3{font-family:'Sora';font-weight:700;font-size:1.1rem;color:var(--navy);margin-bottom:8px}
+.prob-item p{font-size:0.95rem;color:var(--ink-soft);line-height:1.55}
+.prob-item .pi-turn{margin-top:12px;display:flex;gap:8px;align-items:flex-start;font-size:0.9rem;color:var(--accent-deep);font-weight:500}
+.prob-item .pi-turn svg{flex:none;width:16px;height:16px;margin-top:2px}
+
+/* ----- INCLUSO (lista rica, 2 colunas, com ícones — não cards) ----- */
+.incl{padding-block:clamp(64px,9vh,110px);background:var(--white)}
+.incl-grid{display:grid;grid-template-columns:0.8fr 1.2fr;gap:clamp(32px,5vw,64px);align-items:start}
+@media(max-width:860px){.incl-grid{grid-template-columns:1fr;gap:28px}}
+.incl-head h2{font-family:'Sora';font-weight:800;font-size:clamp(1.7rem,3.6vw,2.5rem);letter-spacing:-0.035em;color:var(--navy);text-wrap:balance;position:sticky;top:96px}
+.incl-head p{margin-top:14px;color:var(--ink-soft);font-size:1.05rem;position:sticky;top:96px}
+.incl-items{display:flex;flex-direction:column}
+.incl-row{display:flex;gap:16px;padding:18px 0;border-bottom:1px solid var(--line)}
+.incl-row:last-child{border-bottom:0}
+.incl-ic{flex:none;width:42px;height:42px;border-radius:12px;background:var(--accent-tint);display:grid;place-items:center;color:var(--accent-deep)}
+.incl-ic svg{width:21px;height:21px}
+.incl-row h4{font-family:'Sora';font-weight:700;font-size:1.02rem;color:var(--navy);margin-bottom:5px}
+.incl-row p{font-size:0.93rem;color:var(--ink-soft);line-height:1.5}
+
+/* ----- TIMELINE (passos numerados — sequência REAL, justifica numeração) ----- */
+.steps{padding-block:clamp(64px,9vh,110px)}
+.steps-head{max-width:640px;margin-bottom:clamp(36px,5vh,56px)}
+.steps-head h2{font-family:'Sora';font-weight:800;font-size:clamp(1.7rem,3.6vw,2.5rem);letter-spacing:-0.035em;color:var(--navy);text-wrap:balance}
+.steps-head p{margin-top:14px;color:var(--ink-soft);font-size:1.05rem}
+.steps-track{display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(14px,2vw,20px)}
+@media(max-width:880px){.steps-track{grid-template-columns:1fr 1fr;gap:22px}}
+@media(max-width:520px){.steps-track{grid-template-columns:1fr}}
+.step{position:relative}
+.step-n{width:40px;height:40px;border-radius:999px;background:var(--navy);color:var(--on-navy);display:grid;place-items:center;font-family:'Sora';font-weight:700;font-size:1.02rem;margin-bottom:14px}
+.step:last-child .step-n{background:var(--accent);color:#fff}
+.step h4{font-family:'Sora';font-weight:700;font-size:1rem;color:var(--navy);margin-bottom:6px}
+.step p{font-size:0.9rem;color:var(--ink-soft);line-height:1.5}
+
+/* ----- PLANOS (reusa .plan da principal; só ajustes de acento) ----- */
+.pplans{padding-block:clamp(64px,9vh,110px);background:var(--sand)}
+.pplans-head{max-width:640px;margin-bottom:clamp(32px,4vh,48px)}
+.pplans-head h2{font-family:'Sora';font-weight:800;font-size:clamp(1.7rem,3.6vw,2.5rem);letter-spacing:-0.035em;color:var(--navy);text-wrap:balance}
+.pplans-head p{margin-top:14px;color:var(--ink-soft);font-size:1.05rem}
+.pplans-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(18px,2.4vw,26px);max-width:760px}
+@media(max-width:680px){.pplans-grid{grid-template-columns:1fr;max-width:420px}}
+.pp-plan{position:relative;background:var(--white);border:1px solid var(--line);border-radius:var(--radius-lg);padding:30px 28px;display:flex;flex-direction:column;box-shadow:var(--shadow-sm)}
+.pp-plan--feat{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent), var(--shadow-md)}
+.pp-flag{position:absolute;top:-12px;left:28px;background:var(--accent);color:#fff;font-weight:700;font-size:0.74rem;letter-spacing:0.02em;padding:5px 13px;border-radius:999px}
+.pp-plan h3{font-family:'Sora';font-weight:700;font-size:1.2rem;color:var(--navy)}
+.pp-plan .pp-desc{margin-top:6px;font-size:0.92rem;color:var(--ink-soft);min-height:42px}
+.pp-price{margin-top:16px;display:flex;align-items:baseline;gap:6px}
+.pp-price .cur{font-size:1rem;color:var(--ink-soft);font-weight:600}
+.pp-price .val{font-family:'Sora';font-weight:800;font-size:2.4rem;color:var(--navy);letter-spacing:-0.03em}
+.pp-price .per{font-size:0.9rem;color:var(--ink-faint)}
+.pp-tax{margin-top:10px;display:inline-flex;align-items:center;gap:7px;font-size:0.82rem;color:var(--accent-deep);background:var(--accent-tint);padding:5px 11px;border-radius:8px;font-weight:500}
+.pp-feats{list-style:none;margin:18px 0 22px;display:flex;flex-direction:column;gap:10px;flex:1}
+.pp-feats li{display:flex;gap:9px;align-items:flex-start;font-size:0.9rem;color:var(--ink-soft);line-height:1.45}
+.pp-feats svg{flex:none;width:16px;height:16px;color:var(--accent-deep);margin-top:2px}
+
+/* ----- COMPARATIVO (tabela honesta) ----- */
+.cmp{padding-block:clamp(64px,9vh,110px)}
+.cmp-head{max-width:620px;margin-bottom:clamp(30px,4vh,46px)}
+.cmp-head h2{font-family:'Sora';font-weight:800;font-size:clamp(1.7rem,3.6vw,2.5rem);letter-spacing:-0.035em;color:var(--navy);text-wrap:balance}
+.cmp-head p{margin-top:14px;color:var(--ink-soft);font-size:1.05rem}
+.cmp-table{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;max-width:840px}
+.cmp-row{display:grid;grid-template-columns:1.3fr 1fr 1fr}
+.cmp-row + .cmp-row{border-top:1px solid var(--line)}
+.cmp-row.cmp-h{background:var(--navy);color:var(--on-navy)}
+.cmp-row.cmp-h>div{padding:16px 18px;font-family:'Sora';font-weight:600;font-size:0.92rem}
+.cmp-row.cmp-h .ch-you{color:var(--on-navy-soft)}
+.cmp-row.cmp-h .ch-via{color:#fff;display:flex;align-items:center;gap:7px}
+.cmp-row.cmp-h .ch-via::before{content:"";width:9px;height:9px;border-radius:999px;background:var(--accent)}
+.cmp-cell{padding:15px 18px;font-size:0.92rem;line-height:1.45;display:flex;align-items:center}
+.cmp-cell.lbl{color:var(--navy);font-weight:600;background:var(--white)}
+.cmp-cell.you{color:var(--ink-soft);gap:8px}
+.cmp-cell.via{color:var(--navy);gap:8px;background:var(--accent-tint)}
+.cmp-cell svg{flex:none;width:16px;height:16px}
+.cmp-cell.you svg{color:var(--ink-faint)}
+.cmp-cell.via svg{color:var(--accent-deep)}
+@media(max-width:640px){
+  .cmp-row{grid-template-columns:1fr}
+  .cmp-row.cmp-h{display:none}
+  .cmp-cell{border-top:1px solid var(--line)}
+  .cmp-cell.lbl{border-top:0;font-size:1rem;padding-bottom:4px}
+  .cmp-cell.you::before{content:"Sozinho: ";font-weight:600;color:var(--ink-faint)}
+  .cmp-cell.via::before{content:"Com a Viajaly: ";font-weight:600;color:var(--accent-deep)}
+}
+
+/* ----- PROVA SOCIAL (depoimentos placeholder + faixa) ----- */
+.pproof{padding-block:clamp(64px,9vh,110px);background:var(--white)}
+.pproof-head{max-width:640px;margin-bottom:clamp(32px,4vh,48px)}
+.pproof-head h2{font-family:'Sora';font-weight:800;font-size:clamp(1.7rem,3.6vw,2.5rem);letter-spacing:-0.035em;color:var(--navy);text-wrap:balance}
+.pproof-head p{margin-top:14px;color:var(--ink-soft);font-size:1.05rem}
+.quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2.2vw,24px)}
+@media(max-width:820px){.quotes{grid-template-columns:1fr;max-width:560px}}
+.quote{background:var(--sand);border:1px solid var(--line);border-radius:var(--radius);padding:26px 24px;display:flex;flex-direction:column;gap:16px}
+.quote .qm{font-family:'Sora';font-size:2.4rem;line-height:0.5;color:var(--accent);height:18px}
+.quote p{font-size:0.96rem;color:var(--navy);line-height:1.55;flex:1}
+.quote .qa{display:flex;align-items:center;gap:11px}
+.quote .qav{width:38px;height:38px;border-radius:999px;background:var(--accent-soft);flex:none}
+.quote .qa strong{display:block;font-size:0.9rem;color:var(--navy);font-weight:600}
+.quote .qa span{font-size:0.82rem;color:var(--ink-faint)}
+.pproof-note{margin-top:26px;display:flex;gap:11px;align-items:flex-start;padding:14px 18px;border-radius:var(--radius);background:var(--accent-tint);border:1px dashed var(--accent-soft);max-width:640px}
+.pproof-note svg{flex:none;width:17px;height:17px;color:var(--accent-deep);margin-top:2px}
+.pproof-note p{font-size:0.84rem;color:var(--ink-soft);line-height:1.5}
+
+/* ----- FAQ (acordeão nativo <details>) ----- */
+.faq{padding-block:clamp(64px,9vh,110px);background:var(--sand)}
+.faq-grid{display:grid;grid-template-columns:0.7fr 1.3fr;gap:clamp(28px,4vw,56px);align-items:start}
+@media(max-width:860px){.faq-grid{grid-template-columns:1fr;gap:24px}}
+.faq-head h2{font-family:'Sora';font-weight:800;font-size:clamp(1.7rem,3.6vw,2.5rem);letter-spacing:-0.035em;color:var(--navy);text-wrap:balance;position:sticky;top:96px}
+.faq-head p{margin-top:14px;color:var(--ink-soft);font-size:1rem;position:sticky;top:96px}
+.faq-head a{color:var(--accent-deep);font-weight:600}
+.faq-list{display:flex;flex-direction:column;gap:12px}
+.faq-item{background:var(--white);border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden}
+.faq-item summary{list-style:none;cursor:pointer;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;font-family:'Sora';font-weight:600;font-size:1rem;color:var(--navy)}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary .fq-ic{flex:none;width:24px;height:24px;border-radius:999px;background:var(--accent-tint);display:grid;place-items:center;color:var(--accent-deep);transition:transform .3s var(--ease-out)}
+.faq-item summary .fq-ic svg{width:14px;height:14px}
+.faq-item[open] summary .fq-ic{transform:rotate(45deg)}
+.faq-item .fq-body{padding:0 22px 20px;font-size:0.94rem;color:var(--ink-soft);line-height:1.6}
+.faq-item .fq-body b{color:var(--navy)}
+
+/* ----- CTA final (reusa visual navy) ----- */
+.pcta{position:relative;padding-block:clamp(70px,10vh,120px);background:var(--navy);overflow:hidden}
+.pcta::before{content:"";position:absolute;inset:0;background:radial-gradient(80% 120% at 80% 10%, oklch(0.726 0.108 213 / 0.18), transparent 55%),radial-gradient(70% 100% at 10% 90%, oklch(0.701 0.171 22 / 0.16), transparent 50%)}
+.pcta-inner{position:relative;max-width:680px}
+.pcta h2{font-family:'Sora';font-weight:800;font-size:clamp(1.9rem,4vw,2.9rem);letter-spacing:-0.04em;color:#fff;text-wrap:balance}
+.pcta p{margin-top:16px;font-size:1.1rem;color:var(--on-navy-soft);line-height:1.55;max-width:52ch}
+.pcta-ctas{margin-top:30px;display:flex;flex-wrap:wrap;gap:14px}
+.pcta .btn-ghost{background:transparent;color:#fff;border:1.5px solid oklch(1 0 0 / 0.3)}
+.pcta .btn-ghost:hover{background:oklch(1 0 0 / 0.08);border-color:oklch(1 0 0 / 0.5)}
+.pcta-back{margin-top:28px}
+.pcta-back a{display:inline-flex;align-items:center;gap:8px;color:var(--on-navy-soft);font-size:0.92rem;font-weight:500;transition:gap .3s var(--ease-out),color .2s}
+.pcta-back a:hover{color:#fff;gap:12px}
+.pcta-back svg{width:16px;height:16px}
+
+</style>
+</head>
+<body>
+<nav class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a href="/#topo" class="nav-brand" aria-label="Viajaly — início">
+      <span class="stamp" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 13.5l8-1.2L7.5 5l1.8-.4 5.4 6 4.3-.6c.9-.13 1.7.5 1.7 1.4 0 .8-.6 1.4-1.4 1.5l-4.3.6-2 7.6-1.8.4-.4-7.4-7 1c-.5.07-1-.3-1-.8 0-.4.3-.75.7-.9z" fill="#FFF6ED"/></svg>
+      </span>
+      <span class="wordmark">viaja<span class="ly">ly</span><span class="dot">.</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="/#visto">Visto americano</a>
+      <a href="#planos" class="is-active">Planos</a>
+      <a href="#incluso">O que inclui</a>
+      <a href="#como">Como funciona</a>
+      <a href="#faq">Dúvidas</a>
+    </div>
+    <a href="#planos" class="nav-cta js-wa" data-wa="Ola! Vim pela pagina de Milhas da Viajaly e quero a consultoria de milhas.">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.97L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22c5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.8 14.1c-.24.68-1.4 1.3-1.93 1.34-.5.04-1.13.2-3.8-.8-3.2-1.26-5.25-4.5-5.4-4.7-.16-.21-1.3-1.73-1.3-3.3 0-1.56.82-2.33 1.1-2.65.3-.32.64-.4.86-.4.2 0 .43 0 .62.01.2.01.46-.08.72.55.27.64.9 2.2.98 2.36.08.16.13.35.02.56-.1.21-.16.34-.32.53-.16.19-.34.42-.48.56-.16.16-.33.34-.14.66.19.32.84 1.38 1.8 2.24 1.24 1.1 2.28 1.44 2.6 1.6.32.16.5.13.69-.08.19-.21.8-.93 1.01-1.25.21-.32.43-.27.72-.16.3.11 1.86.88 2.18 1.04.32.16.53.24.61.37.08.13.08.74-.16 1.42z"/></svg>
+      Pedir orçamento
+    </a>
+    <button class="nav-burger" id="burger" aria-label="Abrir menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</nav>
+
+<header class="phero" id="topo">
+  <div class="wrap phero-grid">
+    <div class="phero-copy reveal">
+      <span class="phero-eyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke-linecap="round" stroke-linejoin="round"/></svg> Consultoria de milhas</span>
+      <h1>Suas milhas valem muito mais <em>do jeito certo</em>.</h1>
+      <p class="phero-sub">Milhas paradas, programa errado, transferencia na hora errada: a maioria das pessoas desperdiça o que ja tem. A Viajaly faz o raio-x do seu acumulo e te mostra a melhor estrategia pra cada viagem. A gente nao vende milha nem passagem — orienta voce a usar as suas.</p>
+      <div class="phero-ctas">
+        <a href="#" class="btn btn-lg btn-coral js-wa" data-wa="Ola! Vim pela pagina de Milhas da Viajaly e quero a consultoria de milhas."><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.97L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22c5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.8 14.1c-.24.68-1.4 1.3-1.93 1.34-.5.04-1.13.2-3.8-.8-3.2-1.26-5.25-4.5-5.4-4.7-.16-.21-1.3-1.73-1.3-3.3 0-1.56.82-2.33 1.1-2.65.3-.32.64-.4.86-.4.2 0 .43 0 .62.01.2.01.46-.08.72.55.27.64.9 2.2.98 2.36.08.16.13.35.02.56-.1.21-.16.34-.32.53-.16.19-.34.42-.48.56-.16.16-.33.34-.14.66.19.32.84 1.38 1.8 2.24 1.24 1.1 2.28 1.44 2.6 1.6.32.16.5.13.69-.08.19-.21.8-.93 1.01-1.25.21-.32.43-.27.72-.16.3.11 1.86.88 2.18 1.04.32.16.53.24.61.37.08.13.08.74-.16 1.42z"/></svg> Quero a consultoria</a>
+        <a href="#planos" class="btn btn-lg btn-outline">Ver como funciona</a>
+      </div>
+      <div class="phero-proof">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-deep)" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Diagnostico do seu acumulo</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-deep)" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Melhor programa e hora</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-deep)" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> A gente nao vende milha</span>
+      </div>
+    </div>
+    <div class="phero-media reveal" data-d="1">
+      <img src="data:image/jpeg;base64,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" alt="Vista da janela do aviao com a asa recortada contra o por do sol dourado durante o voo">
+      <div class="phero-badge">
+        <span class="pb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8M21 7v5M21 7h-5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <div><strong>Pode se pagar</strong><span>Numa unica emissao bem feita</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="prob">
+  <div class="wrap">
+    <div class="prob-head reveal">
+      <h2>Voce provavelmente esta deixando dinheiro na mesa.</h2>
+      <p>Milhas paradas, passagem carisima no cartao, promocao que passou batido. Pequenas decisoes erradas custam caro — e ninguem te ensina isso.</p>
+    </div>
+    <div class="prob-list">
+      <div class="prob-item reveal" data-d="1">
+        <h3>"Tenho milhas mas nao sei usar"</h3>
+        <p>Pontos espalhados em cartao e programa, e voce sem saber por onde comecar.</p>
+        <div class="pi-turn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> A gente faz o raio-x do seu acumulo.</div>
+      </div>
+      <div class="prob-item reveal" data-d="2">
+        <h3>"Passagem carisima no cartao"</h3>
+        <p>Voce ia pagar tudo em dinheiro sem saber que dava pra voar por uma fracao com milhas.</p>
+        <div class="pi-turn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Mostramos a melhor jogada pro seu destino.</div>
+      </div>
+      <div class="prob-item reveal" data-d="3">
+        <h3>"Perco promocao por nao acompanhar"</h3>
+        <p>Bonus de transferencia e tarifa promocional aparecem e somem rapido demais.</p>
+        <div class="pi-turn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Alertas sob medida pro seu caso.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="incl" id="incluso">
+  <div class="wrap incl-grid">
+    <div class="incl-head reveal">
+      <h2>O que a consultoria de milhas faz por voce.</h2>
+      <p>Estrategia pra voar gastando menos — sem voce precisar virar especialista em programa de pontos.</p>
+    </div>
+    <div class="incl-items reveal" data-d="1">
+      <div class="incl-row reveal"><span class="incl-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg></span><div><h4>Raio-x do seu acumulo</h4><p>Cartoes, bancos e programas: a gente mapeia tudo que voce ja tem e quanto vale.</p></div></div>
+      <div class="incl-row reveal"><span class="incl-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg></span><div><h4>Melhor programa pro destino</h4><p>Qual programa rende mais pra onde voce quer ir — nem todo ponto vale igual.</p></div></div>
+      <div class="incl-row reveal"><span class="incl-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><h4>Quando e como transferir</h4><p>Bonus de transferencia muda tudo. A gente avisa a hora certa de mover seus pontos.</p></div></div>
+      <div class="incl-row reveal"><span class="incl-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 8l7-5 7 5M3 21h18" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><h4>Milhas x dinheiro</h4><p>Simulacao clara: quando vale usar milha e quando vale pagar — sem achismo.</p></div></div>
+      <div class="incl-row reveal"><span class="incl-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.5 21a2 2 0 01-3 0" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><h4>Alertas sob medida</h4><p>Promocao e tarifa boa pro seu caso, sem voce ficar vigiando site o dia todo.</p></div></div>
+      <div class="incl-row reveal"><span class="incl-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 3v6c0 4.5-3.2 7.5-8 9-4.8-1.5-8-4.5-8-9V6l8-3z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><h4>Consultoria isenta</h4><p>A gente nao vende milha. Sem conflito de interesse: a recomendacao e so pro seu bolso.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="steps" id="como">
+  <div class="wrap">
+    <div class="steps-head reveal">
+      <h2>Do raio-x a estrategia certa.</h2>
+      <p>Cinco passos pra transformar pontos parados em passagem — gastando o minimo.</p>
+    </div>
+    <div class="steps-track">
+      <div class="step reveal" data-d="1"><div class="step-n">1</div><h4>Raio-x</h4><p>A gente mapeia o que voce acumula em cartoes e programas.</p></div>
+      <div class="step reveal" data-d="2"><div class="step-n">2</div><h4>Estrategia</h4><p>Definimos a melhor jogada pro seu destino e suas datas.</p></div>
+      <div class="step reveal" data-d="3"><div class="step-n">3</div><h4>Transferencia</h4><p>Recomendamos como e quando mover os pontos com bonus.</p></div>
+      <div class="step reveal" data-d="4"><div class="step-n">4</div><h4>Acompanhamento</h4><p>Ficamos de olho em promocao e tarifa boa pro seu caso.</p></div>
+      <div class="step reveal" data-d="5"><div class="step-n">5</div><h4>Voce emite</h4><p>Compra a passagem gastando bem menos — voce no controle.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="pplans" id="planos">
+  <div class="wrap">
+    <div class="pplans-head reveal">
+      <h2>Quanto custa.</h2>
+      <p>Um valor por grupo. Numa unica emissao bem feita, a consultoria costuma se pagar — e sobra.</p>
+    </div>
+    <div class="pplans-grid">
+      <div class="pp-plan pp-plan--feat reveal" data-d="1">
+        <span class="pp-flag">Mais economia</span>
+        <h3>Consultoria de milhas</h3>
+        <p class="pp-desc">Raio-x completo, estrategia e acompanhamento pra sua viagem.</p>
+        <div class="pp-price"><span class="cur">R$</span><span class="val">697</span><span class="per">/ grupo</span></div>
+        <span class="pp-tax">pode se pagar numa emissao</span>
+        <ul class="pp-feats">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Raio-x do seu acumulo</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Melhor programa e transferencia</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Simulacao milhas x dinheiro</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Alertas e acompanhamento</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Consultoria isenta (nao vende milha)</li>
+        </ul>
+        <a href="#" class="btn btn-md btn-coral js-wa" data-wa="Ola! Quero a consultoria de MILHAS da Viajaly para minhas milhas renderem mais.">Quero a consultoria</a>
+      </div>
+      <div class="pp-plan reveal" data-d="2">
+        <h3>Combinado com o visto</h3>
+        <p class="pp-desc">Ja vai tirar o visto? Junte os servicos e pague menos.</p>
+        <div class="pp-price"><span class="cur"></span><span class="val">-10%</span><span class="per">no combo</span></div>
+        <span class="pp-tax">desconto na consultoria</span>
+        <ul class="pp-feats">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Tudo da consultoria de milhas</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Visto + milhas na mesma solicitacao</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> 10% de desconto na consultoria</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Uma so conversa, do visto a passagem</li>
+        </ul>
+        <a href="#" class="btn btn-md btn-outline js-wa" data-wa="Ola! Quero combinar VISTO e MILHAS com a Viajaly (desconto de 10%).">Quero o combo</a>
+      </div>
+    </div>
+    <div class="plans-note reveal" style="margin-top:26px;max-width:760px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01" stroke-linecap="round"/></svg>
+      <p>A Viajaly faz <b>consultoria de milhas</b> — orienta a melhor estrategia. <b>Nao vendemos milhas nem pontos.</b> As transferencias e a emissao acontecem nas suas proprias contas, com voce no controle.</p>
+    </div>
+    <p class="plans-disc reveal">A Viajaly e uma consultoria de viagem. O resultado depende da disponibilidade de tarifas e da pontuacao de cada cliente; nao garantimos valor fixo de economia.</p>
+  </div>
+</section>
+
+<section class="cmp">
+  <div class="wrap">
+    <div class="cmp-head reveal">
+      <h2>Pagar caro ou voar esperto. Voce escolhe.</h2>
+      <p>Da pra fazer sozinho, claro. Mas conhecimento de milhas e o que separa a passagem cheia da passagem por uma fracao.</p>
+    </div>
+    <div class="cmp-table reveal" data-d="1">
+      <div class="cmp-row cmp-h"><div>Na hora de emitir</div><div class="ch-you">Por conta propria</div><div class="ch-via">Com a Viajaly</div></div>
+      <div class="cmp-row"><div class="cmp-cell lbl">Comprar a passagem</div><div class="cmp-cell you"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>Cartao, preco cheio</div><div class="cmp-cell via"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>Estrategia de milhas</div></div>
+      <div class="cmp-row"><div class="cmp-cell lbl">Bonus de transferencia</div><div class="cmp-cell you"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>Perde o timing</div><div class="cmp-cell via"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>Move na hora certa</div></div>
+      <div class="cmp-row"><div class="cmp-cell lbl">Escolher o programa</div><div class="cmp-cell you"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>No chute</div><div class="cmp-cell via"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>O que mais rende pro destino</div></div>
+      <div class="cmp-row"><div class="cmp-cell lbl">Acompanhar promocao</div><div class="cmp-cell you"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>Vigiar site sozinho</div><div class="cmp-cell via"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>Alertas sob medida</div></div>
+      <div class="cmp-row"><div class="cmp-cell lbl">Decisao milhas x dinheiro</div><div class="cmp-cell you"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>Achismo</div><div class="cmp-cell via"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>Simulacao clara</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="pproof">
+  <div class="wrap">
+    <div class="pproof-head reveal">
+      <h2>Quem voou pagando menos.</h2>
+      <p>Clientes que usaram a consultoria de milhas pra economizar de verdade na passagem.</p>
+    </div>
+    <div class="quotes">
+      <div class="quote reveal"><div class="qm">"</div><p>Economizei quase 4 mil nas passagens usando milhas que eu nem sabia que dava pra juntar a tempo.</p><div class="qa"><span class="qav"></span><div><strong>Nome do cliente</strong><span>Familia · NY</span></div></div></div>
+      <div class="quote reveal"><div class="qm">"</div><p>Eu ia pagar tudo no cartao. Me mostraram a transferencia com bonus e voei por uma fracao.</p><div class="qa"><span class="qav"></span><div><strong>Nome do cliente</strong><span>Casal · primeira vez</span></div></div></div>
+      <div class="quote reveal"><div class="qm">"</div><p>O melhor e que nao vendem milha, entao a recomendacao era so pro meu bolso. Confianca total.</p><div class="qa"><span class="qav"></span><div><strong>Nome do cliente</strong><span>Viagem em grupo</span></div></div></div>
+    </div>
+    <div class="pproof-note reveal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01" stroke-linecap="round"/></svg>
+      <p>Depoimentos ilustrativos para demonstracao. Valores variam por caso. Ao publicar, substitua por depoimentos reais com autorizacao do cliente.</p>
+    </div>
+  </div>
+</section>
+
+<section class="faq" id="faq">
+  <div class="wrap faq-grid">
+    <div class="faq-head reveal">
+      <h2>Perguntas sobre milhas.</h2>
+      <p>Nao achou a sua? <a href="#" class="js-wa" data-wa="Ola! Tenho uma duvida sobre a consultoria de milhas da Viajaly.">Pergunta no WhatsApp.</a></p>
+    </div>
+    <div class="faq-list reveal" data-d="1">
+      <details class="faq-item reveal"><summary>Voces vendem milha?<span class="fq-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span></summary><div class="fq-body">Nao. A Viajaly faz <b>consultoria</b>: a gente orienta a melhor estrategia pra voce usar e juntar milhas. As transferencias e a emissao acontecem nas suas proprias contas. Isso garante que a recomendacao e isenta, so pro seu bolso.</div></details>
+      <details class="faq-item reveal"><summary>Funciona se eu tenho poucas milhas?<span class="fq-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span></summary><div class="fq-body">Sim. Parte do trabalho e justamente mostrar <b>como juntar do jeito certo</b> ate a viagem: bonus de transferencia, melhor cartao e timing. Mesmo comecando do zero, da pra montar uma estrategia.</div></details>
+      <details class="faq-item reveal"><summary>Com quais programas voces trabalham?<span class="fq-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span></summary><div class="fq-body">A gente analisa os principais programas e bancos do mercado e indica o que <b>mais rende pro seu destino</b>. A recomendacao e sempre baseada no seu caso, nao num parceiro fixo.</div></details>
+      <details class="faq-item reveal"><summary>Vale a pena pagar R$697?<span class="fq-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span></summary><div class="fq-body">A logica e de payback: numa <b>unica emissao bem feita</b>, a economia costuma superar o valor da consultoria. E voce sai com conhecimento que serve pras proximas viagens tambem.</div></details>
+      <details class="faq-item reveal"><summary>Preciso de cartao de credito especifico?<span class="fq-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span></summary><div class="fq-body">Nao necessariamente. A gente trabalha com o que voce ja tem e, se fizer sentido, sugere caminhos pra acumular mais rapido. Sem empurrar produto.</div></details>
+      <details class="faq-item reveal"><summary>Quanto da pra economizar?<span class="fq-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span></summary><div class="fq-body">Depende das suas milhas, do destino e da disponibilidade de tarifas — por isso <b>nao prometemos um numero fixo</b>. O que garantimos e a melhor estrategia possivel pro seu caso, com transparencia.</div></details>
+      <details class="faq-item reveal"><summary>Por quanto tempo dura o acompanhamento?<span class="fq-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span></summary><div class="fq-body">O acompanhamento cobre o ciclo da sua viagem: do raio-x ate a emissao, incluindo os alertas de promocao no periodo. Combinamos os detalhes no inicio.</div></details>
+    </div>
+  </div>
+</section>
+
+<section class="pcta">
+  <div class="wrap pcta-inner reveal">
+    <h2>Pare de deixar suas milhas pararem.</h2>
+    <p>Conta pra onde voce quer ir e o que ja acumula em cartoes e programas. A gente monta a estrategia pra suas milhas renderem o maximo — sem compromisso.</p>
+    <div class="pcta-ctas">
+      <a href="#" class="btn btn-lg btn-coral js-wa" data-wa="Ola! Vim pela pagina de Milhas da Viajaly e quero a consultoria de milhas sem compromisso."><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.97L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22c5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.8 14.1c-.24.68-1.4 1.3-1.93 1.34-.5.04-1.13.2-3.8-.8-3.2-1.26-5.25-4.5-5.4-4.7-.16-.21-1.3-1.73-1.3-3.3 0-1.56.82-2.33 1.1-2.65.3-.32.64-.4.86-.4.2 0 .43 0 .62.01.2.01.46-.08.72.55.27.64.9 2.2.98 2.36.08.16.13.35.02.56-.1.21-.16.34-.32.53-.16.19-.34.42-.48.56-.16.16-.33.34-.14.66.19.32.84 1.38 1.8 2.24 1.24 1.1 2.28 1.44 2.6 1.6.32.16.5.13.69-.08.19-.21.8-.93 1.01-1.25.21-.32.43-.27.72-.16.3.11 1.86.88 2.18 1.04.32.16.53.24.61.37.08.13.08.74-.16 1.42z"/></svg> Quero a consultoria</a>
+      <a href="#planos" class="btn btn-lg btn-ghost">Ver planos de novo</a>
+    </div>
+    <div class="pcta-back">
+      <a href="/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M11 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg> Tudo comeca pelo visto — voltar ao inicio</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="wordmark">viaja<span class="ly" style="color:var(--sky-300)">ly</span><span class="dot">.</span></span>
+        <p>Consultoria digital de viagem. Cuidamos do visto americano, do passaporte, do roteiro e das suas milhas — pra você só pensar em viajar.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Serviços</h5>
+        <a href="#visto">Visto americano</a>
+        <a href="#produtos">Passaporte</a>
+        <a href="#produtos">Roteiros</a>
+        <a href="#produtos">Milhas</a>
+      </div>
+      <div class="footer-col">
+        <h5>A Viajaly</h5>
+        <a href="#como">Como funciona</a>
+        <a href="#porque">Por que a Viajaly</a>
+        <a href="#orcamento" class="js-wa" data-wa="Ola! Vim pela pagina de Milhas da Viajaly e quero falar no WhatsApp.">Falar no WhatsApp</a>
+        <a href="#orcamento" class="js-wa" data-wa="Ola! Vim pela pagina de Milhas da Viajaly e quero pedir um orcamento.">Pedir orçamento</a>
+      </div>
+    </div>
+    <div class="footer-disclaimer">
+      <p>A Viajaly é uma consultoria de viagem e não presta consultoria jurídica. Não garantimos a aprovação de vistos — a decisão é exclusiva das autoridades consulares.</p>
+      <span class="copy">© 2026 Viajaly</span>
+    </div>
+  </div>
+</footer>
+
+<!-- WhatsApp float -->
+<a href="#" class="wa-float js-wa" aria-label="Falar no WhatsApp" data-wa="Ola! Vim pela pagina de Milhas da Viajaly e quero a consultoria de milhas.">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.97L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22c5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.8 14.1c-.24.68-1.4 1.3-1.93 1.34-.5.04-1.13.2-3.8-.8-3.2-1.26-5.25-4.5-5.4-4.7-.16-.21-1.3-1.73-1.3-3.3 0-1.56.82-2.33 1.1-2.65.3-.32.64-.4.86-.4.2 0 .43 0 .62.01.2.01.46-.08.72.55.27.64.9 2.2.98 2.36.08.16.13.35.02.56-.1.21-.16.34-.32.53-.16.19-.34.42-.48.56-.16.16-.33.34-.14.66.19.32.84 1.38 1.8 2.24 1.24 1.1 2.28 1.44 2.6 1.6.32.16.5.13.69-.08.19-.21.8-.93 1.01-1.25.21-.32.43-.27.72-.16.3.11 1.86.88 2.18 1.04.32.16.53.24.61.37.08.13.08.74-.16 1.42z"/></svg>
+</a>
+
+
+<script>
+(function(){
+  // ===== WhatsApp — edite SOMENTE o número abaixo (só dígitos, com DDI 55) =====
+  var WA_NUMBER = "5511999990000"; // <-- troque pelo número real da Viajaly
+  // Mensagem padrão (fallback) caso algum botão não tenha data-wa:
+  var WA_DEFAULT = "Ola! Vim pela pagina de Milhas da Viajaly e quero a consultoria de milhas.";
+
+  document.querySelectorAll(".js-wa").forEach(function(a){
+    var msg = a.getAttribute("data-wa") || WA_DEFAULT;
+    var href = "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(msg);
+    a.setAttribute("href", href);
+    a.setAttribute("target","_blank");
+    a.setAttribute("rel","noopener");
+  });
+
+  // ===== Nav scrolled state =====
+  var nav = document.getElementById("nav");
+  var onScroll = function(){ nav.classList.toggle("scrolled", window.scrollY > 24); };
+  onScroll(); window.addEventListener("scroll", onScroll, {passive:true});
+
+  // ===== Reveal on scroll =====
+  var els = document.querySelectorAll(".reveal");
+  if("IntersectionObserver" in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target);} });
+    }, {threshold:0.12, rootMargin:"0px 0px -8% 0px"});
+    els.forEach(function(el){ io.observe(el); });
+  } else {
+    els.forEach(function(el){ el.classList.add("in"); });
+  }
+
+  // ===== Mobile menu (simples: rola para serviços) =====
+  document.getElementById("burger").addEventListener("click", function(){
+    document.getElementById("visto").scrollIntoView({behavior:"smooth"});
+  });
+})();
+</script>
+
+</body>
+</html>
