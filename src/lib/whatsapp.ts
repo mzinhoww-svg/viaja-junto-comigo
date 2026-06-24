@@ -1,11 +1,13 @@
+const VIAJALY_WA = "5565996076018";
+
 /**
  * WhatsApp helpers — usa wa.me (sem custo de API oficial).
- * Normaliza para E.164 com DDI 55 quando ausente.
+ * Sempre direciona para o número da Viajaly.
  */
 
 export function normalizeE164BR(phone: string | null | undefined): string {
   const digits = (phone ?? "").replace(/\D/g, "");
-  if (!digits) return "";
+  if (!digits) return VIAJALY_WA;
   // já vem com DDI (>=12 dígitos) → mantém só dígitos
   if (digits.length >= 12) return digits;
   // assume BR sem DDI (10 ou 11 dígitos com DDD) → prefixa 55
@@ -16,7 +18,7 @@ export function normalizeE164BR(phone: string | null | undefined): string {
 export function waLink(phoneE164: string | null | undefined, message: string): string {
   const phone = normalizeE164BR(phoneE164);
   const text = encodeURIComponent(message);
-  return phone ? `https://wa.me/${phone}?text=${text}` : `https://wa.me/?text=${text}`;
+  return `https://wa.me/${phone}?text=${text}`;
 }
 
 /**

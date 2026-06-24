@@ -58,8 +58,7 @@ export function RoteiroCardPortal({ requestId, phone }: { requestId: string; pho
   function shareWhatsApp() {
     if (!rot?.share_url) return;
     const txt = encodeURIComponent(`Seu roteiro Viajaly${rot.trip ? ` — ${rot.trip}` : ""}: ${rot.share_url}`);
-    const to = phone ? `https://wa.me/${phone.replace(/\D/g, "")}` : "https://wa.me/";
-    window.open(`${to}?text=${txt}`, "_blank", "noopener");
+    window.open(`https://wa.me/5565996076018?text=${txt}`, "_blank", "noopener");
   }
 
   return (
