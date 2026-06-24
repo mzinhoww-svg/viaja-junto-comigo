@@ -17,11 +17,14 @@ type Agency = {
   public_email: string | null;
   public_whatsapp: string | null;
   visa_disclaimer: string;
+  emergency_contacts: unknown;
+};
+
+type AgencyBilling = {
   pix_key: string | null;
   pix_key_type: string | null;
   pix_merchant_name: string | null;
   pix_merchant_city: string | null;
-  emergency_contacts: unknown;
 };
 
 function useAgency() {
@@ -30,13 +33,26 @@ function useAgency() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("agencies")
-        .select("id, name, bio, primary_color, instagram, endereco, public_email, public_whatsapp, visa_disclaimer, pix_key, pix_key_type, pix_merchant_name, pix_merchant_city, emergency_contacts")
+        .select("id, name, bio, primary_color, instagram, endereco, public_email, public_whatsapp, visa_disclaimer, emergency_contacts")
         .limit(1).maybeSingle();
       if (error) throw error;
       return data as Agency | null;
     },
   });
 }
+
+function useAgencyBilling() {
+  return useQuery({
+    queryKey: ["my-agency-billing"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_agency_billing" as never);
+      if (error) throw error;
+      const row = Array.isArray(data) && data.length > 0 ? (data[0] as AgencyBilling) : null;
+      return row ?? { pix_key: null, pix_key_type: null, pix_merchant_name: null, pix_merchant_city: null };
+    },
+  });
+}
+
 
 type Tab = "identidade" | "cobranca" | "politica";
 
