@@ -114,7 +114,7 @@ export function ContractPanel({
       {bodyHtml ? (
         <article
           className="rounded-2xl bg-white border border-[var(--color-border)] p-5 text-sm text-ink leading-relaxed prose-contract"
-          dangerouslySetInnerHTML={{ __html: bodyHtml }}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(bodyHtml, { USE_PROFILES: { html: true } }) }}
         />
       ) : (
         <p className="text-sm text-ink-muted">Sem itens para gerar o contrato ainda.</p>
