@@ -47,11 +47,13 @@ function useAgencyBilling() {
     queryFn: async () => {
       const { data, error } = await supabase.rpc("get_agency_billing" as never);
       if (error) throw error;
-      const row = Array.isArray(data) && data.length > 0 ? (data[0] as AgencyBilling) : null;
+      const rows = (data ?? []) as unknown as AgencyBilling[];
+      const row = rows.length > 0 ? rows[0] : null;
       return row ?? { pix_key: null, pix_key_type: null, pix_merchant_name: null, pix_merchant_city: null };
     },
   });
 }
+
 
 
 type Tab = "identidade" | "cobranca" | "politica";
