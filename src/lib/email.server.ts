@@ -1,33 +1,36 @@
-// supabase/functions/send-email/index.ts
+// Server-only: envio de e-mail transacional via gateway do conector Brevo.
+// Importar APENAS de outros arquivos *.server.ts ou dentro de handlers
+// (server functions / server routes). Nunca importar do bundle do cliente.
 //
-// E-mail transacional via Brevo (https://developers.brevo.com/reference/sendtransacemail).
+// Requer:
+//   - LOVABLE_API_KEY  (injetada pela plataforma)
+//   - BREVO_API_KEY    (connection key do conector Brevo)
+//   - BREVO_SENDER     (ex.: "Viajaly <contato@viajaly.app>") — sem isso vira no-op
 //
-// PARA ATIVAR, configurar 3 secrets em Project Settings → Secrets:
-//   - BREVO_API_KEY   → chave da API do Brevo (xkeysib-…)
-//   - BREVO_SENDER    → e-mail do remetente verificado (ex.: "Viajaly <contato@viajaly.app>")
-//   - EMAIL_ENABLED   → "true" para liberar envios; qualquer outro valor = no-op
-//
-// Enquanto qualquer um deles estiver vazio/desligado a função retorna {sent:false, reason:'email_disabled'}
-// SEM quebrar nenhum fluxo. Os avisos seguem por wa.me + notificações internas.
+// Mantém o mesmo contrato da antiga edge function `send-email` para não quebrar
+// chamadores: { template, to, vars, subject? } → { sent, reason?, messageId? }.
 
-// deno-lint-ignore-file no-explicit-any
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo/smtp/email";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
-
-type TemplateKey =
+export type TemplateKey =
   | "access_code"
   | "proposal_sent"
   | "payment_confirmed"
   | "document_rejected"
   | "schedule_confirmed";
 
-type Vars = Record<string, string | number | undefined>;
+export type EmailVars = Record<string, string | number | undefined>;
+
+export type SendEmailInput = {
+  template: TemplateKey;
+  to: string | { email: string; name?: string };
+  vars?: EmailVars;
+  subject?: string;
+};
+
+export type SendEmailResult =
+  | { sent: true; messageId: string | null }
+  | { sent: false; reason: string; status?: number };
 
 function esc(s: unknown): string {
   return String(s ?? "")
@@ -48,7 +51,7 @@ function shell(title: string, inner: string): string {
   </body></html>`;
 }
 
-const TEMPLATES: Record<TemplateKey, (v: Vars) => { subject: string; html: string }> = {
+const TEMPLATES: Record<TemplateKey, (v: EmailVars) => { subject: string; html: string }> = {
   access_code: (v) => ({
     subject: "Seu código de acesso — Viajaly",
     html: shell("Seu código de acesso", `
@@ -87,70 +90,65 @@ const TEMPLATES: Record<TemplateKey, (v: Vars) => { subject: string; html: strin
   }),
 };
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+function parseSender(s: string): { email: string; name?: string } {
+  const m = s.match(/^\s*(.+?)\s*<\s*([^>]+)\s*>\s*$/);
+  if (m) return { name: m[1], email: m[2] };
+  return { email: s.trim() };
+}
 
-  let body: any;
-  try { body = await req.json(); } catch { body = {}; }
-
-  const template = body?.template as TemplateKey | undefined;
-  const to = body?.to as string | { email: string; name?: string } | undefined;
-  const vars = (body?.vars ?? {}) as Vars;
-  const subjectOverride = body?.subject as string | undefined;
+export async function sendTransactionalEmail(input: SendEmailInput): Promise<SendEmailResult> {
+  const { template, to, vars = {}, subject: subjectOverride } = input;
 
   if (!template || !TEMPLATES[template]) {
-    return json({ sent: false, reason: "invalid_template" }, 200);
+    return { sent: false, reason: "invalid_template" };
   }
   if (!to) {
-    return json({ sent: false, reason: "missing_to" }, 200);
+    return { sent: false, reason: "missing_to" };
   }
 
-  const apiKey = Deno.env.get("BREVO_API_KEY") ?? "";
-  const sender = Deno.env.get("BREVO_SENDER") ?? "";
-  const enabled = (Deno.env.get("EMAIL_ENABLED") ?? "").toLowerCase() === "true";
+  const lovableKey = process.env.LOVABLE_API_KEY ?? "";
+  const brevoKey = process.env.BREVO_API_KEY ?? "";
+  const sender = process.env.BREVO_SENDER ?? "";
 
-  if (!enabled || !apiKey || !sender) {
-    console.log("[send-email] no-op", { template, enabled, hasKey: !!apiKey, hasSender: !!sender });
-    return json({ sent: false, reason: "email_disabled" }, 200);
+  if (!lovableKey || !brevoKey || !sender) {
+    console.log("[email] no-op", {
+      template,
+      hasLovable: !!lovableKey,
+      hasBrevo: !!brevoKey,
+      hasSender: !!sender,
+    });
+    return { sent: false, reason: "email_disabled" };
   }
 
   const tpl = TEMPLATES[template](vars);
   const toList = typeof to === "string" ? [{ email: to }] : [to];
   const senderObj = parseSender(sender);
 
-  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
-    method: "POST",
-    headers: {
-      "api-key": apiKey,
-      "content-type": "application/json",
-      "accept": "application/json",
-    },
-    body: JSON.stringify({
-      sender: senderObj,
-      to: toList,
-      subject: subjectOverride ?? tpl.subject,
-      htmlContent: tpl.html,
-    }),
-  });
+  try {
+    const res = await fetch(GATEWAY_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${lovableKey}`,
+        "X-Connection-Api-Key": brevoKey,
+      },
+      body: JSON.stringify({
+        sender: senderObj,
+        to: toList,
+        subject: subjectOverride ?? tpl.subject,
+        htmlContent: tpl.html,
+      }),
+    });
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    console.error("[send-email] brevo error", res.status, text);
-    return json({ sent: false, reason: "brevo_error", status: res.status }, 200);
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      console.error("[email] brevo gateway error", res.status, text);
+      return { sent: false, reason: "brevo_error", status: res.status };
+    }
+    const out = (await res.json().catch(() => ({}))) as { messageId?: string };
+    return { sent: true, messageId: out?.messageId ?? null };
+  } catch (e) {
+    console.error("[email] fetch error", e);
+    return { sent: false, reason: "fetch_error" };
   }
-  const out = await res.json().catch(() => ({}));
-  return json({ sent: true, messageId: out?.messageId ?? null }, 200);
-});
-
-function json(payload: unknown, status = 200) {
-  return new Response(JSON.stringify(payload), {
-    status,
-    headers: { ...corsHeaders, "content-type": "application/json" },
-  });
-}
-
-function parseSender(s: string): { email: string; name?: string } {
-  const m = s.match(/^\s*(.+?)\s*<\s*([^>]+)\s*>\s*$/);
-  if (m) return { name: m[1], email: m[2] };
-  return { email: s.trim() };
 }
