@@ -47,7 +47,7 @@ function PropostaPage() {
   // mark as viewed once
   useEffect(() => {
     if (req.data?.id && req.data.proposal_status === "sent") {
-      supabase.from("requests").update({ proposal_status: "viewed" }).eq("id", req.data.id);
+      supabase.rpc("client_set_proposal_status", { _request_id: req.data.id, _status: "viewed", _reason: null });
     }
   }, [req.data?.id, req.data?.proposal_status]);
 
@@ -65,10 +65,9 @@ function PropostaPage() {
 
   const accept = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from("requests")
-        .update({ proposal_status: "accepted", proposal_accepted_at: new Date().toISOString() })
-        .eq("id", req.data!.id);
+      const { error } = await supabase.rpc("client_set_proposal_status", {
+        _request_id: req.data!.id, _status: "accepted", _reason: null,
+      });
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Proposta aceita! Vamos ao pagamento 🎉"); qc.invalidateQueries({ queryKey: ["my-request"] }); nav({ to: "/portal/pagamento" }); },
@@ -77,10 +76,9 @@ function PropostaPage() {
 
   const decline = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from("requests")
-        .update({ proposal_status: "declined", proposal_decline_reason: reason })
-        .eq("id", req.data!.id);
+      const { error } = await supabase.rpc("client_set_proposal_status", {
+        _request_id: req.data!.id, _status: "declined", _reason: reason,
+      });
       if (error) throw error;
     },
     onSuccess: () => { setDeclineOpen(false); toast("Recebemos seu retorno."); qc.invalidateQueries({ queryKey: ["my-request"] }); },
