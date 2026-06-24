@@ -50,6 +50,13 @@ export type Database = {
             referencedRelation: "requests"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "access_code_attempts_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests_safe"
+            referencedColumns: ["id"]
+          },
         ]
       }
       agencies: {
@@ -232,6 +239,7 @@ export type Database = {
       }
       contract_templates: {
         Row: {
+          agency_id: string
           body_html: string
           id: string
           scope: string
@@ -240,6 +248,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          agency_id: string
           body_html: string
           id?: string
           scope?: string
@@ -248,6 +257,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          agency_id?: string
           body_html?: string
           id?: string
           scope?: string
@@ -255,7 +265,15 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "contract_templates_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       contracts: {
         Row: {
@@ -321,6 +339,13 @@ export type Database = {
             columns: ["request_id"]
             isOneToOne: false
             referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests_safe"
             referencedColumns: ["id"]
           },
         ]
@@ -543,6 +568,13 @@ export type Database = {
             referencedRelation: "requests"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "messages_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests_safe"
+            referencedColumns: ["id"]
+          },
         ]
       }
       milhas_consult: {
@@ -602,6 +634,13 @@ export type Database = {
             referencedRelation: "requests"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "milhas_consult_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests_safe"
+            referencedColumns: ["id"]
+          },
         ]
       }
       notifications: {
@@ -644,6 +683,13 @@ export type Database = {
             columns: ["request_id"]
             isOneToOne: false
             referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests_safe"
             referencedColumns: ["id"]
           },
         ]
@@ -691,6 +737,13 @@ export type Database = {
             columns: ["request_id"]
             isOneToOne: false
             referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_briefings_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests_safe"
             referencedColumns: ["id"]
           },
         ]
@@ -830,6 +883,13 @@ export type Database = {
             referencedRelation: "requests"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "proposal_items_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests_safe"
+            referencedColumns: ["id"]
+          },
         ]
       }
       request_group: {
@@ -854,6 +914,13 @@ export type Database = {
             columns: ["request_id"]
             isOneToOne: true
             referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "request_group_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: true
+            referencedRelation: "requests_safe"
             referencedColumns: ["id"]
           },
         ]
@@ -1089,6 +1156,13 @@ export type Database = {
             referencedRelation: "requests"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "roteiros_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests_safe"
+            referencedColumns: ["id"]
+          },
         ]
       }
       schedule_intents: {
@@ -1203,6 +1277,13 @@ export type Database = {
             referencedRelation: "requests"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "stripe_webhook_events_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests_safe"
+            referencedColumns: ["id"]
+          },
         ]
       }
       tax_payments: {
@@ -1297,6 +1378,13 @@ export type Database = {
             referencedRelation: "requests"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "travelers_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests_safe"
+            referencedColumns: ["id"]
+          },
         ]
       }
       visto_plans: {
@@ -1322,7 +1410,187 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      requests_safe: {
+        Row: {
+          access_code_expires_at: string | null
+          agency_id: string | null
+          archived_at: string | null
+          assigned_to: string | null
+          client_feedback: string | null
+          client_rating: number | null
+          combo_discount_cents: number | null
+          combo_pct: number | null
+          contract_signed: boolean | null
+          created_at: string | null
+          created_by: string | null
+          id: string | null
+          lead_consent_at: string | null
+          lead_consent_text: string | null
+          lead_email: string | null
+          lead_message: string | null
+          lead_name: string | null
+          lead_phone: string | null
+          lead_source: string | null
+          manual_discount_cents: number | null
+          passport_notes: string | null
+          passport_status: string | null
+          payment_amount_cents: number | null
+          payment_attempts: number | null
+          payment_card_last4: string | null
+          payment_confirmed_by: string | null
+          payment_installments: number | null
+          payment_method: Database["public"]["Enums"]["payment_method_t"] | null
+          payment_paid_at: string | null
+          payment_status: Database["public"]["Enums"]["payment_status_t"] | null
+          proposal_accepted_at: string | null
+          proposal_decline_reason: string | null
+          proposal_discount_cents: number | null
+          proposal_sent_at: string | null
+          proposal_status:
+            | Database["public"]["Enums"]["proposal_status_t"]
+            | null
+          proposal_subtotal_cents: number | null
+          proposal_total_cents: number | null
+          sched_window_open: boolean | null
+          sign_name: string | null
+          signed_at: string | null
+          tax_status: Database["public"]["Enums"]["tax_status_t"] | null
+          travel_checklist: Json | null
+          usd_as_of: string | null
+          usd_rate: number | null
+          usd_source: string | null
+          visa_decision_at: string | null
+          visa_outcome: Database["public"]["Enums"]["visa_outcome_t"] | null
+          visa_validity_until: string | null
+          visto_plan: Database["public"]["Enums"]["visto_plan_t"] | null
+          whatsapp_e164: string | null
+        }
+        Insert: {
+          access_code_expires_at?: string | null
+          agency_id?: string | null
+          archived_at?: string | null
+          assigned_to?: string | null
+          client_feedback?: string | null
+          client_rating?: number | null
+          combo_discount_cents?: number | null
+          combo_pct?: number | null
+          contract_signed?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string | null
+          lead_consent_at?: string | null
+          lead_consent_text?: string | null
+          lead_email?: string | null
+          lead_message?: string | null
+          lead_name?: string | null
+          lead_phone?: string | null
+          lead_source?: string | null
+          manual_discount_cents?: number | null
+          passport_notes?: string | null
+          passport_status?: string | null
+          payment_amount_cents?: number | null
+          payment_attempts?: number | null
+          payment_card_last4?: string | null
+          payment_confirmed_by?: string | null
+          payment_installments?: number | null
+          payment_method?:
+            | Database["public"]["Enums"]["payment_method_t"]
+            | null
+          payment_paid_at?: string | null
+          payment_status?:
+            | Database["public"]["Enums"]["payment_status_t"]
+            | null
+          proposal_accepted_at?: string | null
+          proposal_decline_reason?: string | null
+          proposal_discount_cents?: number | null
+          proposal_sent_at?: string | null
+          proposal_status?:
+            | Database["public"]["Enums"]["proposal_status_t"]
+            | null
+          proposal_subtotal_cents?: number | null
+          proposal_total_cents?: number | null
+          sched_window_open?: boolean | null
+          sign_name?: string | null
+          signed_at?: string | null
+          tax_status?: Database["public"]["Enums"]["tax_status_t"] | null
+          travel_checklist?: Json | null
+          usd_as_of?: string | null
+          usd_rate?: number | null
+          usd_source?: string | null
+          visa_decision_at?: string | null
+          visa_outcome?: Database["public"]["Enums"]["visa_outcome_t"] | null
+          visa_validity_until?: string | null
+          visto_plan?: Database["public"]["Enums"]["visto_plan_t"] | null
+          whatsapp_e164?: string | null
+        }
+        Update: {
+          access_code_expires_at?: string | null
+          agency_id?: string | null
+          archived_at?: string | null
+          assigned_to?: string | null
+          client_feedback?: string | null
+          client_rating?: number | null
+          combo_discount_cents?: number | null
+          combo_pct?: number | null
+          contract_signed?: boolean | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string | null
+          lead_consent_at?: string | null
+          lead_consent_text?: string | null
+          lead_email?: string | null
+          lead_message?: string | null
+          lead_name?: string | null
+          lead_phone?: string | null
+          lead_source?: string | null
+          manual_discount_cents?: number | null
+          passport_notes?: string | null
+          passport_status?: string | null
+          payment_amount_cents?: number | null
+          payment_attempts?: number | null
+          payment_card_last4?: string | null
+          payment_confirmed_by?: string | null
+          payment_installments?: number | null
+          payment_method?:
+            | Database["public"]["Enums"]["payment_method_t"]
+            | null
+          payment_paid_at?: string | null
+          payment_status?:
+            | Database["public"]["Enums"]["payment_status_t"]
+            | null
+          proposal_accepted_at?: string | null
+          proposal_decline_reason?: string | null
+          proposal_discount_cents?: number | null
+          proposal_sent_at?: string | null
+          proposal_status?:
+            | Database["public"]["Enums"]["proposal_status_t"]
+            | null
+          proposal_subtotal_cents?: number | null
+          proposal_total_cents?: number | null
+          sched_window_open?: boolean | null
+          sign_name?: string | null
+          signed_at?: string | null
+          tax_status?: Database["public"]["Enums"]["tax_status_t"] | null
+          travel_checklist?: Json | null
+          usd_as_of?: string | null
+          usd_rate?: number | null
+          usd_source?: string | null
+          visa_decision_at?: string | null
+          visa_outcome?: Database["public"]["Enums"]["visa_outcome_t"] | null
+          visa_validity_until?: string | null
+          visto_plan?: Database["public"]["Enums"]["visto_plan_t"] | null
+          whatsapp_e164?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "requests_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       accept_invite: { Args: { _token: string }; Returns: Json }
@@ -1364,6 +1632,10 @@ export type Database = {
       }
       attach_stripe_session: {
         Args: { _request_id: string; _session_id: string }
+        Returns: undefined
+      }
+      client_set_proposal_status: {
+        Args: { _reason?: string; _request_id: string; _status: string }
         Returns: undefined
       }
       complete_briefing: {
