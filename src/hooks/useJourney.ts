@@ -64,7 +64,9 @@ export function useMyRequest() {
         .limit(1)
         .maybeSingle();
       if (error) throw error;
-      return data;
+      // Cast to requests Row shape — sensitive columns (access_code, stripe_*) are
+      // intentionally absent at runtime; callers must not depend on them.
+      return data as unknown as RequestRow | null;
     },
   });
 }
