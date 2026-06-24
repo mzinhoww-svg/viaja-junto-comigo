@@ -78,7 +78,7 @@ function PortalConclusao() {
                 const { generateTravelKitPDF } = await import("@/lib/travel-kit-pdf");
                 generateTravelKitPDF({
                   clientName: r.lead_name ?? "Viajante",
-                  accessCode: r.access_code ?? "",
+                  accessCode: r.id?.slice(0, 6).toUpperCase() ?? "",
                   outcome: r.visa_outcome ?? null,
                   decisionAt: r.visa_decision_at ?? null,
                   validityUntil: r.visa_validity_until ?? null,

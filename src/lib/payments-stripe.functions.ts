@@ -26,7 +26,7 @@ export const createConsultancyCheckout = createServerFn({ method: "POST" })
       // Load request (RLS guarantees membership)
       const { data: req, error } = await supabase
         .from("requests")
-        .select("id, lead_name, lead_email, proposal_total_cents, payment_status, access_code")
+        .select("id, lead_name, lead_email, proposal_total_cents, payment_status")
         .eq("id", data.requestId)
         .maybeSingle();
       if (error) throw error;
@@ -48,7 +48,7 @@ export const createConsultancyCheckout = createServerFn({ method: "POST" })
           price_data: {
             currency: "brl",
             product_data: {
-              name: `Consultoria Viajaly · #${req.access_code ?? data.requestId.slice(0, 8)}`,
+              name: `Consultoria Viajaly · #${data.requestId.slice(0, 8)}`,
               description: `Pacote de serviços de assessoria — ${req.lead_name ?? "Cliente"}`,
             },
             unit_amount: amount,
@@ -56,7 +56,7 @@ export const createConsultancyCheckout = createServerFn({ method: "POST" })
         }],
         ...(req.lead_email && { customer_email: req.lead_email }),
         payment_intent_data: {
-          description: `Consultoria Viajaly #${req.access_code ?? ""}`.trim(),
+          description: `Consultoria Viajaly #${data.requestId.slice(0, 8)}`,
           metadata: { request_id: data.requestId, method: data.method, kind: "consultancy" },
         },
         metadata: { request_id: data.requestId, method: data.method, kind: "consultancy" },
@@ -102,7 +102,7 @@ export const createTaxesCheckout = createServerFn({ method: "POST" })
 
       const { data: req, error: rErr } = await supabase
         .from("requests")
-        .select("id, lead_name, lead_email, access_code, usd_rate, tax_status")
+        .select("id, lead_name, lead_email, usd_rate, tax_status")
         .eq("id", data.requestId)
         .maybeSingle();
       if (rErr) throw rErr;
@@ -161,7 +161,7 @@ export const createTaxesCheckout = createServerFn({ method: "POST" })
           price_data: {
             currency: "brl",
             product_data: {
-              name: `Taxas governamentais · #${req.access_code ?? data.requestId.slice(0, 8)}`,
+              name: `Taxas governamentais · #${data.requestId.slice(0, 8)}`,
               description: "Taxas consulares (MRV) e Polícia Federal — recolhidas pela Viajaly.",
             },
             unit_amount: taxesTotal,
@@ -192,7 +192,7 @@ export const createTaxesCheckout = createServerFn({ method: "POST" })
         line_items: lineItems,
         ...(req.lead_email && { customer_email: req.lead_email }),
         payment_intent_data: {
-          description: `Taxas Viajaly #${req.access_code ?? ""}`.trim(),
+          description: `Taxas Viajaly #${data.requestId.slice(0, 8)}`,
           metadata: {
             request_id: data.requestId,
             method: data.method,

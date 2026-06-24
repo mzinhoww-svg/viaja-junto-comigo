@@ -47,7 +47,7 @@ function PropostaPage() {
   // mark as viewed once
   useEffect(() => {
     if (req.data?.id && req.data.proposal_status === "sent") {
-      supabase.rpc("client_set_proposal_status", { _request_id: req.data.id, _status: "viewed", _reason: null });
+      supabase.rpc("client_set_proposal_status", { _request_id: req.data.id, _status: "viewed", _reason: undefined });
     }
   }, [req.data?.id, req.data?.proposal_status]);
 
@@ -66,7 +66,7 @@ function PropostaPage() {
   const accept = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.rpc("client_set_proposal_status", {
-        _request_id: req.data!.id, _status: "accepted", _reason: null,
+        _request_id: req.data!.id, _status: "accepted", _reason: undefined,
       });
       if (error) throw error;
     },
