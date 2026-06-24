@@ -1115,6 +1115,18 @@ p{text-wrap:pretty}
   document.getElementById("burger").addEventListener("click", function(){
     document.getElementById("visto").scrollIntoView({behavior:"smooth"});
   });
+
+  // ===== Cards de produto clicáveis (Passaporte / Roteiros / Milhas) =====
+  document.querySelectorAll(".js-card").forEach(function(card){
+    var href = card.getAttribute("data-href");
+    if(!href) return;
+    card.style.cursor = "pointer";
+    card.addEventListener("click", function(e){
+      // Não interceptar cliques em links/botões dentro do card
+      if(e.target.closest("a, button")) return;
+      window.location.href = href;
+    });
+  });
 })();
 </script>
 </body>
