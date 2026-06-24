@@ -62,7 +62,7 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
     enabled: !!requestId,
     queryFn: async () => {
       const { data: req, error: rErr } = await supabase
-        .from("requests")
+        .from("requests_safe")
         .select("id, agency_id, usd_rate, usd_as_of, usd_source")
         .eq("id", requestId)
         .single();
