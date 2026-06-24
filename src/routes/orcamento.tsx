@@ -7,7 +7,11 @@ export const Route = createFileRoute("/orcamento")({
   head: () => ({
     meta: [
       { title: "Solicitar orçamento — Viajaly" },
-      { name: "description", content: "Consultoria de vistos, passaporte, roteiros e milhas. Solicite um orçamento sem compromisso." },
+      { name: "description", content: "Consultoria de vistos, passaporte, roteiros e milhas. Solicite um orçamento sem compromisso e receba uma proposta personalizada." },
+      { property: "og:title", content: "Solicitar orçamento — Viajaly" },
+      { property: "og:description", content: "Peça um orçamento para visto, passaporte, roteiros ou milhas. Atendimento humano em português, sem compromisso." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://viajaly.com/orcamento" },
     ],
   }),
   component: PageOrcamento,
