@@ -24,7 +24,15 @@ function PageOrcamento() {
       <header className="border-b border-[var(--color-border)] bg-white">
         <div className="max-w-2xl mx-auto px-5 py-4 flex items-center justify-between">
           <Logo size={28} />
-          <a href="https://wa.me/5565996076018" className="text-xs text-ink-soft hover:text-coral">Já é cliente? Acesse o portal</a>
+          <a
+            href={waLink(null, "Olá! Já sou cliente Viajaly e quero acessar o portal.", { source: "orcamento", campaign: "orcamento", content: "ja-cliente" })}
+            target="_blank"
+            rel="noopener"
+            onClick={() => trackWhatsAppClick({ source: "orcamento", campaign: "orcamento", content: "ja-cliente" })}
+            className="text-xs text-ink-soft hover:text-coral"
+          >
+            Já é cliente? Acesse o portal
+          </a>
         </div>
       </header>
 
