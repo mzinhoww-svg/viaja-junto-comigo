@@ -865,17 +865,34 @@ p{text-wrap:pretty}
 
 <script>
 (function(){
-  // ===== WhatsApp — edite SOMENTE o número abaixo (só dígitos, com DDI 55) =====
-  var WA_NUMBER = "5565996076018"; // Viajaly
-  // Mensagem padrão (fallback) caso algum botão não tenha data-wa:
+  // ===== WhatsApp — número vem de src/lib/contact.ts (token injetado no servidor) =====
+  var WA_NUMBER = "__WHATSAPP_NUMBER__"; // Viajaly — fonte única em src/lib/contact.ts
   var WA_DEFAULT = "Ola! Vim pela pagina de Passaporte da Viajaly e quero um orcamento.";
+  var WA_CAMPAIGN = "passaporte";
 
-  document.querySelectorAll(".js-wa").forEach(function(a){
+  function buildHref(msg, content){
+    var qs = "text=" + encodeURIComponent(msg)
+      + "&utm_source=site&utm_medium=whatsapp"
+      + "&utm_campaign=" + encodeURIComponent(WA_CAMPAIGN)
+      + (content ? "&utm_content=" + encodeURIComponent(content) : "");
+    return "https://wa.me/" + WA_NUMBER + "?" + qs;
+  }
+  function trackClick(content, msg){
+    try {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event:"whatsapp_click", wa_source:"site", wa_campaign:WA_CAMPAIGN, wa_content:content||"", wa_page:location.pathname, wa_message:msg });
+      if (typeof window.gtag === "function") window.gtag("event","whatsapp_click",{ wa_source:"site", wa_campaign:WA_CAMPAIGN, wa_content:content||"" });
+    } catch(_){}
+  }
+  document.querySelectorAll(".js-wa").forEach(function(a, i){
     var msg = a.getAttribute("data-wa") || WA_DEFAULT;
-    var href = "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(msg);
-    a.setAttribute("href", href);
+    var content = a.getAttribute("data-wa-id")
+      || (a.className && (a.className.match(/wa-float|nav-cta|prod-wa|btn-coral|btn-navy|btn-outline/) || [])[0])
+      || ("cta-" + (i + 1));
+    a.setAttribute("href", buildHref(msg, content));
     a.setAttribute("target","_blank");
     a.setAttribute("rel","noopener");
+    a.addEventListener("click", function(){ trackClick(content, msg); });
   });
 
   // ===== Nav scrolled state =====
