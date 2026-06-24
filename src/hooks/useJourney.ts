@@ -44,13 +44,19 @@ export function useJourney(requestId: string | undefined) {
   });
 }
 
+// Column list excludes stripe_session_id, stripe_payment_intent_id, client_signature_ip
+// which are revoked from `authenticated` role at the column level (admin-only via webhook
+// service-role client). Keeping them out also avoids leaking them to clients.
+const REQUEST_SAFE_COLUMNS =
+  "id, agency_id, lead_name, lead_email, lead_phone, access_code, combo_pct, proposal_status, contract_signed, sign_name, signed_at, payment_method, payment_status, tax_status, usd_rate, usd_as_of, usd_source, sched_window_open, created_by, created_at, proposal_subtotal_cents, proposal_discount_cents, proposal_total_cents, proposal_sent_at, proposal_accepted_at, proposal_decline_reason, whatsapp_e164, payment_amount_cents, payment_paid_at, payment_confirmed_by, access_code_expires_at, visa_outcome, visa_decision_at, visa_validity_until, archived_at, client_rating, client_feedback, travel_checklist, passport_status, passport_notes, lead_source, lead_message, lead_consent_at, lead_consent_text, assigned_to, payment_installments, payment_card_last4, payment_attempts, combo_discount_cents, manual_discount_cents, visto_plan";
+
 export function useMyRequest() {
   return useQuery({
     queryKey: ["my-request"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("requests")
-        .select("*")
+        .select(REQUEST_SAFE_COLUMNS)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -59,3 +65,6 @@ export function useMyRequest() {
     },
   });
 }
+
+export { REQUEST_SAFE_COLUMNS };
+
