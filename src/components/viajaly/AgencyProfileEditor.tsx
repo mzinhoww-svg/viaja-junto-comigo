@@ -136,11 +136,21 @@ function IdentidadeTab({ agency, reload }: { agency: Agency; reload: () => void 
   );
 }
 
-function CobrancaTab({ agency, reload }: { agency: Agency; reload: () => void }) {
-  const [key, setKey] = useState(agency.pix_key ?? "");
-  const [type, setType] = useState(agency.pix_key_type ?? "cpf");
-  const [merchant, setMerchant] = useState(agency.pix_merchant_name ?? "");
-  const [city, setCity] = useState(agency.pix_merchant_city ?? "");
+function CobrancaTab({ reload }: { reload: () => void }) {
+  const billing = useAgencyBilling();
+  const [key, setKey] = useState("");
+  const [type, setType] = useState("cpf");
+  const [merchant, setMerchant] = useState("");
+  const [city, setCity] = useState("");
+
+  useEffect(() => {
+    if (billing.data) {
+      setKey(billing.data.pix_key ?? "");
+      setType(billing.data.pix_key_type ?? "cpf");
+      setMerchant(billing.data.pix_merchant_name ?? "");
+      setCity(billing.data.pix_merchant_city ?? "");
+    }
+  }, [billing.data]);
 
   const save = useMutation({
     mutationFn: async () => {
@@ -149,9 +159,10 @@ function CobrancaTab({ agency, reload }: { agency: Agency; reload: () => void })
       } as never);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Dados de cobrança atualizados"); reload(); },
+    onSuccess: () => { toast.success("Dados de cobrança atualizados"); reload(); billing.refetch(); },
     onError: (e: Error) => toast.error(e.message),
   });
+
 
   return (
     <div className="bg-white border border-[var(--color-border)] rounded-2xl p-5 space-y-4 max-w-2xl">
