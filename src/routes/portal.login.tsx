@@ -23,7 +23,17 @@ const loginSearch = z.object({
 export const Route = createFileRoute("/portal/login")({
   ssr: false,
   validateSearch: (search) => loginSearch.parse(search),
-  head: () => ({ meta: [{ title: "Entrar — Viajaly" }] }),
+  head: () => ({
+    meta: [
+      { title: "Entrar — Viajaly" },
+      { name: "description", content: "Acesse o portal do cliente Viajaly para acompanhar sua proposta, contrato, documentos e agendamento de visto." },
+      { name: "robots", content: "noindex,follow" },
+      { property: "og:title", content: "Entrar no portal — Viajaly" },
+      { property: "og:description", content: "Login do portal do cliente Viajaly: acompanhe sua jornada de visto em um só lugar." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://viajaly.com/portal/login" },
+    ],
+  }),
   component: PortalLogin,
 });
 
