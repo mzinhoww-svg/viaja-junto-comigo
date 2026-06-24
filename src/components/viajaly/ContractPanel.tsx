@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import DOMPurify from "dompurify";
 import { supabase } from "@/integrations/supabase/client";
 import { renderContract } from "@/lib/contract-template";
 import { CheckCircle2, Download } from "lucide-react";
