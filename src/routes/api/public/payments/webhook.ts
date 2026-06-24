@@ -56,13 +56,11 @@ async function notifyPaymentConfirmed(session: any) {
   if (!email) return;
   const name: string | undefined =
     session?.customer_details?.name ?? session?.metadata?.lead_name;
-  const supabase = getSupabase();
-  await supabase.functions.invoke("send-email", {
-    body: {
-      template: "payment_confirmed",
-      to: { email, name },
-      vars: { name, link: "https://viajaly.app/portal" },
-    },
+  const { sendTransactionalEmail } = await import("@/lib/email.server");
+  await sendTransactionalEmail({
+    template: "payment_confirmed",
+    to: { email, name },
+    vars: { name, link: "https://viajaly.app/portal" },
   });
 }
 
