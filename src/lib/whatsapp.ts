@@ -1,13 +1,24 @@
-const VIAJALY_WA = "5565996076018";
+import { WHATSAPP_NUMBER } from "./contact";
 
 /**
  * WhatsApp helpers — usa wa.me (sem custo de API oficial).
- * Sempre direciona para o número da Viajaly.
+ * Sempre direciona para o número da Viajaly definido em `@/lib/contact`.
  */
+
+export { WHATSAPP_NUMBER };
+
+export type WaTracking = {
+  /** Origem (página/rota) — vira utm_source e propriedade do evento. */
+  source?: string;
+  /** Campanha (produto/contexto) — vira utm_campaign. */
+  campaign?: string;
+  /** Identificador do CTA específico — vira utm_content. */
+  content?: string;
+};
 
 export function normalizeE164BR(phone: string | null | undefined): string {
   const digits = (phone ?? "").replace(/\D/g, "");
-  if (!digits) return VIAJALY_WA;
+  if (!digits) return WHATSAPP_NUMBER;
   // já vem com DDI (>=12 dígitos) → mantém só dígitos
   if (digits.length >= 12) return digits;
   // assume BR sem DDI (10 ou 11 dígitos com DDD) → prefixa 55
@@ -15,10 +26,48 @@ export function normalizeE164BR(phone: string | null | undefined): string {
   return digits;
 }
 
-export function waLink(phoneE164: string | null | undefined, message: string): string {
+export function waLink(
+  phoneE164: string | null | undefined,
+  message: string,
+  tracking?: WaTracking,
+): string {
   const phone = normalizeE164BR(phoneE164);
-  const text = encodeURIComponent(message);
-  return `https://wa.me/${phone}?text=${text}`;
+  const params = new URLSearchParams({ text: message });
+  if (tracking?.source) params.set("utm_source", tracking.source);
+  params.set("utm_medium", "whatsapp");
+  if (tracking?.campaign) params.set("utm_campaign", tracking.campaign);
+  if (tracking?.content) params.set("utm_content", tracking.content);
+  return `https://wa.me/${phone}?${params.toString()}`;
+}
+
+/**
+ * Rastreia clique em CTA do WhatsApp.
+ * - Empurra evento `whatsapp_click` para `window.dataLayer` (GA4/GTM).
+ * - Chama `window.gtag('event', ...)` quando disponível.
+ * Seguro para SSR (no-op fora do browser).
+ */
+export function trackWhatsAppClick(tracking?: WaTracking) {
+  if (typeof window === "undefined") return;
+  const payload = {
+    event: "whatsapp_click",
+    wa_source: tracking?.source ?? "site",
+    wa_campaign: tracking?.campaign ?? "default",
+    wa_content: tracking?.content ?? "",
+    wa_page: typeof location !== "undefined" ? location.pathname : "",
+  };
+  try {
+    const w = window as unknown as {
+      dataLayer?: Record<string, unknown>[];
+      gtag?: (...args: unknown[]) => void;
+    };
+    w.dataLayer = w.dataLayer || [];
+    w.dataLayer.push(payload);
+    if (typeof w.gtag === "function") {
+      w.gtag("event", "whatsapp_click", payload);
+    }
+  } catch {
+    /* analytics nunca deve quebrar a UX */
+  }
 }
 
 /**
@@ -45,9 +94,14 @@ Qualquer dúvida, é só responder por aqui. Até já! 💛`
   );
 }
 
-export function openWhatsApp(e164: string | null | undefined, text: string) {
+export function openWhatsApp(
+  e164: string | null | undefined,
+  text: string,
+  tracking?: WaTracking,
+) {
   if (typeof window === "undefined") return;
-  window.open(waLink(e164, text), "_blank", "noopener");
+  trackWhatsAppClick(tracking);
+  window.open(waLink(e164, text, tracking), "_blank", "noopener");
 }
 
 // --- Mensagens prontas para avisos acionáveis ---
