@@ -148,7 +148,7 @@ function PagamentoPage() {
                 <div className="flex justify-between gap-3 px-4 py-3">
                   <dt className="text-ink-soft">Autenticação</dt>
                   <dd className="font-mono text-navy">
-                    VJ-{req.data?.access_code ?? "------"}-CN
+                    VJ-{req.data?.id?.slice(0, 6).toUpperCase() ?? "------"}-CN
                   </dd>
                 </div>
                 {req.data?.payment_paid_at && (

@@ -45,7 +45,7 @@ export function ProductsHub({ requestId }: { requestId: string }) {
     queryKey: ["product_status", requestId],
     queryFn: async () => {
       const { data: req } = await supabase
-        .from("requests")
+        .from("requests_safe")
         .select("visa_outcome, passport_status")
         .eq("id", requestId)
         .maybeSingle();

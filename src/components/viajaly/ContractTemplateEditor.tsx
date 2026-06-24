@@ -36,9 +36,12 @@ export function ContractTemplateEditor() {
 
   const save = useMutation({
     mutationFn: async () => {
+      const { data: prof, error: pErr } = await supabase.from("profiles").select("agency_id").eq("id", (await supabase.auth.getUser()).data.user?.id ?? "").maybeSingle();
+      if (pErr) throw pErr;
+      if (!prof?.agency_id) throw new Error("Agência não encontrada para o usuário.");
       const { error } = await supabase.from("contract_templates").upsert(
-        { scope, title: current?.title ?? `Contrato ${scope}`, body_html: body, updated_at: new Date().toISOString() },
-        { onConflict: "scope" },
+        { agency_id: prof.agency_id, scope, title: current?.title ?? `Contrato ${scope}`, body_html: body, updated_at: new Date().toISOString() },
+        { onConflict: "agency_id,scope" },
       );
       if (error) throw error;
     },

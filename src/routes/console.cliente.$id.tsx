@@ -47,7 +47,13 @@ function ConsoleClient() {
     queryKey: ["request", id],
     queryFn: async () => {
       const { REQUEST_SAFE_COLUMNS } = await import("@/hooks/useJourney");
-      const { data, error } = await supabase.from("requests").select(REQUEST_SAFE_COLUMNS).eq("id", id).maybeSingle();
+      // Admin view also needs access_code (revoked from client view, but staff
+      // can still read it via the requests table under requests_staff_read).
+      const { data, error } = await supabase
+        .from("requests")
+        .select(`${REQUEST_SAFE_COLUMNS}, access_code`)
+        .eq("id", id)
+        .maybeSingle();
       if (error) throw error;
       return data;
     },

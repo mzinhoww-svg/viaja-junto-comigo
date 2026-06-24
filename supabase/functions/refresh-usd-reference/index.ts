@@ -12,6 +12,8 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const AWESOMEAPI_TOKEN = Deno.env.get("AWESOMEAPI_TOKEN") ?? "";
 
+const CRON_SECRET = Deno.env.get("CRON_SECRET") ?? "";
+
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -21,6 +23,13 @@ function json(body: unknown, status = 200) {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: CORS });
+
+  // Require CRON_SECRET via x-cron-secret header (or Authorization: Bearer ...)
+  const provided = req.headers.get("x-cron-secret")
+    ?? (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
+  if (!CRON_SECRET || provided !== CRON_SECRET) {
+    return json({ ok: false, error: "unauthorized" }, 401);
+  }
 
   const headers: Record<string, string> = { accept: "application/json" };
   if (AWESOMEAPI_TOKEN) headers["Authorization"] = `Bearer ${AWESOMEAPI_TOKEN}`;
