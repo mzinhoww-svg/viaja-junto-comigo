@@ -11,7 +11,17 @@ import { Search, LayoutGrid, Table2 } from "lucide-react";
 
 export const Route = createFileRoute("/console/")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Pipeline — Viajaly Console" }] }),
+  head: () => ({
+    meta: [
+      { title: "Pipeline — Viajaly Console" },
+      { name: "description", content: "Pipeline de atendimento Viajaly: organize orçamentos, propostas e agendamentos da equipe em um só painel administrativo." },
+      { name: "robots", content: "noindex,nofollow" },
+      { property: "og:title", content: "Pipeline — Viajaly Console" },
+      { property: "og:description", content: "Painel administrativo Viajaly para gestão da operação de vistos." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://viajaly.com/console" },
+    ],
+  }),
   component: ConsoleHome,
 });
 
