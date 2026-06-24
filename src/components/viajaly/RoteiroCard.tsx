@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Upload, ExternalLink, Send, Loader2, FileText, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { waLink, trackWhatsAppClick } from "@/lib/whatsapp";
 
 type Roteiro = {
   id: string;
