@@ -81,11 +81,12 @@ export function AgencyProfileEditor() {
       </div>
 
       {tab === "identidade" && <IdentidadeTab agency={q.data} reload={reload} />}
-      {tab === "cobranca" && <CobrancaTab agency={q.data} reload={reload} />}
+      {tab === "cobranca" && <CobrancaTab reload={reload} />}
       {tab === "politica" && <PoliticaTab agency={q.data} reload={reload} />}
     </div>
   );
 }
+
 
 function IdentidadeTab({ agency, reload }: { agency: Agency; reload: () => void }) {
   const [name, setName] = useState(agency.name);
