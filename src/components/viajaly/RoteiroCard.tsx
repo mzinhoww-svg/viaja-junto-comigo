@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Upload, ExternalLink, Send, Loader2, FileText, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { waLink, trackWhatsAppClick } from "@/lib/whatsapp";
 
 type Roteiro = {
   id: string;
@@ -57,9 +58,12 @@ export function RoteiroCardPortal({ requestId, phone }: { requestId: string; pho
 
   function shareWhatsApp() {
     if (!rot?.share_url) return;
-    const txt = encodeURIComponent(`Seu roteiro Viajaly${rot.trip ? ` — ${rot.trip}` : ""}: ${rot.share_url}`);
-    window.open(`https://wa.me/5565996076018?text=${txt}`, "_blank", "noopener");
+    const msg = `Seu roteiro Viajaly${rot.trip ? ` — ${rot.trip}` : ""}: ${rot.share_url}`;
+    const tracking = { source: "portal", campaign: "roteiro_share", content: `v${rot.version}` };
+    trackWhatsAppClick(tracking);
+    window.open(waLink(null, msg, tracking), "_blank", "noopener");
   }
+
 
   return (
     <div className="rounded-2xl bg-white border border-[var(--color-border)] p-5">
