@@ -29,7 +29,17 @@ const STEP_TO_ROUTE: Record<string, "/portal/proposta" | "/portal/contrato" | "/
 
 export const Route = createFileRoute("/portal/")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Sua jornada — Viajaly" }] }),
+  head: () => ({
+    meta: [
+      { title: "Sua jornada — Viajaly" },
+      { name: "description", content: "Acompanhe sua jornada Viajaly: proposta, contrato, documentos, taxas e agendamento — tudo num portal só, em português." },
+      { name: "robots", content: "noindex,follow" },
+      { property: "og:title", content: "Sua jornada — Viajaly" },
+      { property: "og:description", content: "Portal do cliente Viajaly: acompanhe cada etapa da sua viagem em um só lugar." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://viajaly.com/portal" },
+    ],
+  }),
   component: PortalHome,
 });
 

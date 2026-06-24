@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /portal
+Disallow: /portal/
+Disallow: /console
+Disallow: /console/
+Disallow: /api/
+
+Sitemap: https://viajaly.com/sitemap.xml
