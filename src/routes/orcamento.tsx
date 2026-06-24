@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicLeadForm } from "@/components/viajaly/PublicLeadForm";
 import { Logo } from "@/components/viajaly/Logo";
+import { waLink, trackWhatsAppClick } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/orcamento")({
   ssr: false,
