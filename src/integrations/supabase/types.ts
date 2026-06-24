@@ -1397,6 +1397,15 @@ export type Database = {
       }
       create_request_with_travelers: { Args: { payload: Json }; Returns: Json }
       current_agency_id: { Args: never; Returns: string }
+      get_agency_billing: {
+        Args: never
+        Returns: {
+          pix_key: string
+          pix_key_type: string
+          pix_merchant_city: string
+          pix_merchant_name: string
+        }[]
+      }
       get_usd_rate: { Args: { _request_id: string }; Returns: Json }
       has_role: {
         Args: {
@@ -1410,6 +1419,13 @@ export type Database = {
         Returns: Json
       }
       is_request_member: { Args: { _request_id: string }; Returns: boolean }
+      list_contract_templates_for_request: {
+        Args: { _request_id: string }
+        Returns: {
+          body_html: string
+          scope: string
+        }[]
+      }
       log_audit: {
         Args: { _action: string; _payload?: Json; _target: string }
         Returns: undefined
