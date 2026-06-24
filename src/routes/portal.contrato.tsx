@@ -83,12 +83,17 @@ function ContratoPage() {
   });
 
   const templates = useQuery({
-    queryKey: ["contract-templates-all"],
+    queryKey: ["contract-templates-for-request", req.data?.id],
+    enabled: !!req.data?.id,
     queryFn: async () => {
-      const { data } = await supabase.from("contract_templates").select("scope, body_html");
-      return data ?? [];
+      const { data, error } = await supabase.rpc("list_contract_templates_for_request" as never, {
+        _request_id: req.data!.id,
+      } as never);
+      if (error) throw error;
+      return (data ?? []) as { scope: string; body_html: string }[];
     },
   });
+
 
   const bodyHtml = useMemo(() => {
     if (!req.data || !items.data || !ctx.data) return "";

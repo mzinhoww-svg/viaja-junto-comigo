@@ -17,11 +17,14 @@ type Agency = {
   public_email: string | null;
   public_whatsapp: string | null;
   visa_disclaimer: string;
+  emergency_contacts: unknown;
+};
+
+type AgencyBilling = {
   pix_key: string | null;
   pix_key_type: string | null;
   pix_merchant_name: string | null;
   pix_merchant_city: string | null;
-  emergency_contacts: unknown;
 };
 
 function useAgency() {
@@ -30,13 +33,28 @@ function useAgency() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("agencies")
-        .select("id, name, bio, primary_color, instagram, endereco, public_email, public_whatsapp, visa_disclaimer, pix_key, pix_key_type, pix_merchant_name, pix_merchant_city, emergency_contacts")
+        .select("id, name, bio, primary_color, instagram, endereco, public_email, public_whatsapp, visa_disclaimer, emergency_contacts")
         .limit(1).maybeSingle();
       if (error) throw error;
       return data as Agency | null;
     },
   });
 }
+
+function useAgencyBilling() {
+  return useQuery({
+    queryKey: ["my-agency-billing"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_agency_billing" as never);
+      if (error) throw error;
+      const rows = (data ?? []) as unknown as AgencyBilling[];
+      const row = rows.length > 0 ? rows[0] : null;
+      return row ?? { pix_key: null, pix_key_type: null, pix_merchant_name: null, pix_merchant_city: null };
+    },
+  });
+}
+
+
 
 type Tab = "identidade" | "cobranca" | "politica";
 
@@ -65,11 +83,12 @@ export function AgencyProfileEditor() {
       </div>
 
       {tab === "identidade" && <IdentidadeTab agency={q.data} reload={reload} />}
-      {tab === "cobranca" && <CobrancaTab agency={q.data} reload={reload} />}
+      {tab === "cobranca" && <CobrancaTab reload={reload} />}
       {tab === "politica" && <PoliticaTab agency={q.data} reload={reload} />}
     </div>
   );
 }
+
 
 function IdentidadeTab({ agency, reload }: { agency: Agency; reload: () => void }) {
   const [name, setName] = useState(agency.name);
@@ -119,11 +138,21 @@ function IdentidadeTab({ agency, reload }: { agency: Agency; reload: () => void 
   );
 }
 
-function CobrancaTab({ agency, reload }: { agency: Agency; reload: () => void }) {
-  const [key, setKey] = useState(agency.pix_key ?? "");
-  const [type, setType] = useState(agency.pix_key_type ?? "cpf");
-  const [merchant, setMerchant] = useState(agency.pix_merchant_name ?? "");
-  const [city, setCity] = useState(agency.pix_merchant_city ?? "");
+function CobrancaTab({ reload }: { reload: () => void }) {
+  const billing = useAgencyBilling();
+  const [key, setKey] = useState("");
+  const [type, setType] = useState("cpf");
+  const [merchant, setMerchant] = useState("");
+  const [city, setCity] = useState("");
+
+  useEffect(() => {
+    if (billing.data) {
+      setKey(billing.data.pix_key ?? "");
+      setType(billing.data.pix_key_type ?? "cpf");
+      setMerchant(billing.data.pix_merchant_name ?? "");
+      setCity(billing.data.pix_merchant_city ?? "");
+    }
+  }, [billing.data]);
 
   const save = useMutation({
     mutationFn: async () => {
@@ -132,9 +161,10 @@ function CobrancaTab({ agency, reload }: { agency: Agency; reload: () => void })
       } as never);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Dados de cobrança atualizados"); reload(); },
+    onSuccess: () => { toast.success("Dados de cobrança atualizados"); reload(); billing.refetch(); },
     onError: (e: Error) => toast.error(e.message),
   });
+
 
   return (
     <div className="bg-white border border-[var(--color-border)] rounded-2xl p-5 space-y-4 max-w-2xl">

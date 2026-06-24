@@ -46,7 +46,8 @@ function ConsoleClient() {
   const req = useQuery({
     queryKey: ["request", id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("requests").select("*").eq("id", id).maybeSingle();
+      const { REQUEST_SAFE_COLUMNS } = await import("@/hooks/useJourney");
+      const { data, error } = await supabase.from("requests").select(REQUEST_SAFE_COLUMNS).eq("id", id).maybeSingle();
       if (error) throw error;
       return data;
     },
