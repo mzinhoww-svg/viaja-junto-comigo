@@ -9,9 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RoteirosRouteImport } from './routes/roteiros'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as PortalRouteImport } from './routes/portal'
+import { Route as PassaporteRouteImport } from './routes/passaporte'
 import { Route as OrcamentoRouteImport } from './routes/orcamento'
+import { Route as MilhasRouteImport } from './routes/milhas'
 import { Route as ConsoleRouteImport } from './routes/console'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
@@ -46,6 +49,11 @@ import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$
 import { Route as ConsoleOrcamentoIdEditarRouteImport } from './routes/console.orcamento.$id.editar'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
+const RoteirosRoute = RoteirosRouteImport.update({
+  id: '/roteiros',
+  path: '/roteiros',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
   id: '/privacidade',
   path: '/privacidade',
@@ -56,9 +64,19 @@ const PortalRoute = PortalRouteImport.update({
   path: '/portal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PassaporteRoute = PassaporteRouteImport.update({
+  id: '/passaporte',
+  path: '/passaporte',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrcamentoRoute = OrcamentoRouteImport.update({
   id: '/orcamento',
   path: '/orcamento',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MilhasRoute = MilhasRouteImport.update({
+  id: '/milhas',
+  path: '/milhas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConsoleRoute = ConsoleRouteImport.update({
@@ -232,9 +250,12 @@ const ApiPublicPaymentsWebhookRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/console': typeof ConsoleRouteWithChildren
+  '/milhas': typeof MilhasRoute
   '/orcamento': typeof OrcamentoRouteWithChildren
+  '/passaporte': typeof PassaporteRoute
   '/portal': typeof PortalRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
+  '/roteiros': typeof RoteirosRoute
   '/console/aceitar-convite': typeof ConsoleAceitarConviteRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
@@ -269,8 +290,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/milhas': typeof MilhasRoute
   '/orcamento': typeof OrcamentoRouteWithChildren
+  '/passaporte': typeof PassaporteRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/roteiros': typeof RoteirosRoute
   '/console/aceitar-convite': typeof ConsoleAceitarConviteRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
@@ -307,9 +331,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/console': typeof ConsoleRouteWithChildren
+  '/milhas': typeof MilhasRoute
   '/orcamento': typeof OrcamentoRouteWithChildren
+  '/passaporte': typeof PassaporteRoute
   '/portal': typeof PortalRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
+  '/roteiros': typeof RoteirosRoute
   '/console/aceitar-convite': typeof ConsoleAceitarConviteRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
@@ -347,9 +374,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/console'
+    | '/milhas'
     | '/orcamento'
+    | '/passaporte'
     | '/portal'
     | '/privacidade'
+    | '/roteiros'
     | '/console/aceitar-convite'
     | '/console/agenda'
     | '/console/auditoria'
@@ -384,8 +414,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/milhas'
     | '/orcamento'
+    | '/passaporte'
     | '/privacidade'
+    | '/roteiros'
     | '/console/aceitar-convite'
     | '/console/agenda'
     | '/console/auditoria'
@@ -421,9 +454,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/console'
+    | '/milhas'
     | '/orcamento'
+    | '/passaporte'
     | '/portal'
     | '/privacidade'
+    | '/roteiros'
     | '/console/aceitar-convite'
     | '/console/agenda'
     | '/console/auditoria'
@@ -460,14 +496,24 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConsoleRoute: typeof ConsoleRouteWithChildren
+  MilhasRoute: typeof MilhasRoute
   OrcamentoRoute: typeof OrcamentoRouteWithChildren
+  PassaporteRoute: typeof PassaporteRoute
   PortalRoute: typeof PortalRouteWithChildren
   PrivacidadeRoute: typeof PrivacidadeRoute
+  RoteirosRoute: typeof RoteirosRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/roteiros': {
+      id: '/roteiros'
+      path: '/roteiros'
+      fullPath: '/roteiros'
+      preLoaderRoute: typeof RoteirosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacidade': {
       id: '/privacidade'
       path: '/privacidade'
@@ -482,11 +528,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/passaporte': {
+      id: '/passaporte'
+      path: '/passaporte'
+      fullPath: '/passaporte'
+      preLoaderRoute: typeof PassaporteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/orcamento': {
       id: '/orcamento'
       path: '/orcamento'
       fullPath: '/orcamento'
       preLoaderRoute: typeof OrcamentoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/milhas': {
+      id: '/milhas'
+      path: '/milhas'
+      fullPath: '/milhas'
+      preLoaderRoute: typeof MilhasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/console': {
@@ -814,9 +874,12 @@ const PortalRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConsoleRoute: ConsoleRouteWithChildren,
+  MilhasRoute: MilhasRoute,
   OrcamentoRoute: OrcamentoRouteWithChildren,
+  PassaporteRoute: PassaporteRoute,
   PortalRoute: PortalRouteWithChildren,
   PrivacidadeRoute: PrivacidadeRoute,
+  RoteirosRoute: RoteirosRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
