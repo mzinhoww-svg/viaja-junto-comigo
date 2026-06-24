@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import html from "@/landing/home.html?raw";
+import html from "@/landing/roteiros.html?raw";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/roteiros")({
   server: {
     handlers: {
       GET: async () =>
