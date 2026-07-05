@@ -21,6 +21,7 @@ const EmergencyContactsEditor = lazy(() => import("@/components/viajaly/Emergenc
 const BriefingReadOnly = lazy(() => import("@/components/viajaly/BriefingForm").then((m) => ({ default: m.BriefingReadOnly })));
 const MessageThread = lazy(() => import("@/components/viajaly/MessageThread").then((m) => ({ default: m.MessageThread })));
 const ContractPanel = lazy(() => import("@/components/viajaly/ContractPanel").then((m) => ({ default: m.ContractPanel })));
+import { WaQuickActions } from "@/components/viajaly/WaQuickActions";
 import { OutcomeBadge, type VisaOutcome } from "@/components/viajaly/OutcomeBadge";
 import { StatusPill } from "@/components/viajaly/StatusPill";
 import { Button } from "@/components/ui/button";
@@ -45,7 +46,14 @@ function ConsoleClient() {
   const req = useQuery({
     queryKey: ["request", id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("requests").select("*").eq("id", id).maybeSingle();
+      const { REQUEST_SAFE_COLUMNS } = await import("@/hooks/useJourney");
+      // Admin view also needs access_code (revoked from client view, but staff
+      // can still read it via the requests table under requests_staff_read).
+      const { data, error } = await supabase
+        .from("requests")
+        .select(`${REQUEST_SAFE_COLUMNS}, access_code`)
+        .eq("id", id)
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -135,11 +143,11 @@ function ConsoleClient() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setShowShare((v) => !v)}>
+          <Button variant="outline" size="sm" className="min-h-10" onClick={() => setShowShare((v) => !v)}>
             <Share2 size={14} className="mr-1.5" /> {showShare ? "Ocultar acesso" : "Compartilhar acesso"}
           </Button>
           <Link to="/console/orcamento/$id/editar" params={{ id }}>
-            <Button size="sm" className="bg-navy hover:bg-[var(--color-navy-light)] text-cream">
+            <Button size="sm" className="bg-navy hover:bg-[var(--color-navy-light)] text-cream min-h-10">
               <Pencil size={14} className="mr-1.5" /> Editar orçamento
             </Button>
           </Link>
@@ -157,6 +165,13 @@ function ConsoleClient() {
           />
         </div>
       )}
+
+      <WaQuickActions
+        phone={req.data.whatsapp_e164 ?? req.data.lead_phone ?? ""}
+        clientName={req.data.lead_name}
+      />
+
+
 
 
       <div className="mt-6 border-b border-[var(--color-border)] flex gap-1">
@@ -188,13 +203,13 @@ function ConsoleClient() {
             <h2 className="font-display font-bold text-navy">Controles rápidos</h2>
             <p className="text-xs text-ink-soft">Atalhos manuais — portal reflete em &lt;2s via realtime.</p>
             <div className="space-y-2">
-              <Button size="sm" variant="outline" onClick={() => flipProposal.mutate(req.data!.proposal_status === "accepted" ? "sent" : "accepted")}>
+              <Button size="sm" variant="outline" className="min-h-10" onClick={() => flipProposal.mutate(req.data!.proposal_status === "accepted" ? "sent" : "accepted")}>
                 {req.data.proposal_status === "accepted" ? "Marcar proposta como enviada" : "Aceitar proposta"}
               </Button>
-              <Button size="sm" variant="outline" onClick={() => flipSigned.mutate(!req.data!.contract_signed)}>
+              <Button size="sm" variant="outline" className="min-h-10" onClick={() => flipSigned.mutate(!req.data!.contract_signed)}>
                 {req.data.contract_signed ? "Desassinar contrato" : "Assinar contrato"}
               </Button>
-              <Button size="sm" variant="outline" onClick={() => flipPayment.mutate(req.data!.payment_status !== "paid")}>
+              <Button size="sm" variant="outline" className="min-h-10" onClick={() => flipPayment.mutate(req.data!.payment_status !== "paid")}>
                 {req.data.payment_status === "paid" ? "Reverter pagamento" : "Marcar pago"}
               </Button>
             </div>

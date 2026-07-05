@@ -1,0 +1,12 @@
+# Viajaly
+
+> Consultoria especializada em vistos americanos, passaportes, roteiros de viagem e milhas, com atendimento humano em português e portal do cliente para acompanhar cada etapa.
+
+## Pages
+
+- [Home](/): Visão geral da consultoria Viajaly — visto, passaporte, roteiros e milhas.
+- [Passaporte](/passaporte): Como a Viajaly cuida da emissão e renovação do seu passaporte.
+- [Roteiros](/roteiros): Roteiros de viagem personalizados pela Viajaly.
+- [Milhas](/milhas): Consultoria de milhas para emissões e resgates inteligentes.
+- [Solicitar orçamento](/orcamento): Peça um orçamento sem compromisso para qualquer serviço Viajaly.
+- [Política de privacidade](/privacidade): Como tratamos seus dados.

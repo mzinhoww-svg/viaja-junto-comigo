@@ -9,10 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RoteirosRouteImport } from './routes/roteiros'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as VistosRouteImport } from './routes/vistos'
 import { Route as PortalRouteImport } from './routes/portal'
+import { Route as PassaporteRouteImport } from './routes/passaporte'
 import { Route as OrcamentoRouteImport } from './routes/orcamento'
+import { Route as MilhasRouteImport } from './routes/milhas'
 import { Route as ConsoleRouteImport } from './routes/console'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
@@ -33,19 +37,30 @@ import { Route as PortalAgendaRouteImport } from './routes/portal.agenda'
 import { Route as OrcamentoSucessoRouteImport } from './routes/orcamento.sucesso'
 import { Route as ConsoleTemplatesRouteImport } from './routes/console.templates'
 import { Route as ConsoleRelatorioRouteImport } from './routes/console.relatorio'
+import { Route as ConsoleProdutosRouteImport } from './routes/console.produtos'
 import { Route as ConsoleLoginRouteImport } from './routes/console.login'
 import { Route as ConsoleJanelasRouteImport } from './routes/console.janelas'
+import { Route as ConsoleFinanceiroRouteImport } from './routes/console.financeiro'
 import { Route as ConsoleEquipeRouteImport } from './routes/console.equipe'
 import { Route as ConsoleConfiguracoesRouteImport } from './routes/console.configuracoes'
 import { Route as ConsoleAuditoriaRouteImport } from './routes/console.auditoria'
 import { Route as ConsoleAgendaRouteImport } from './routes/console.agenda'
 import { Route as ConsoleAceitarConviteRouteImport } from './routes/console.aceitar-convite'
-import { Route as ConsoleProdutosRouteImport } from './routes/console.produtos'
-import { Route as ConsoleFinanceiroRouteImport } from './routes/console.financeiro'
 import { Route as ConsoleOrcamentoNovoRouteImport } from './routes/console.orcamento.novo'
 import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$id'
 import { Route as ConsoleOrcamentoIdEditarRouteImport } from './routes/console.orcamento.$id.editar'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoteirosRoute = RoteirosRouteImport.update({
+  id: '/roteiros',
+  path: '/roteiros',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
   id: '/privacidade',
   path: '/privacidade',
@@ -61,9 +76,19 @@ const PortalRoute = PortalRouteImport.update({
   path: '/portal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PassaporteRoute = PassaporteRouteImport.update({
+  id: '/passaporte',
+  path: '/passaporte',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrcamentoRoute = OrcamentoRouteImport.update({
   id: '/orcamento',
   path: '/orcamento',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MilhasRoute = MilhasRouteImport.update({
+  id: '/milhas',
+  path: '/milhas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConsoleRoute = ConsoleRouteImport.update({
@@ -166,6 +191,11 @@ const ConsoleRelatorioRoute = ConsoleRelatorioRouteImport.update({
   path: '/relatorio',
   getParentRoute: () => ConsoleRoute,
 } as any)
+const ConsoleProdutosRoute = ConsoleProdutosRouteImport.update({
+  id: '/produtos',
+  path: '/produtos',
+  getParentRoute: () => ConsoleRoute,
+} as any)
 const ConsoleLoginRoute = ConsoleLoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -174,6 +204,11 @@ const ConsoleLoginRoute = ConsoleLoginRouteImport.update({
 const ConsoleJanelasRoute = ConsoleJanelasRouteImport.update({
   id: '/janelas',
   path: '/janelas',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleFinanceiroRoute = ConsoleFinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
   getParentRoute: () => ConsoleRoute,
 } as any)
 const ConsoleEquipeRoute = ConsoleEquipeRouteImport.update({
@@ -201,16 +236,6 @@ const ConsoleAceitarConviteRoute = ConsoleAceitarConviteRouteImport.update({
   path: '/aceitar-convite',
   getParentRoute: () => ConsoleRoute,
 } as any)
-const ConsoleProdutosRoute = ConsoleProdutosRouteImport.update({
-  id: '/produtos',
-  path: '/produtos',
-  getParentRoute: () => ConsoleRoute,
-} as any)
-const ConsoleFinanceiroRoute = ConsoleFinanceiroRouteImport.update({
-  id: '/financeiro',
-  path: '/financeiro',
-  getParentRoute: () => ConsoleRoute,
-} as any)
 const ConsoleOrcamentoNovoRoute = ConsoleOrcamentoNovoRouteImport.update({
   id: '/orcamento/novo',
   path: '/orcamento/novo',
@@ -227,20 +252,32 @@ const ConsoleOrcamentoIdEditarRoute =
     path: '/orcamento/$id/editar',
     getParentRoute: () => ConsoleRoute,
   } as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/console': typeof ConsoleRouteWithChildren
+  '/milhas': typeof MilhasRoute
   '/orcamento': typeof OrcamentoRouteWithChildren
+  '/passaporte': typeof PassaporteRoute
   '/portal': typeof PortalRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
+  '/roteiros': typeof RoteirosRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/console/aceitar-convite': typeof ConsoleAceitarConviteRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/configuracoes': typeof ConsoleConfiguracoesRoute
   '/console/equipe': typeof ConsoleEquipeRoute
+  '/console/financeiro': typeof ConsoleFinanceiroRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
+  '/console/produtos': typeof ConsoleProdutosRoute
   '/console/relatorio': typeof ConsoleRelatorioRoute
   '/console/templates': typeof ConsoleTemplatesRoute
   '/orcamento/sucesso': typeof OrcamentoSucessoRoute
@@ -261,19 +298,26 @@ export interface FileRoutesByFullPath {
   '/portal/': typeof PortalIndexRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
   '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/console/orcamento/$id/editar': typeof ConsoleOrcamentoIdEditarRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/milhas': typeof MilhasRoute
   '/orcamento': typeof OrcamentoRouteWithChildren
+  '/passaporte': typeof PassaporteRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/roteiros': typeof RoteirosRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/console/aceitar-convite': typeof ConsoleAceitarConviteRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/configuracoes': typeof ConsoleConfiguracoesRoute
   '/console/equipe': typeof ConsoleEquipeRoute
+  '/console/financeiro': typeof ConsoleFinanceiroRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
+  '/console/produtos': typeof ConsoleProdutosRoute
   '/console/relatorio': typeof ConsoleRelatorioRoute
   '/console/templates': typeof ConsoleTemplatesRoute
   '/orcamento/sucesso': typeof OrcamentoSucessoRoute
@@ -294,22 +338,29 @@ export interface FileRoutesByTo {
   '/portal': typeof PortalIndexRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
   '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/console/orcamento/$id/editar': typeof ConsoleOrcamentoIdEditarRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/console': typeof ConsoleRouteWithChildren
+  '/milhas': typeof MilhasRoute
   '/orcamento': typeof OrcamentoRouteWithChildren
+  '/passaporte': typeof PassaporteRoute
   '/portal': typeof PortalRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
+  '/roteiros': typeof RoteirosRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/console/aceitar-convite': typeof ConsoleAceitarConviteRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
   '/console/configuracoes': typeof ConsoleConfiguracoesRoute
   '/console/equipe': typeof ConsoleEquipeRoute
+  '/console/financeiro': typeof ConsoleFinanceiroRoute
   '/console/janelas': typeof ConsoleJanelasRoute
   '/console/login': typeof ConsoleLoginRoute
+  '/console/produtos': typeof ConsoleProdutosRoute
   '/console/relatorio': typeof ConsoleRelatorioRoute
   '/console/templates': typeof ConsoleTemplatesRoute
   '/orcamento/sucesso': typeof OrcamentoSucessoRoute
@@ -330,6 +381,7 @@ export interface FileRoutesById {
   '/portal/': typeof PortalIndexRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
   '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/console/orcamento/$id/editar': typeof ConsoleOrcamentoIdEditarRoute
 }
 export interface FileRouteTypes {
@@ -337,16 +389,22 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/console'
+    | '/milhas'
     | '/orcamento'
+    | '/passaporte'
     | '/portal'
     | '/privacidade'
+    | '/roteiros'
+    | '/sitemap.xml'
     | '/console/aceitar-convite'
     | '/console/agenda'
     | '/console/auditoria'
     | '/console/configuracoes'
     | '/console/equipe'
+    | '/console/financeiro'
     | '/console/janelas'
     | '/console/login'
+    | '/console/produtos'
     | '/console/relatorio'
     | '/console/templates'
     | '/orcamento/sucesso'
@@ -367,19 +425,26 @@ export interface FileRouteTypes {
     | '/portal/'
     | '/console/cliente/$id'
     | '/console/orcamento/novo'
+    | '/api/public/payments/webhook'
     | '/console/orcamento/$id/editar'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/milhas'
     | '/orcamento'
+    | '/passaporte'
     | '/privacidade'
+    | '/roteiros'
+    | '/sitemap.xml'
     | '/console/aceitar-convite'
     | '/console/agenda'
     | '/console/auditoria'
     | '/console/configuracoes'
     | '/console/equipe'
+    | '/console/financeiro'
     | '/console/janelas'
     | '/console/login'
+    | '/console/produtos'
     | '/console/relatorio'
     | '/console/templates'
     | '/orcamento/sucesso'
@@ -400,21 +465,28 @@ export interface FileRouteTypes {
     | '/portal'
     | '/console/cliente/$id'
     | '/console/orcamento/novo'
+    | '/api/public/payments/webhook'
     | '/console/orcamento/$id/editar'
   id:
     | '__root__'
     | '/'
     | '/console'
+    | '/milhas'
     | '/orcamento'
+    | '/passaporte'
     | '/portal'
     | '/privacidade'
+    | '/roteiros'
+    | '/sitemap.xml'
     | '/console/aceitar-convite'
     | '/console/agenda'
     | '/console/auditoria'
     | '/console/configuracoes'
     | '/console/equipe'
+    | '/console/financeiro'
     | '/console/janelas'
     | '/console/login'
+    | '/console/produtos'
     | '/console/relatorio'
     | '/console/templates'
     | '/orcamento/sucesso'
@@ -435,20 +507,40 @@ export interface FileRouteTypes {
     | '/portal/'
     | '/console/cliente/$id'
     | '/console/orcamento/novo'
+    | '/api/public/payments/webhook'
     | '/console/orcamento/$id/editar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConsoleRoute: typeof ConsoleRouteWithChildren
+  MilhasRoute: typeof MilhasRoute
   OrcamentoRoute: typeof OrcamentoRouteWithChildren
+  PassaporteRoute: typeof PassaporteRoute
   PortalRoute: typeof PortalRouteWithChildren
   PrivacidadeRoute: typeof PrivacidadeRoute
   VistosRoute: typeof VistosRoute
+  RoteirosRoute: typeof RoteirosRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/roteiros': {
+      id: '/roteiros'
+      path: '/roteiros'
+      fullPath: '/roteiros'
+      preLoaderRoute: typeof RoteirosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacidade': {
       id: '/privacidade'
       path: '/privacidade'
@@ -463,11 +555,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/passaporte': {
+      id: '/passaporte'
+      path: '/passaporte'
+      fullPath: '/passaporte'
+      preLoaderRoute: typeof PassaporteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/orcamento': {
       id: '/orcamento'
       path: '/orcamento'
       fullPath: '/orcamento'
       preLoaderRoute: typeof OrcamentoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/milhas': {
+      id: '/milhas'
+      path: '/milhas'
+      fullPath: '/milhas'
+      preLoaderRoute: typeof MilhasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/console': {
@@ -610,6 +716,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleRelatorioRouteImport
       parentRoute: typeof ConsoleRoute
     }
+    '/console/produtos': {
+      id: '/console/produtos'
+      path: '/produtos'
+      fullPath: '/console/produtos'
+      preLoaderRoute: typeof ConsoleProdutosRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
     '/console/login': {
       id: '/console/login'
       path: '/login'
@@ -622,6 +735,13 @@ declare module '@tanstack/react-router' {
       path: '/janelas'
       fullPath: '/console/janelas'
       preLoaderRoute: typeof ConsoleJanelasRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/financeiro': {
+      id: '/console/financeiro'
+      path: '/financeiro'
+      fullPath: '/console/financeiro'
+      preLoaderRoute: typeof ConsoleFinanceiroRouteImport
       parentRoute: typeof ConsoleRoute
     }
     '/console/equipe': {
@@ -680,6 +800,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleOrcamentoIdEditarRouteImport
       parentRoute: typeof ConsoleRoute
     }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -689,12 +816,12 @@ interface ConsoleRouteChildren {
   ConsoleAuditoriaRoute: typeof ConsoleAuditoriaRoute
   ConsoleConfiguracoesRoute: typeof ConsoleConfiguracoesRoute
   ConsoleEquipeRoute: typeof ConsoleEquipeRoute
+  ConsoleFinanceiroRoute: typeof ConsoleFinanceiroRoute
   ConsoleJanelasRoute: typeof ConsoleJanelasRoute
   ConsoleLoginRoute: typeof ConsoleLoginRoute
+  ConsoleProdutosRoute: typeof ConsoleProdutosRoute
   ConsoleRelatorioRoute: typeof ConsoleRelatorioRoute
   ConsoleTemplatesRoute: typeof ConsoleTemplatesRoute
-  ConsoleProdutosRoute: typeof ConsoleProdutosRoute
-  ConsoleFinanceiroRoute: typeof ConsoleFinanceiroRoute
   ConsoleIndexRoute: typeof ConsoleIndexRoute
   ConsoleClienteIdRoute: typeof ConsoleClienteIdRoute
   ConsoleOrcamentoNovoRoute: typeof ConsoleOrcamentoNovoRoute
@@ -707,12 +834,12 @@ const ConsoleRouteChildren: ConsoleRouteChildren = {
   ConsoleAuditoriaRoute: ConsoleAuditoriaRoute,
   ConsoleConfiguracoesRoute: ConsoleConfiguracoesRoute,
   ConsoleEquipeRoute: ConsoleEquipeRoute,
+  ConsoleFinanceiroRoute: ConsoleFinanceiroRoute,
   ConsoleJanelasRoute: ConsoleJanelasRoute,
   ConsoleLoginRoute: ConsoleLoginRoute,
+  ConsoleProdutosRoute: ConsoleProdutosRoute,
   ConsoleRelatorioRoute: ConsoleRelatorioRoute,
   ConsoleTemplatesRoute: ConsoleTemplatesRoute,
-  ConsoleProdutosRoute: ConsoleProdutosRoute,
-  ConsoleFinanceiroRoute: ConsoleFinanceiroRoute,
   ConsoleIndexRoute: ConsoleIndexRoute,
   ConsoleClienteIdRoute: ConsoleClienteIdRoute,
   ConsoleOrcamentoNovoRoute: ConsoleOrcamentoNovoRoute,
@@ -774,10 +901,15 @@ const PortalRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConsoleRoute: ConsoleRouteWithChildren,
+  MilhasRoute: MilhasRoute,
   OrcamentoRoute: OrcamentoRouteWithChildren,
+  PassaporteRoute: PassaporteRoute,
   PortalRoute: PortalRouteWithChildren,
   PrivacidadeRoute: PrivacidadeRoute,
   VistosRoute: VistosRoute,
+  RoteirosRoute: RoteirosRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

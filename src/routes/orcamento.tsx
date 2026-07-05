@@ -1,13 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PublicLeadForm } from "@/components/viajaly/PublicLeadForm";
 import { Logo } from "@/components/viajaly/Logo";
+import { waLink, trackWhatsAppClick } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/orcamento")({
   ssr: false,
   head: () => ({
     meta: [
       { title: "Solicitar orçamento — Viajaly" },
-      { name: "description", content: "Consultoria de vistos, passaporte, roteiros e milhas. Solicite um orçamento sem compromisso." },
+      { name: "description", content: "Consultoria de vistos, passaporte, roteiros e milhas. Solicite um orçamento sem compromisso e receba uma proposta personalizada." },
+      { property: "og:title", content: "Solicitar orçamento — Viajaly" },
+      { property: "og:description", content: "Peça um orçamento para visto, passaporte, roteiros ou milhas. Atendimento humano em português, sem compromisso." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://viajaly.com/orcamento" },
     ],
   }),
   component: PageOrcamento,
@@ -19,7 +24,15 @@ function PageOrcamento() {
       <header className="border-b border-[var(--color-border)] bg-white">
         <div className="max-w-2xl mx-auto px-5 py-4 flex items-center justify-between">
           <Logo size={28} />
-          <a href="https://wa.me/" className="text-xs text-ink-soft hover:text-coral">Já é cliente? Acesse o portal</a>
+          <a
+            href={waLink(null, "Olá! Já sou cliente Viajaly e quero acessar o portal.", { source: "orcamento", campaign: "orcamento", content: "ja-cliente" })}
+            target="_blank"
+            rel="noopener"
+            onClick={() => trackWhatsAppClick({ source: "orcamento", campaign: "orcamento", content: "ja-cliente" })}
+            className="text-xs text-ink-soft hover:text-coral"
+          >
+            Já é cliente? Acesse o portal
+          </a>
         </div>
       </header>
 

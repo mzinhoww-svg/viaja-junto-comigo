@@ -1,8 +1,11 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import DOMPurify from "dompurify";
 import { supabase } from "@/integrations/supabase/client";
 import { renderContract } from "@/lib/contract-template";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 // Visão read-only do contrato no console (admin). Mostra o snapshot imutável já
 // assinado (contracts.body_html) ou um preview gerado por renderContract.
@@ -77,15 +80,41 @@ export function ContractPanel({
         )}
       </div>
       {request.contract_signed && (
-        <p className="text-sm text-ink-soft">
-          Assinado por <b>{request.sign_name}</b>
-          {request.signed_at && <> em {new Date(request.signed_at).toLocaleString("pt-BR")}</>}.
-        </p>
+        <div className="space-y-2">
+          <p className="text-sm text-ink-soft">
+            Assinado por <b>{request.sign_name}</b>
+            {request.signed_at && <> em {new Date(request.signed_at).toLocaleString("pt-BR")}</>}.
+          </p>
+          {existing.data?.body_sha256 && (
+            <p className="text-xs text-ink-muted break-all">
+              <b>IP:</b> {existing.data?.signed_ip || "—"} · <b>SHA-256:</b> {existing.data.body_sha256}
+            </p>
+          )}
+          {existing.data?.pdf_path && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="min-h-10"
+              onClick={async () => {
+                const { data, error } = await supabase.storage
+                  .from("documents")
+                  .createSignedUrl(existing.data!.pdf_path as string, 300);
+                if (error || !data) {
+                  toast.error("Não consegui gerar o link do PDF.");
+                  return;
+                }
+                window.open(data.signedUrl, "_blank", "noopener");
+              }}
+            >
+              <Download size={14} className="mr-2" /> Baixar PDF assinado
+            </Button>
+          )}
+        </div>
       )}
       {bodyHtml ? (
         <article
           className="rounded-2xl bg-white border border-[var(--color-border)] p-5 text-sm text-ink leading-relaxed prose-contract"
-          dangerouslySetInnerHTML={{ __html: bodyHtml }}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(bodyHtml, { USE_PROFILES: { html: true } }) }}
         />
       ) : (
         <p className="text-sm text-ink-muted">Sem itens para gerar o contrato ainda.</p>

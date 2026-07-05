@@ -83,6 +83,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Viajaly — Consultoria de viagem" },
       { property: "og:description", content: "Portal Viajaly: consultoria especializada para vistos, passaporte, roteiros e milhas." },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "Viajaly" },
+      { property: "og:url", content: "https://viajaly.com/" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:title", content: "Viajaly — Consultoria de viagem" },
       { name: "twitter:description", content: "Portal Viajaly: consultoria especializada para vistos, passaporte, roteiros e milhas." },

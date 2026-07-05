@@ -13,7 +13,7 @@ export function ScheduleList({ requestId, variant }: { requestId: string; varian
     enabled: !!requestId,
     queryFn: async () => {
       const { data: reqRow, error: rErr } = await supabase
-        .from("requests").select("id, agency_id").eq("id", requestId).maybeSingle();
+        .from("requests_safe").select("id, agency_id").eq("id", requestId).maybeSingle();
       if (rErr) throw rErr;
       const agency_id = reqRow?.agency_id;
 
