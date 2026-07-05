@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as VistosRouteImport } from './routes/vistos'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as OrcamentoRouteImport } from './routes/orcamento'
 import { Route as ConsoleRouteImport } from './routes/console'
@@ -48,6 +49,11 @@ import { Route as ConsoleOrcamentoIdEditarRouteImport } from './routes/console.o
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
   id: '/privacidade',
   path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VistosRoute = VistosRouteImport.update({
+  id: '/vistos',
+  path: '/vistos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortalRoute = PortalRouteImport.update({
@@ -438,6 +444,7 @@ export interface RootRouteChildren {
   OrcamentoRoute: typeof OrcamentoRouteWithChildren
   PortalRoute: typeof PortalRouteWithChildren
   PrivacidadeRoute: typeof PrivacidadeRoute
+  VistosRoute: typeof VistosRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -770,6 +777,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrcamentoRoute: OrcamentoRouteWithChildren,
   PortalRoute: PortalRouteWithChildren,
   PrivacidadeRoute: PrivacidadeRoute,
+  VistosRoute: VistosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

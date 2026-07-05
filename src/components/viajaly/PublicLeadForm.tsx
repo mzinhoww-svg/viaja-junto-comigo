@@ -16,7 +16,7 @@ const PRODUCTS: { value: "vistos" | "passaporte" | "roteiro" | "milhas"; label: 
   { value: "milhas", label: "Consultoria de milhas" },
 ];
 
-export function PublicLeadForm() {
+export function PublicLeadForm({ onSubmitted }: { onSubmitted?: () => void } = {}) {
   const nav = useNavigate();
   const startedAt = useMemo(() => Date.now(), []);
   const [name, setName] = useState("");
@@ -42,7 +42,7 @@ export function PublicLeadForm() {
           turnstile_token: "",
         },
       }),
-    onSuccess: () => { nav({ to: "/orcamento/sucesso" }); },
+    onSuccess: () => { onSubmitted?.(); nav({ to: "/orcamento/sucesso" }); },
     onError: (e: Error) => {
       const map: Record<string, string> = {
         rate_limit_ip: "Muitas tentativas. Tente novamente em alguns minutos.",
