@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RoteirosRouteImport } from './routes/roteiros'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as VistosRouteImport } from './routes/vistos'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as PassaporteRouteImport } from './routes/passaporte'
 import { Route as OrcamentoRouteImport } from './routes/orcamento'
@@ -63,6 +64,11 @@ const RoteirosRoute = RoteirosRouteImport.update({
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
   id: '/privacidade',
   path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VistosRoute = VistosRouteImport.update({
+  id: '/vistos',
+  path: '/vistos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortalRoute = PortalRouteImport.update({
@@ -513,6 +519,7 @@ export interface RootRouteChildren {
   PassaporteRoute: typeof PassaporteRoute
   PortalRoute: typeof PortalRouteWithChildren
   PrivacidadeRoute: typeof PrivacidadeRoute
+  VistosRoute: typeof VistosRoute
   RoteirosRoute: typeof RoteirosRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -899,6 +906,7 @@ const rootRouteChildren: RootRouteChildren = {
   PassaporteRoute: PassaporteRoute,
   PortalRoute: PortalRouteWithChildren,
   PrivacidadeRoute: PrivacidadeRoute,
+  VistosRoute: VistosRoute,
   RoteirosRoute: RoteirosRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,

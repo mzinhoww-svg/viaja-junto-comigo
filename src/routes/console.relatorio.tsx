@@ -25,6 +25,15 @@ function Relatorio() {
     },
   });
 
+  const ab = useQuery({
+    queryKey: ["ab-results", "lp_vistos_hero_v1"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("ab_results", { _experiment: "lp_vistos_hero_v1" });
+      if (error) throw error;
+      return (data ?? []) as { variant: string; views: number; converts: number }[];
+    },
+  });
+
   const list = q.data ?? [];
   const ativos = list.filter((r) => !r.visa_outcome && !r.archived_at).length;
   const byOutcome: Record<string, number> = {};
@@ -93,6 +102,34 @@ function Relatorio() {
         <Stat label="Ticket médio" value={formatBRL(ticket)} />
       </div>
       <p className="mt-2 text-xs text-ink-muted">Valores da consultoria (proposta). Taxas governamentais são pagas à parte e não entram aqui.</p>
+
+      <h2 className="mt-10 mb-3 text-sm font-display font-bold text-navy uppercase tracking-wider">Teste A/B — landing /vistos (hero)</h2>
+      <div className="bg-white rounded-2xl border border-[var(--color-border)] overflow-x-auto">
+        <table className="w-full text-sm min-w-[420px]">
+          <thead className="bg-[var(--color-muted)] text-ink-soft text-xs uppercase tracking-wider">
+            <tr>
+              <th className="text-left px-4 py-3 font-semibold">Variante</th>
+              <th className="text-left px-4 py-3 font-semibold">Views</th>
+              <th className="text-left px-4 py-3 font-semibold">Conversões</th>
+              <th className="text-left px-4 py-3 font-semibold">Taxa</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(ab.data ?? []).length === 0 && <tr><td colSpan={4} className="p-6 text-center text-ink-muted">Sem dados ainda.</td></tr>}
+            {(ab.data ?? []).map((r) => {
+              const rate = r.views > 0 ? ((r.converts / r.views) * 100).toFixed(1) : "0.0";
+              return (
+                <tr key={r.variant} className="border-t border-[var(--color-border)]">
+                  <td className="px-4 py-3 font-semibold text-navy">Variante {r.variant}</td>
+                  <td className="px-4 py-3 font-mono">{r.views}</td>
+                  <td className="px-4 py-3 font-mono">{r.converts}</td>
+                  <td className="px-4 py-3 font-mono text-navy font-bold">{rate}%</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       <h2 className="mt-10 mb-3 text-sm font-display font-bold text-navy uppercase tracking-wider">Últimos feedbacks</h2>
       <div className="space-y-2">
