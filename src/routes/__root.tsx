@@ -12,6 +12,8 @@ import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { JsonLd } from "../components/seo/JsonLd";
+import { graph, organizationSchema, websiteSchema } from "../lib/seo/schema";
 
 function NotFoundComponent() {
   return (
@@ -85,11 +87,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Viajaly" },
       { property: "og:url", content: "https://viajaly.com/" },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Viajaly — Consultoria de viagem" },
       { name: "twitter:description", content: "Portal Viajaly: consultoria especializada para vistos, passaporte, roteiros e milhas." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/033c9c04-6f00-46b5-9289-9c8d70a4c67d/id-preview-b99d15b1--a357c84b-f9f7-4cb0-8d4e-a9798a04ecbd.lovable.app-1782181634618.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/033c9c04-6f00-46b5-9289-9c8d70a4c67d/id-preview-b99d15b1--a357c84b-f9f7-4cb0-8d4e-a9798a04ecbd.lovable.app-1782181634618.png" },
+      { property: "og:image", content: "https://viajaly.com/og/viajaly-og-default.png" },
+      { name: "twitter:image", content: "https://viajaly.com/og/viajaly-og-default.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -107,7 +109,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         <HeadContent />
       </head>
@@ -124,6 +126,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <JsonLd data={graph(organizationSchema(), websiteSchema())} />
       <Outlet />
       <Toaster richColors position="top-center" />
     </QueryClientProvider>

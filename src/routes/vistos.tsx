@@ -4,17 +4,48 @@ import { Logo } from "@/components/viajaly/Logo";
 import { PublicLeadForm } from "@/components/viajaly/PublicLeadForm";
 import { LegalDisclaimer } from "@/components/viajaly/LegalDisclaimer";
 import { getVariant, trackAb } from "@/lib/ab";
+import { WHATSAPP_NUMBER } from "@/lib/contact";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { graph, serviceSchema, breadcrumbSchema, site } from "@/lib/seo/schema";
 import { Check, MessageCircle, ShieldCheck, Clock, Users, Smartphone, Stamp, Plane, BookOpen, Sparkles } from "lucide-react";
 
+const PAGE = site.pages["/vistos"];
+
 export const Route = createFileRoute("/vistos")({
-  ssr: false,
-  head: () => ({ meta: [{ title: "Viajaly — Assessoria de visto americano" }] }),
+  head: () => ({
+    meta: [
+      { title: PAGE.title },
+      { name: "description", content: PAGE.description },
+      { property: "og:title", content: PAGE.ogTitle },
+      { property: "og:description", content: PAGE.description },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://viajaly.com/vistos" },
+      { property: "og:image", content: PAGE.ogImage },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: PAGE.ogImage },
+    ],
+    links: [{ rel: "canonical", href: "https://viajaly.com/vistos" }],
+  }),
   component: LandingVistos,
 });
 
-// Número de WhatsApp da Viajaly — TODO: trocar pelo real.
-const WHATSAPP = "5511999999999";
+const WHATSAPP = WHATSAPP_NUMBER;
 const waLink = () => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent("Olá! Quero meu diagnóstico grátis de visto americano.")}`;
+
+// HowTo (AEO): reflete os 5 passos exibidos na seção "Como funciona".
+const HOWTO_SCHEMA = {
+  "@type": "HowTo",
+  name: "Como funciona a assessoria de visto americano da Viajaly",
+  description:
+    "Cinco passos, do diagnóstico ao resultado da entrevista, com acompanhamento humano em português.",
+  step: [
+    { "@type": "HowToStep", position: 1, name: "Diagnóstico grátis", text: "Analisamos seu perfil e montamos o plano." },
+    { "@type": "HowToStep", position: 2, name: "Proposta e pagamento", text: "Pix ou cartão em até 12x, direto no app." },
+    { "@type": "HowToStep", position: 3, name: "DS-160 guiado", text: "Preenchimento assistido e revisão humana do formulário." },
+    { "@type": "HowToStep", position: 4, name: "Documentos e agenda", text: "Checklist e agendamento do CASV e da entrevista." },
+    { "@type": "HowToStep", position: 5, name: "Entrevista e resultado", text: "Simulação de entrevista e acompanhamento até o fim." },
+  ],
+};
 
 const EXP = "lp_vistos_hero_v1";
 // A/B no hero (elemento de maior alavancagem): A = autoridade/segurança · B = app/jornada guiada.
@@ -32,12 +63,19 @@ const HERO: Record<string, { h1: string; sub: string; cta: string }> = {
 };
 
 function LandingVistos() {
-  const [variant] = useState(() => getVariant(EXP, ["A", "B"]));
-  useEffect(() => { trackAb(EXP, variant, "view"); }, [variant]);
+  // Variante inicial determinística ("A") para casar SSR e primeira renderização
+  // no cliente (evita hydration mismatch); a variante real do A/B é aplicada após montar.
+  const [variant, setVariant] = useState<"A" | "B">("A");
+  useEffect(() => {
+    const v = getVariant(EXP, ["A", "B"]) as "A" | "B";
+    setVariant(v);
+    trackAb(EXP, v, "view");
+  }, []);
   const hero = HERO[variant] ?? HERO.A;
 
   return (
     <div className="min-h-screen bg-appbg text-ink">
+      <JsonLd data={graph(serviceSchema("/vistos"), breadcrumbSchema("/vistos"), HOWTO_SCHEMA)} />
       {/* Faixa de aviso legal (não-vínculo com governo) */}
       <div className="bg-navy/95 text-cream/80 text-[11px] leading-snug px-4 py-1.5 text-center">
         A Viajaly é uma empresa privada de <b>consultoria de viagem</b> — não é órgão do governo e não possui vínculo com consulados ou embaixadas.

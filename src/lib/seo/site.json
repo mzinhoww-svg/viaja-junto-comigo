@@ -1,0 +1,99 @@
+{
+  "url": "https://viajaly.com",
+  "name": "Viajaly",
+  "legalName": "Viajaly Consultoria de Viagem",
+  "slogan": "A papelada resolvida. A viagem montada.",
+  "description": "Consultoria digital de viagem com atendimento humano em português. Cuidamos do DS-160 e da preparação de entrevista do visto americano, e seguimos até passaporte, roteiro e milhas otimizadas.",
+  "inLanguage": "pt-BR",
+  "areaServed": "BR",
+  "logo": "https://viajaly.com/og/viajaly-logo.png",
+  "defaultOgImage": "https://viajaly.com/og/viajaly-og-default.png",
+  "phone": "+5565996076018",
+  "knowsAbout": [
+    "Visto americano",
+    "Formulário DS-160",
+    "Entrevista consular",
+    "Passaporte brasileiro",
+    "Roteiro de viagem",
+    "Milhas aéreas"
+  ],
+  "consultant": {
+    "name": "Letícia",
+    "jobTitle": "Consultora de viagem"
+  },
+  "pages": {
+    "/": {
+      "title": "Viajaly — A papelada resolvida. A viagem montada.",
+      "description": "Consultoria digital de viagem com atendimento humano em português: visto americano (DS-160 e entrevista), passaporte, roteiros e milhas otimizadas — tudo acompanhado num portal só.",
+      "ogTitle": "Viajaly — A papelada resolvida. A viagem montada.",
+      "ogImage": "https://viajaly.com/og/viajaly-og-home.png",
+      "breadcrumb": [{ "name": "Início", "path": "/" }]
+    },
+    "/passaporte": {
+      "title": "Passaporte — Viajaly | Seu passaporte pronto antes do visto",
+      "description": "Consultoria de passaporte da Viajaly: checklist do seu caso, orientação de documentos e foto, agendamento na Polícia Federal e suporte humano até a emissão. A partir de R$197 + taxa da PF.",
+      "ogTitle": "Passaporte pronto antes do visto — Viajaly",
+      "ogImage": "https://viajaly.com/og/viajaly-og-passaporte.png",
+      "breadcrumb": [{ "name": "Início", "path": "/" }, { "name": "Passaporte", "path": "/passaporte" }],
+      "service": {
+        "name": "Consultoria de passaporte",
+        "description": "Acompanhamento completo da emissão ou renovação do passaporte brasileiro: diagnóstico do caso, checklist de documentos, orientação de foto, agendamento na Polícia Federal e suporte humano até a emissão.",
+        "serviceType": "Consultoria de passaporte",
+        "price": "197.00"
+      }
+    },
+    "/roteiros": {
+      "title": "Roteiros — Viajaly | A viagem que você sonhou, montada dia a dia",
+      "description": "Roteiro de viagem personalizado pela Viajaly: plano dia a dia com o que fazer de manhã, tarde e noite, estimativa de custos e tempo, equilíbrio entre passeio e descanso. A partir de R$97 por grupo.",
+      "ogTitle": "A viagem que você sonhou, montada dia a dia — Viajaly",
+      "ogImage": "https://viajaly.com/og/viajaly-og-roteiros.png",
+      "breadcrumb": [{ "name": "Início", "path": "/" }, { "name": "Roteiros", "path": "/roteiros" }],
+      "service": {
+        "name": "Consultoria de roteiro de viagem",
+        "description": "Roteiro de viagem personalizado, dia a dia, com o que fazer em cada período, ordem dos passeios, estimativa de custos e tempo, equilibrando atividades e descanso.",
+        "serviceType": "Consultoria de roteiro de viagem",
+        "price": "97.00"
+      }
+    },
+    "/milhas": {
+      "title": "Milhas — Viajaly | Voe gastando muito menos",
+      "description": "Consultoria de milhas da Viajaly: raio-x do seu acúmulo, estratégia de transferências e resgates inteligentes e alertas de promoção — sem vender milhas. A partir de R$697 por grupo.",
+      "ogTitle": "Suas milhas valem muito mais do jeito certo — Viajaly",
+      "ogImage": "https://viajaly.com/og/viajaly-og-milhas.png",
+      "breadcrumb": [{ "name": "Início", "path": "/" }, { "name": "Milhas", "path": "/milhas" }],
+      "service": {
+        "name": "Consultoria de milhas",
+        "description": "Análise do seu acúmulo de milhas em cartões e programas, estratégia de transferências e resgates, e acompanhamento de promoções para emitir passagens gastando menos. A Viajaly não vende milhas.",
+        "serviceType": "Consultoria de milhas aéreas",
+        "price": "697.00"
+      }
+    },
+    "/vistos": {
+      "title": "Viajaly — Assessoria de visto americano",
+      "description": "Assessoria de visto americano da Viajaly: revisão do DS-160, agendamento, simulação de entrevista e análise de perfil — com acompanhamento humano em português do início ao resultado.",
+      "ogTitle": "Assessoria de visto americano — Viajaly",
+      "ogImage": "https://viajaly.com/og/viajaly-og-vistos.png",
+      "breadcrumb": [{ "name": "Início", "path": "/" }, { "name": "Visto americano", "path": "/vistos" }],
+      "service": {
+        "name": "Assessoria de visto americano",
+        "description": "Assessoria completa para o visto americano: revisão do formulário DS-160, agendamento, simulação de entrevista e análise de perfil, com acompanhamento humano em português. Consultoria de viagem — não garante a aprovação do visto.",
+        "serviceType": "Assessoria de visto americano",
+        "price": "397.00"
+      }
+    },
+    "/orcamento": {
+      "title": "Solicitar orçamento — Viajaly",
+      "description": "Consultoria de vistos, passaporte, roteiros e milhas. Solicite um orçamento sem compromisso e receba uma proposta personalizada com atendimento humano em português.",
+      "ogTitle": "Solicitar orçamento — Viajaly",
+      "ogImage": "https://viajaly.com/og/viajaly-og-default.png",
+      "breadcrumb": [{ "name": "Início", "path": "/" }, { "name": "Solicitar orçamento", "path": "/orcamento" }]
+    },
+    "/privacidade": {
+      "title": "Política de Privacidade — Viajaly",
+      "description": "Como a Viajaly trata seus dados pessoais conforme a LGPD.",
+      "ogTitle": "Política de Privacidade — Viajaly",
+      "ogImage": "https://viajaly.com/og/viajaly-og-default.png",
+      "breadcrumb": [{ "name": "Início", "path": "/" }, { "name": "Política de Privacidade", "path": "/privacidade" }]
+    }
+  }
+}

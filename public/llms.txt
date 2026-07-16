@@ -5,6 +5,7 @@
 ## Pages
 
 - [Home](/): Visão geral da consultoria Viajaly — visto, passaporte, roteiros e milhas.
+- [Visto americano](/vistos): Assessoria de visto americano — DS-160, agendamento, simulação de entrevista e análise de perfil.
 - [Passaporte](/passaporte): Como a Viajaly cuida da emissão e renovação do seu passaporte.
 - [Roteiros](/roteiros): Roteiros de viagem personalizados pela Viajaly.
 - [Milhas](/milhas): Consultoria de milhas para emissões e resgates inteligentes.
