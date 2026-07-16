@@ -3,6 +3,10 @@ import type {} from "@tanstack/react-start";
 
 const BASE_URL = "https://viajaly.com";
 
+// Data da última revisão de conteúdo do site. Atualize a cada publicação
+// relevante para sinalizar frescor aos crawlers.
+const LASTMOD = "2026-07-16";
+
 interface SitemapEntry {
   path: string;
   changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
@@ -15,6 +19,7 @@ export const Route = createFileRoute("/sitemap.xml")({
       GET: async () => {
         const entries: SitemapEntry[] = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
+          { path: "/vistos", changefreq: "monthly", priority: "0.9" },
           { path: "/passaporte", changefreq: "monthly", priority: "0.8" },
           { path: "/roteiros", changefreq: "monthly", priority: "0.8" },
           { path: "/milhas", changefreq: "monthly", priority: "0.8" },
@@ -26,6 +31,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           [
             `  <url>`,
             `    <loc>${BASE_URL}${e.path}</loc>`,
+            `    <lastmod>${LASTMOD}</lastmod>`,
             e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
             e.priority ? `    <priority>${e.priority}</priority>` : null,
             `  </url>`,

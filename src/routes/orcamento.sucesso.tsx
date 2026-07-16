@@ -4,7 +4,7 @@ import { CheckCircle2 } from "lucide-react";
 
 export const Route = createFileRoute("/orcamento/sucesso")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Solicitação recebida — Viajaly" }] }),
+  head: () => ({ meta: [{ title: "Solicitação recebida — Viajaly" }, { name: "robots", content: "noindex, follow" }] }),
   component: PageSucesso,
 });
 

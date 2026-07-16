@@ -8,6 +8,7 @@ export const Route = createFileRoute("/privacidade")({
       { title: "Política de Privacidade — Viajaly" },
       { name: "description", content: "Como a Viajaly trata seus dados pessoais conforme a LGPD." },
     ],
+    links: [{ rel: "canonical", href: "https://viajaly.com/privacidade" }],
   }),
   component: PagePrivacidade,
 });

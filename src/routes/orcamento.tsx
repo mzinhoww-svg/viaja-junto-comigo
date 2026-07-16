@@ -13,7 +13,11 @@ export const Route = createFileRoute("/orcamento")({
       { property: "og:description", content: "Peça um orçamento para visto, passaporte, roteiros ou milhas. Atendimento humano em português, sem compromisso." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://viajaly.com/orcamento" },
+      { property: "og:image", content: "https://viajaly.com/og/viajaly-og-default.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://viajaly.com/og/viajaly-og-default.png" },
     ],
+    links: [{ rel: "canonical", href: "https://viajaly.com/orcamento" }],
   }),
   component: PageOrcamento,
 });
