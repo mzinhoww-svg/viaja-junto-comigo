@@ -9,10 +9,10 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VistosRouteImport } from './routes/vistos'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RoteirosRouteImport } from './routes/roteiros'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
-import { Route as VistosRouteImport } from './routes/vistos'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as PassaporteRouteImport } from './routes/passaporte'
 import { Route as OrcamentoRouteImport } from './routes/orcamento'
@@ -51,6 +51,11 @@ import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$
 import { Route as ConsoleOrcamentoIdEditarRouteImport } from './routes/console.orcamento.$id.editar'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
+const VistosRoute = VistosRouteImport.update({
+  id: '/vistos',
+  path: '/vistos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -64,11 +69,6 @@ const RoteirosRoute = RoteirosRouteImport.update({
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
   id: '/privacidade',
   path: '/privacidade',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const VistosRoute = VistosRouteImport.update({
-  id: '/vistos',
-  path: '/vistos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortalRoute = PortalRouteImport.update({
@@ -269,6 +269,7 @@ export interface FileRoutesByFullPath {
   '/privacidade': typeof PrivacidadeRoute
   '/roteiros': typeof RoteirosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/vistos': typeof VistosRoute
   '/console/aceitar-convite': typeof ConsoleAceitarConviteRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
@@ -309,6 +310,7 @@ export interface FileRoutesByTo {
   '/privacidade': typeof PrivacidadeRoute
   '/roteiros': typeof RoteirosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/vistos': typeof VistosRoute
   '/console/aceitar-convite': typeof ConsoleAceitarConviteRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
@@ -352,6 +354,7 @@ export interface FileRoutesById {
   '/privacidade': typeof PrivacidadeRoute
   '/roteiros': typeof RoteirosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/vistos': typeof VistosRoute
   '/console/aceitar-convite': typeof ConsoleAceitarConviteRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
@@ -396,6 +399,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/roteiros'
     | '/sitemap.xml'
+    | '/vistos'
     | '/console/aceitar-convite'
     | '/console/agenda'
     | '/console/auditoria'
@@ -436,6 +440,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/roteiros'
     | '/sitemap.xml'
+    | '/vistos'
     | '/console/aceitar-convite'
     | '/console/agenda'
     | '/console/auditoria'
@@ -478,6 +483,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/roteiros'
     | '/sitemap.xml'
+    | '/vistos'
     | '/console/aceitar-convite'
     | '/console/agenda'
     | '/console/auditoria'
@@ -519,14 +525,21 @@ export interface RootRouteChildren {
   PassaporteRoute: typeof PassaporteRoute
   PortalRoute: typeof PortalRouteWithChildren
   PrivacidadeRoute: typeof PrivacidadeRoute
-  VistosRoute: typeof VistosRoute
   RoteirosRoute: typeof RoteirosRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  VistosRoute: typeof VistosRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/vistos': {
+      id: '/vistos'
+      path: '/vistos'
+      fullPath: '/vistos'
+      preLoaderRoute: typeof VistosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -906,9 +919,9 @@ const rootRouteChildren: RootRouteChildren = {
   PassaporteRoute: PassaporteRoute,
   PortalRoute: PortalRouteWithChildren,
   PrivacidadeRoute: PrivacidadeRoute,
-  VistosRoute: VistosRoute,
   RoteirosRoute: RoteirosRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  VistosRoute: VistosRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
