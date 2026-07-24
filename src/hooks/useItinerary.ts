@@ -207,15 +207,16 @@ export function useUpdateItinerarySlot(tripId: string) {
       field: keyof Pick<ItinerarySlot, "ondeIr" | "ondeComer" | "observacoes">;
       value: string;
     }) => {
-      const column =
+      const value = input.value || null;
+      const update =
         input.field === "ondeIr"
-          ? "onde_ir"
+          ? { onde_ir: value }
           : input.field === "ondeComer"
-            ? "onde_comer"
-            : "observacoes";
+            ? { onde_comer: value }
+            : { observacoes: value };
       const { error } = await supabase
         .from("itinerary_slots")
-        .update({ [column]: input.value || null })
+        .update(update)
         .eq("id", input.slotId);
       if (error) throw error;
     },
