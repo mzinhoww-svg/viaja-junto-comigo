@@ -172,6 +172,85 @@ export type Database = {
           },
         ]
       }
+      ai_conversations: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          trip_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          trip_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_conversations_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          role: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          role: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "ai_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_usage: {
+        Row: {
+          mes_ano: string
+          msgs_count: number
+          user_id: string
+        }
+        Insert: {
+          mes_ano: string
+          msgs_count?: number
+          user_id: string
+        }
+        Update: {
+          mes_ano?: string
+          msgs_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       atendimentos: {
         Row: {
           agency_id: string
@@ -236,6 +315,213 @@ export type Database = {
           target?: string | null
         }
         Relationships: []
+      }
+      budget_categories: {
+        Row: {
+          cor: string
+          id: string
+          is_default: boolean
+          nome: string
+          ordem: number
+          trip_id: string
+        }
+        Insert: {
+          cor?: string
+          id?: string
+          is_default?: boolean
+          nome: string
+          ordem?: number
+          trip_id: string
+        }
+        Update: {
+          cor?: string
+          id?: string
+          is_default?: boolean
+          nome?: string
+          ordem?: number
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_categories_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      budget_items: {
+        Row: {
+          category_id: string
+          created_at: string
+          id: string
+          nome: string
+          nota: string | null
+          trip_id: string
+          valor_estimado_brl_cents: number | null
+          valor_estimado_destino_cents: number | null
+          valor_pago_brl_cents: number
+          valor_pago_destino_cents: number
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          id?: string
+          nome: string
+          nota?: string | null
+          trip_id: string
+          valor_estimado_brl_cents?: number | null
+          valor_estimado_destino_cents?: number | null
+          valor_pago_brl_cents?: number
+          valor_pago_destino_cents?: number
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          id?: string
+          nome?: string
+          nota?: string | null
+          trip_id?: string
+          valor_estimado_brl_cents?: number | null
+          valor_estimado_destino_cents?: number | null
+          valor_pago_brl_cents?: number
+          valor_pago_destino_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_items_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "budget_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_items_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      checklist_items: {
+        Row: {
+          checklist_id: string
+          done: boolean
+          id: string
+          marco: number | null
+          nota: string | null
+          ordem: number
+          prazo_dias_antes: number | null
+          titulo: string
+        }
+        Insert: {
+          checklist_id: string
+          done?: boolean
+          id?: string
+          marco?: number | null
+          nota?: string | null
+          ordem?: number
+          prazo_dias_antes?: number | null
+          titulo: string
+        }
+        Update: {
+          checklist_id?: string
+          done?: boolean
+          id?: string
+          marco?: number | null
+          nota?: string | null
+          ordem?: number
+          prazo_dias_antes?: number | null
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_items_checklist_id_fkey"
+            columns: ["checklist_id"]
+            isOneToOne: false
+            referencedRelation: "checklists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      checklist_templates: {
+        Row: {
+          clima: string | null
+          com_crianca: boolean | null
+          destino_pack: string | null
+          id: string
+          marco: number | null
+          min_duracao: number | null
+          ordem: number
+          prazo_dias_antes: number | null
+          regiao: string | null
+          tier: Database["public"]["Enums"]["plan_tier"]
+          tipo: Database["public"]["Enums"]["checklist_type"]
+          titulo: string
+        }
+        Insert: {
+          clima?: string | null
+          com_crianca?: boolean | null
+          destino_pack?: string | null
+          id?: string
+          marco?: number | null
+          min_duracao?: number | null
+          ordem?: number
+          prazo_dias_antes?: number | null
+          regiao?: string | null
+          tier?: Database["public"]["Enums"]["plan_tier"]
+          tipo: Database["public"]["Enums"]["checklist_type"]
+          titulo: string
+        }
+        Update: {
+          clima?: string | null
+          com_crianca?: boolean | null
+          destino_pack?: string | null
+          id?: string
+          marco?: number | null
+          min_duracao?: number | null
+          ordem?: number
+          prazo_dias_antes?: number | null
+          regiao?: string | null
+          tier?: Database["public"]["Enums"]["plan_tier"]
+          tipo?: Database["public"]["Enums"]["checklist_type"]
+          titulo?: string
+        }
+        Relationships: []
+      }
+      checklists: {
+        Row: {
+          id: string
+          nome: string
+          ordem: number
+          tipo: Database["public"]["Enums"]["checklist_type"]
+          trip_id: string
+        }
+        Insert: {
+          id?: string
+          nome: string
+          ordem?: number
+          tipo: Database["public"]["Enums"]["checklist_type"]
+          trip_id: string
+        }
+        Update: {
+          id?: string
+          nome?: string
+          ordem?: number
+          tipo?: Database["public"]["Enums"]["checklist_type"]
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklists_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       contract_templates: {
         Row: {
@@ -452,6 +738,103 @@ export type Database = {
             columns: ["traveler_id"]
             isOneToOne: true
             referencedRelation: "travelers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      entitlements: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          origem: Database["public"]["Enums"]["entitlement_origin"] | null
+          plano: Database["public"]["Enums"]["plan_tier"]
+          stripe_payment_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          origem?: Database["public"]["Enums"]["entitlement_origin"] | null
+          plano?: Database["public"]["Enums"]["plan_tier"]
+          stripe_payment_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          origem?: Database["public"]["Enums"]["entitlement_origin"] | null
+          plano?: Database["public"]["Enums"]["plan_tier"]
+          stripe_payment_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      itinerary_days: {
+        Row: {
+          data: string | null
+          dia_numero: number
+          id: string
+          ordem: number
+          trip_id: string
+        }
+        Insert: {
+          data?: string | null
+          dia_numero: number
+          id?: string
+          ordem?: number
+          trip_id: string
+        }
+        Update: {
+          data?: string | null
+          dia_numero?: number
+          id?: string
+          ordem?: number
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itinerary_days_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      itinerary_slots: {
+        Row: {
+          day_id: string
+          id: string
+          observacoes: string | null
+          onde_comer: string | null
+          onde_ir: string | null
+          periodo: Database["public"]["Enums"]["slot_period"]
+        }
+        Insert: {
+          day_id: string
+          id?: string
+          observacoes?: string | null
+          onde_comer?: string | null
+          onde_ir?: string | null
+          periodo: Database["public"]["Enums"]["slot_period"]
+        }
+        Update: {
+          day_id?: string
+          id?: string
+          observacoes?: string | null
+          onde_comer?: string | null
+          onde_ir?: string | null
+          periodo?: Database["public"]["Enums"]["slot_period"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itinerary_slots_day_id_fkey"
+            columns: ["day_id"]
+            isOneToOne: false
+            referencedRelation: "itinerary_days"
             referencedColumns: ["id"]
           },
         ]
@@ -693,6 +1076,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      paises_visto: {
+        Row: {
+          exige_visto_br: boolean
+          link_consultoria: string | null
+          pais_iso: string
+          pais_nome: string
+          tipo_visto: string | null
+        }
+        Insert: {
+          exige_visto_br: boolean
+          link_consultoria?: string | null
+          pais_iso: string
+          pais_nome: string
+          tipo_visto?: string | null
+        }
+        Update: {
+          exige_visto_br?: boolean
+          link_consultoria?: string | null
+          pais_iso?: string
+          pais_nome?: string
+          tipo_visto?: string | null
+        }
+        Relationships: []
       }
       product_briefings: {
         Row: {
@@ -1165,6 +1572,41 @@ export type Database = {
           },
         ]
       }
+      savings_entries: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          mes_ano: string
+          trip_id: string
+          valor_brl_cents: number
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          mes_ano: string
+          trip_id: string
+          valor_brl_cents: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          mes_ano?: string
+          trip_id?: string
+          valor_brl_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "savings_entries_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       schedule_intents: {
         Row: {
           confirmed_by: string | null
@@ -1387,6 +1829,118 @@ export type Database = {
           },
         ]
       }
+      trip_invites: {
+        Row: {
+          accepted_by: string | null
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          token: string
+          trip_id: string
+        }
+        Insert: {
+          accepted_by?: string | null
+          created_at?: string
+          created_by: string
+          expires_at?: string
+          id?: string
+          token?: string
+          trip_id: string
+        }
+        Update: {
+          accepted_by?: string | null
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          token?: string
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_invites_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_members: {
+        Row: {
+          joined_at: string
+          role: Database["public"]["Enums"]["member_role"]
+          trip_id: string
+          user_id: string
+        }
+        Insert: {
+          joined_at?: string
+          role?: Database["public"]["Enums"]["member_role"]
+          trip_id: string
+          user_id: string
+        }
+        Update: {
+          joined_at?: string
+          role?: Database["public"]["Enums"]["member_role"]
+          trip_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_members_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trips: {
+        Row: {
+          cambio_atualizado_em: string | null
+          cambio_manual: number | null
+          created_at: string
+          data_viagem: string | null
+          destino_cidade: string | null
+          destino_pais: string
+          id: string
+          moeda_destino: string | null
+          nome: string
+          num_pessoas: number
+          owner_id: string
+          status: Database["public"]["Enums"]["trip_status"]
+        }
+        Insert: {
+          cambio_atualizado_em?: string | null
+          cambio_manual?: number | null
+          created_at?: string
+          data_viagem?: string | null
+          destino_cidade?: string | null
+          destino_pais: string
+          id?: string
+          moeda_destino?: string | null
+          nome?: string
+          num_pessoas?: number
+          owner_id: string
+          status?: Database["public"]["Enums"]["trip_status"]
+        }
+        Update: {
+          cambio_atualizado_em?: string | null
+          cambio_manual?: number | null
+          created_at?: string
+          data_viagem?: string | null
+          destino_cidade?: string | null
+          destino_pais?: string
+          id?: string
+          moeda_destino?: string | null
+          nome?: string
+          num_pessoas?: number
+          owner_id?: string
+          status?: Database["public"]["Enums"]["trip_status"]
+        }
+        Relationships: []
+      }
       visto_plans: {
         Row: {
           descr: string | null
@@ -1594,6 +2148,7 @@ export type Database = {
     }
     Functions: {
       accept_invite: { Args: { _token: string }; Returns: Json }
+      accept_trip_invite: { Args: { p_token: string }; Returns: string }
       add_product_to_request: {
         Args: {
           _origin?: string
@@ -1691,6 +2246,8 @@ export type Database = {
         Returns: Json
       }
       is_request_member: { Args: { _request_id: string }; Returns: boolean }
+      is_trip_member: { Args: { p_trip_id: string }; Returns: boolean }
+      is_trip_owner: { Args: { p_trip_id: string }; Returns: boolean }
       list_contract_templates_for_request: {
         Args: { _request_id: string }
         Returns: {
@@ -1877,22 +2434,33 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "client" | "consultor"
+      checklist_type:
+        | "documentos"
+        | "preparativos"
+        | "mala"
+        | "compras"
+        | "custom"
       contract_status_t: "draft" | "sent" | "signed"
       doc_kind_t: "pass" | "foto" | "renda" | "vinc" | "ds160" | "outro"
       doc_status_t: "locked" | "pending" | "received" | "approved" | "rejected"
       ds160_status_t: "draft" | "received" | "validated" | "pending_review"
+      entitlement_origin: "stripe" | "pacote_visto" | "manual"
       journey_step_status_t: "done" | "active" | "locked"
+      member_role: "owner" | "editor"
       msg_from_t: "client" | "consultant"
       payment_method_t: "pix" | "card"
       payment_status_t: "pending" | "processing" | "declined" | "paid"
       per_t: "person" | "group"
+      plan_tier: "free" | "premium"
       product_key_t: "vistos" | "pass" | "rot" | "mil"
       proposal_status_t: "draft" | "sent" | "accepted" | "viewed" | "declined"
       sched_service_t: "casv" | "entrevista" | "pf"
       sched_status_t: "open" | "sent" | "confirmed"
+      slot_period: "manha" | "tarde" | "noite"
       tax_kind_t: "consular_mrv" | "passaporte_pf"
       tax_payment_status_t: "pending" | "paid" | "waived"
       tax_status_t: "pending" | "paid"
+      trip_status: "sonho" | "planejando" | "concluida"
       visa_outcome_t: "aprovado" | "recusado" | "admin_processing" | "cancelado"
       visto_plan_t: "start" | "pro" | "prem"
     }
@@ -2023,22 +2591,34 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "client", "consultor"],
+      checklist_type: [
+        "documentos",
+        "preparativos",
+        "mala",
+        "compras",
+        "custom",
+      ],
       contract_status_t: ["draft", "sent", "signed"],
       doc_kind_t: ["pass", "foto", "renda", "vinc", "ds160", "outro"],
       doc_status_t: ["locked", "pending", "received", "approved", "rejected"],
       ds160_status_t: ["draft", "received", "validated", "pending_review"],
+      entitlement_origin: ["stripe", "pacote_visto", "manual"],
       journey_step_status_t: ["done", "active", "locked"],
+      member_role: ["owner", "editor"],
       msg_from_t: ["client", "consultant"],
       payment_method_t: ["pix", "card"],
       payment_status_t: ["pending", "processing", "declined", "paid"],
       per_t: ["person", "group"],
+      plan_tier: ["free", "premium"],
       product_key_t: ["vistos", "pass", "rot", "mil"],
       proposal_status_t: ["draft", "sent", "accepted", "viewed", "declined"],
       sched_service_t: ["casv", "entrevista", "pf"],
       sched_status_t: ["open", "sent", "confirmed"],
+      slot_period: ["manha", "tarde", "noite"],
       tax_kind_t: ["consular_mrv", "passaporte_pf"],
       tax_payment_status_t: ["pending", "paid", "waived"],
       tax_status_t: ["pending", "paid"],
+      trip_status: ["sonho", "planejando", "concluida"],
       visa_outcome_t: ["aprovado", "recusado", "admin_processing", "cancelado"],
       visto_plan_t: ["start", "pro", "prem"],
     },
