@@ -29,8 +29,7 @@ export type SendEmailInput = {
 };
 
 export type SendEmailResult =
-  | { sent: true; messageId: string | null }
-  | { sent: false; reason: string; status?: number };
+  { sent: true; messageId: string | null } | { sent: false; reason: string; status?: number };
 
 function esc(s: unknown): string {
   return String(s ?? "")

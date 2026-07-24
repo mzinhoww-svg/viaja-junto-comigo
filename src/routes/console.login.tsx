@@ -11,7 +11,7 @@ import { z } from "zod";
 
 export const Route = createFileRoute("/console/login")({
   ssr: false,
-  validateSearch: (s: Record<string, unknown>) => ({
+  validateSearch: (s: Record<string, unknown>): { next?: string } => ({
     next: typeof s.next === "string" && s.next.startsWith("/") ? s.next : undefined,
   }),
   head: () => ({ meta: [{ title: "Console — Viajaly" }] }),
