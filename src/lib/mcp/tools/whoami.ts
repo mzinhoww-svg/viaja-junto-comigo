@@ -20,7 +20,7 @@ export default defineTool({
     if (error) {
       return { content: [{ type: "text", text: error.message }], isError: true };
     }
-    const profile = data ?? { id: ctx.getUserId(), email: ctx.getUserEmail(), role: null };
+    const profile = data ?? { id: ctx.getUserId(), email: ctx.getUserEmail() ?? null, role: null };
     return {
       content: [{ type: "text", text: JSON.stringify(profile) }],
       structuredContent: { profile },
