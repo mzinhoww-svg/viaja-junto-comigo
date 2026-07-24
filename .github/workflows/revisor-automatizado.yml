@@ -1,0 +1,70 @@
+name: Revisor Automatizado (Claude Code)
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  id-token: write
+
+concurrency:
+  group: revisor-automatizado-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  revisor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Revisor automatizado
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          use_sticky_comment: false
+          track_progress: false
+          claude_args: |
+            --allowedTools "Read,Grep,Glob,Bash(git diff:*),Bash(git log:*),Bash(git show:*)"
+            --disallowedTools "Bash(git push:*),Bash(git commit:*),Bash(git merge:*),Bash(git checkout:*),Bash(gh pr merge:*)"
+          prompt: |
+            Você é o revisor automatizado do repositório mzinhoww-svg/viaja-junto-comigo,
+            definido em VIAJALY-TRIP.md, Seção 6 ("Protocolo de execução"), subseção
+            "Revisor automatizado". Esta sessão roda à parte do CI e nunca é disparada por
+            comentário — só por PR aberto ou por novo commit sincronizado neste PR.
+
+            Passo a passo obrigatório:
+            1. Leia VIAJALY-TRIP.md por completo, com foco na Seção 6 e na subseção
+               "Revisor automatizado". Essa subseção é a fonte da verdade do seu checklist
+               e das suas restrições — se este prompt divergir do arquivo, o arquivo vence.
+            2. Busque o DIFF REAL deste PR, por exemplo com
+               `git diff origin/${{ github.event.pull_request.base.ref }}...HEAD`
+               ou equivalente. Nunca avalie a partir da descrição/resumo do PR — só o diff
+               e os arquivos que ele toca contam.
+            3. Aplique o checklist de 5 pontos da subseção "Revisor automatizado", nesta
+               ordem exata:
+               a) toda fórmula/agregação nova reutiliza trip-math.ts (ou o módulo puro
+                  equivalente do domínio), ou reimplementa em paralelo?
+               b) se o PR toca dados que outra tela/hook também lê (ex.: budget_items,
+                  trips.cambio_manual), existe invalidação cruzada entre as queries, testada
+                  de verdade (não só argumentada em texto)?
+               c) existe issue/PR duplicado para o mesmo ticket?
+               d) alguma dependência de backlog ou escopo de arquivo foi adicionada sem
+                  necessidade técnica real?
+               e) edge cases da Seção 2 (modo sonho, concluída, meta zero, estouro, divisão
+                  por zero) cobertos quando o ticket os toca?
+            4. Poste exatamente UM comentário normal neste PR com o resultado:
+               - Sem problema: comentário curto confirmando que o checklist passou.
+               - Com problema: achados específicos citando arquivo e linha do diff real,
+                 sem propor correção genérica — aponte o problema concreto e deixe a
+                 correção para o implementador.
+            5. Nunca aprove nem solicite mudanças via review formal do GitHub (sem
+               approve, sem request-changes) — apenas um comentário normal.
+            6. Nunca faça merge. Nunca dê push ou commit em nenhuma branch. Nunca responda
+               a outros comentários do PR — esta execução só reage ao diff atual.
