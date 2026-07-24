@@ -131,7 +131,7 @@ function PortalLogin() {
     onSuccess: () => {
       clearCooldown();
       toast.success("Login realizado");
-      nav({ to: "/portal" });
+      nav({ to: search.next ?? "/portal" });
     },
     onError: (e: Error) => {
       const msg = e.message || "";
