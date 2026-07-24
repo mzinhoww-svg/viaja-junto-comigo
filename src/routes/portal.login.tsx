@@ -21,6 +21,7 @@ const loginSearch = z.object({
     .regex(/^\d{6}$/)
     .optional(),
   name: z.string().min(1).max(80).optional(),
+  next: z.string().startsWith("/").max(500).optional(),
 });
 
 export const Route = createFileRoute("/portal/login")({
@@ -144,7 +145,7 @@ function PortalLogin() {
     onSuccess: () => {
       clearCooldown();
       toast.success("Login realizado");
-      nav({ to: "/portal" });
+      nav({ to: search.next ?? "/portal" });
     },
     onError: (e: Error) => {
       const msg = e.message || "";

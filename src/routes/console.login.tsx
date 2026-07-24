@@ -7,9 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { z } from "zod";
 
 export const Route = createFileRoute("/console/login")({
   ssr: false,
+  validateSearch: (s: Record<string, unknown>) => ({
+    next: typeof s.next === "string" && s.next.startsWith("/") ? s.next : undefined,
+  }),
   head: () => ({ meta: [{ title: "Console — Viajaly" }] }),
   component: ConsoleLogin,
 });
@@ -18,6 +22,7 @@ function ConsoleLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const nav = useNavigate();
+  const search = Route.useSearch();
   const mut = useMutation({
     mutationFn: async () => {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -34,7 +39,7 @@ function ConsoleLogin() {
     },
     onSuccess: () => {
       toast.success("Bem-vinda");
-      nav({ to: "/console" });
+      nav({ to: search.next ?? "/console" });
     },
     onError: (e: Error) => toast.error(e.message),
   });
