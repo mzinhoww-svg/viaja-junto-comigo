@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VistosRouteImport } from './routes/vistos'
+import { Route as TripRouteImport } from './routes/trip'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RoteirosRouteImport } from './routes/roteiros'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
@@ -19,8 +20,13 @@ import { Route as OrcamentoRouteImport } from './routes/orcamento'
 import { Route as MilhasRouteImport } from './routes/milhas'
 import { Route as ConsoleRouteImport } from './routes/console'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TripIndexRouteImport } from './routes/trip.index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as ConsoleIndexRouteImport } from './routes/console.index'
+import { Route as TripRoteiroRouteImport } from './routes/trip.roteiro'
+import { Route as TripMaisRouteImport } from './routes/trip.mais'
+import { Route as TripFinanceiroRouteImport } from './routes/trip.financeiro'
+import { Route as TripChecklistsRouteImport } from './routes/trip.checklists'
 import { Route as PortalTaxasRouteImport } from './routes/portal.taxas'
 import { Route as PortalRoteiroRouteImport } from './routes/portal.roteiro'
 import { Route as PortalPropostaRouteImport } from './routes/portal.proposta'
@@ -54,6 +60,11 @@ import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/publi
 const VistosRoute = VistosRouteImport.update({
   id: '/vistos',
   path: '/vistos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TripRoute = TripRouteImport.update({
+  id: '/trip',
+  path: '/trip',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -101,6 +112,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TripIndexRoute = TripIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => TripRoute,
+} as any)
 const PortalIndexRoute = PortalIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -110,6 +126,26 @@ const ConsoleIndexRoute = ConsoleIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ConsoleRoute,
+} as any)
+const TripRoteiroRoute = TripRoteiroRouteImport.update({
+  id: '/roteiro',
+  path: '/roteiro',
+  getParentRoute: () => TripRoute,
+} as any)
+const TripMaisRoute = TripMaisRouteImport.update({
+  id: '/mais',
+  path: '/mais',
+  getParentRoute: () => TripRoute,
+} as any)
+const TripFinanceiroRoute = TripFinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
+  getParentRoute: () => TripRoute,
+} as any)
+const TripChecklistsRoute = TripChecklistsRouteImport.update({
+  id: '/checklists',
+  path: '/checklists',
+  getParentRoute: () => TripRoute,
 } as any)
 const PortalTaxasRoute = PortalTaxasRouteImport.update({
   id: '/taxas',
@@ -269,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/privacidade': typeof PrivacidadeRoute
   '/roteiros': typeof RoteirosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/trip': typeof TripRouteWithChildren
   '/vistos': typeof VistosRoute
   '/console/aceitar-convite': typeof ConsoleAceitarConviteRoute
   '/console/agenda': typeof ConsoleAgendaRoute
@@ -295,8 +332,13 @@ export interface FileRoutesByFullPath {
   '/portal/proposta': typeof PortalPropostaRoute
   '/portal/roteiro': typeof PortalRoteiroRoute
   '/portal/taxas': typeof PortalTaxasRoute
+  '/trip/checklists': typeof TripChecklistsRoute
+  '/trip/financeiro': typeof TripFinanceiroRoute
+  '/trip/mais': typeof TripMaisRoute
+  '/trip/roteiro': typeof TripRoteiroRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
+  '/trip/': typeof TripIndexRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
   '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -336,8 +378,13 @@ export interface FileRoutesByTo {
   '/portal/proposta': typeof PortalPropostaRoute
   '/portal/roteiro': typeof PortalRoteiroRoute
   '/portal/taxas': typeof PortalTaxasRoute
+  '/trip/checklists': typeof TripChecklistsRoute
+  '/trip/financeiro': typeof TripFinanceiroRoute
+  '/trip/mais': typeof TripMaisRoute
+  '/trip/roteiro': typeof TripRoteiroRoute
   '/console': typeof ConsoleIndexRoute
   '/portal': typeof PortalIndexRoute
+  '/trip': typeof TripIndexRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
   '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -354,6 +401,7 @@ export interface FileRoutesById {
   '/privacidade': typeof PrivacidadeRoute
   '/roteiros': typeof RoteirosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/trip': typeof TripRouteWithChildren
   '/vistos': typeof VistosRoute
   '/console/aceitar-convite': typeof ConsoleAceitarConviteRoute
   '/console/agenda': typeof ConsoleAgendaRoute
@@ -380,8 +428,13 @@ export interface FileRoutesById {
   '/portal/proposta': typeof PortalPropostaRoute
   '/portal/roteiro': typeof PortalRoteiroRoute
   '/portal/taxas': typeof PortalTaxasRoute
+  '/trip/checklists': typeof TripChecklistsRoute
+  '/trip/financeiro': typeof TripFinanceiroRoute
+  '/trip/mais': typeof TripMaisRoute
+  '/trip/roteiro': typeof TripRoteiroRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
+  '/trip/': typeof TripIndexRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
   '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -399,6 +452,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/roteiros'
     | '/sitemap.xml'
+    | '/trip'
     | '/vistos'
     | '/console/aceitar-convite'
     | '/console/agenda'
@@ -425,8 +479,13 @@ export interface FileRouteTypes {
     | '/portal/proposta'
     | '/portal/roteiro'
     | '/portal/taxas'
+    | '/trip/checklists'
+    | '/trip/financeiro'
+    | '/trip/mais'
+    | '/trip/roteiro'
     | '/console/'
     | '/portal/'
+    | '/trip/'
     | '/console/cliente/$id'
     | '/console/orcamento/novo'
     | '/api/public/payments/webhook'
@@ -466,8 +525,13 @@ export interface FileRouteTypes {
     | '/portal/proposta'
     | '/portal/roteiro'
     | '/portal/taxas'
+    | '/trip/checklists'
+    | '/trip/financeiro'
+    | '/trip/mais'
+    | '/trip/roteiro'
     | '/console'
     | '/portal'
+    | '/trip'
     | '/console/cliente/$id'
     | '/console/orcamento/novo'
     | '/api/public/payments/webhook'
@@ -483,6 +547,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/roteiros'
     | '/sitemap.xml'
+    | '/trip'
     | '/vistos'
     | '/console/aceitar-convite'
     | '/console/agenda'
@@ -509,8 +574,13 @@ export interface FileRouteTypes {
     | '/portal/proposta'
     | '/portal/roteiro'
     | '/portal/taxas'
+    | '/trip/checklists'
+    | '/trip/financeiro'
+    | '/trip/mais'
+    | '/trip/roteiro'
     | '/console/'
     | '/portal/'
+    | '/trip/'
     | '/console/cliente/$id'
     | '/console/orcamento/novo'
     | '/api/public/payments/webhook'
@@ -527,6 +597,7 @@ export interface RootRouteChildren {
   PrivacidadeRoute: typeof PrivacidadeRoute
   RoteirosRoute: typeof RoteirosRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TripRoute: typeof TripRouteWithChildren
   VistosRoute: typeof VistosRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
@@ -538,6 +609,13 @@ declare module '@tanstack/react-router' {
       path: '/vistos'
       fullPath: '/vistos'
       preLoaderRoute: typeof VistosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trip': {
+      id: '/trip'
+      path: '/trip'
+      fullPath: '/trip'
+      preLoaderRoute: typeof TripRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -603,6 +681,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/trip/': {
+      id: '/trip/'
+      path: '/'
+      fullPath: '/trip/'
+      preLoaderRoute: typeof TripIndexRouteImport
+      parentRoute: typeof TripRoute
+    }
     '/portal/': {
       id: '/portal/'
       path: '/'
@@ -616,6 +701,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/console/'
       preLoaderRoute: typeof ConsoleIndexRouteImport
       parentRoute: typeof ConsoleRoute
+    }
+    '/trip/roteiro': {
+      id: '/trip/roteiro'
+      path: '/roteiro'
+      fullPath: '/trip/roteiro'
+      preLoaderRoute: typeof TripRoteiroRouteImport
+      parentRoute: typeof TripRoute
+    }
+    '/trip/mais': {
+      id: '/trip/mais'
+      path: '/mais'
+      fullPath: '/trip/mais'
+      preLoaderRoute: typeof TripMaisRouteImport
+      parentRoute: typeof TripRoute
+    }
+    '/trip/financeiro': {
+      id: '/trip/financeiro'
+      path: '/financeiro'
+      fullPath: '/trip/financeiro'
+      preLoaderRoute: typeof TripFinanceiroRouteImport
+      parentRoute: typeof TripRoute
+    }
+    '/trip/checklists': {
+      id: '/trip/checklists'
+      path: '/checklists'
+      fullPath: '/trip/checklists'
+      preLoaderRoute: typeof TripChecklistsRouteImport
+      parentRoute: typeof TripRoute
     }
     '/portal/taxas': {
       id: '/portal/taxas'
@@ -911,6 +1024,24 @@ const PortalRouteChildren: PortalRouteChildren = {
 const PortalRouteWithChildren =
   PortalRoute._addFileChildren(PortalRouteChildren)
 
+interface TripRouteChildren {
+  TripChecklistsRoute: typeof TripChecklistsRoute
+  TripFinanceiroRoute: typeof TripFinanceiroRoute
+  TripMaisRoute: typeof TripMaisRoute
+  TripRoteiroRoute: typeof TripRoteiroRoute
+  TripIndexRoute: typeof TripIndexRoute
+}
+
+const TripRouteChildren: TripRouteChildren = {
+  TripChecklistsRoute: TripChecklistsRoute,
+  TripFinanceiroRoute: TripFinanceiroRoute,
+  TripMaisRoute: TripMaisRoute,
+  TripRoteiroRoute: TripRoteiroRoute,
+  TripIndexRoute: TripIndexRoute,
+}
+
+const TripRouteWithChildren = TripRoute._addFileChildren(TripRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConsoleRoute: ConsoleRouteWithChildren,
@@ -921,9 +1052,20 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacidadeRoute: PrivacidadeRoute,
   RoteirosRoute: RoteirosRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TripRoute: TripRouteWithChildren,
   VistosRoute: VistosRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
