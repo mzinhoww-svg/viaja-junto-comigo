@@ -4,11 +4,12 @@
 ## 0. STATUS ATUAL — leia isto primeiro, sempre
 | Campo | Valor |
 |---|---|
-| Onda atual | 1 — Fundação concluída; VJT-002, VJT-003 e VJT-008 desbloqueados (rodam em paralelo) |
-| Último ticket concluído (mergeado) | VJT-001 (PR [#11](https://github.com/mzinhoww-svg/viaja-junto-comigo/pull/11), mergeado em 2026-07-24) |
-| Ticket em aberto aguardando review | — nenhum |
+| Onda atual | 1 — Fundação **parcialmente** concluída: VJT-001, VJT-002 e VJT-008 mergeados; **VJT-003 (wizard de onboarding) NÃO foi mergeado — não existe PR nem issue aberta para ele**, apesar de ter rodado em paralelo com os outros dois (ver nota abaixo) |
+| Último ticket concluído (mergeado) | VJT-002 (PR [#15](https://github.com/mzinhoww-svg/viaja-junto-comigo/pull/15), issue [#12](https://github.com/mzinhoww-svg/viaja-junto-comigo/issues/12), mergeado em 2026-07-24 13:49) — também mergeados na mesma janela: VJT-001 (PR #11, 12:20) e VJT-008 (PR [#14](https://github.com/mzinhoww-svg/viaja-junto-comigo/pull/14), issue [#13](https://github.com/mzinhoww-svg/viaja-junto-comigo/issues/13), 13:15) |
+| Ticket em aberto aguardando review | — nenhum (não há PR aberto nem para VJT-003, que segue não iniciado apesar de estar desbloqueado desde o merge de VJT-001) |
 | Migration aplicada no Supabase | **Sim** — aplicada manualmente via SQL Editor do dashboard em 2026-07-24 (o conector Supabase desta conta não acessa o projeto `urrlqljlibpzaqnemlwf`, gerenciado pelo Lovable Cloud). Confirmada indiretamente: o `types.ts` regenerado automaticamente pelo Lovable Cloud em `main` já reflete as 16 tabelas e as funções `accept_trip_invite`/`is_trip_member`/`is_trip_owner`. Falta só confirmar as contagens de seed: `select count(*) from paises_visto` = 14 e `select count(*) from checklist_templates` = 15 |
 | Última atualização desta seção | 2026-07-24 |
+> ⚠️ **Divergência encontrada e reconciliada nesta sessão**: uma sessão anterior pediu para tratar VJT-003 como já mergeado (junto com VJT-001/002/008). Checado contra o GitHub: **isso é falso** — não há PR (aberto, fechado ou mergeado) nem issue para VJT-003 neste repositório, e nenhuma branch remota remanescente contém esse trabalho. Ver Seção 8 para o motivo (não foi log, foi verificação direta via `git log`/API do GitHub). VJT-003 continua bloqueado apenas por VJT-001 (já mergeado) — está desbloqueado para execução, só não foi executado ainda.
 **Protocolo de toda sessão, sem exceção:**
 1. Leia esta seção 0 e a seção 8 (Log). Se este arquivo e o estado real do repositório divergirem (ex.: PR já mergeado mas não registrado aqui), reconcilie a seção 0 e o log ANTES de fazer qualquer coisa nova
 2. Determine o próximo ticket executável: primeiro ticket da seção 7 cujo "Bloqueado por" já está com status Mergeado no log, e que ainda não tem entrada de conclusão
@@ -379,6 +380,24 @@ Formato: **VJT-XXX Título** — Problema · Escopo IN/OUT · Aceite · Bloquead
 ---
 ## 8. Log de execução
 > Toda tarefa concluída gera uma entrada aqui, no topo (mais recente primeiro). Sem entrada = tarefa não existe.
+
+### 2026-07-24 — VJT-002 trip-math + testes — **Mergeado** (PR [#15](https://github.com/mzinhoww-svg/viaja-junto-comigo/pull/15), issue [#12](https://github.com/mzinhoww-svg/viaja-junto-comigo/issues/12))
+- **O que foi feito**: módulo puro `src/lib/trip-math.ts` com todas as fórmulas da Seção 2 (`consolidarValorBRL`, `calcularMeta`, `calcularAcumulado`, `calcularProgressoFinanceiro`, `determinarModoTrip`, `calcularMesesRestantes`, `calcularSugestaoMensal`, `calcularProgressoChecklists`, `calcularProgressoJornada` com pesos como constantes nomeadas exportadas, `categoriaEstourada`, e o orquestrador `calcularTripMath`). Sem I/O, sem acesso a Supabase — recebe dados já carregados.
+- **Arquivos novos**: `src/lib/trip-math.ts`, `src/lib/trip-math.test.ts` (44 testes, cobrindo os 5 edge cases obrigatórios: sonho, concluída, meta zero, categoria estourada, divisão por zero).
+- **Tabelas/RLS**: nenhuma (módulo puro, OUT de escopo qualquer UI/persistência).
+- **Execução em paralelo**: rodou em paralelo com VJT-003 e VJT-008 enquanto VJT-001 ainda aguardava merge; branch recriada a partir do `main` pós-merge de VJT-001 (via cherry-pick do commit de feature) para que o PR final ficasse só com o diff real do ticket (2 arquivos, 472 linhas). Seção 0/8 não foram editadas no PR, por regra — consolidado agora.
+- **Como testar**: `bun run test` → 62/62 (44 novos + os já existentes). Sem UI para testar no celular neste ticket (VJT-004 a VJT-007 vão consumir as funções).
+- **Verificação local**: lint/typecheck/test/build verdes com bun 1.3.14 (mesma versão do CI).
+- **Pendências deixadas para tickets futuros**: nenhuma função ainda é consumida por UI (entra em VJT-004+).
+
+### 2026-07-24 — VJT-008 Roteiro: dias e slots — **Mergeado** (PR [#14](https://github.com/mzinhoww-svg/viaja-junto-comigo/pull/14), issue [#13](https://github.com/mzinhoww-svg/viaja-junto-comigo/issues/13))
+- **O que foi feito**: módulo puro `src/lib/itinerary.ts` (tipos `SlotPeriod`/`ItineraryDay`/`ItinerarySlot`, geração automática de `dia_numero`/`ordem`, renumeração após remoção, plano de swap para reordenar sem violar `unique(trip_id, dia_numero)`, ponto plugável do limite free `FREE_ITINERARY_DAY_LIMIT = 5`/`getItineraryDayLimit(tier)`); hook `src/hooks/useItinerary.ts` (`useCurrentTrip()` + `useItineraryDays(tripId)` + mutations de adicionar/remover/duplicar/mover dia e editar slot); UI em `src/components/trip/roteiro/` (card de dia colapsável, ações mover/duplicar/remover com confirmação, aviso de limite free); `src/routes/trip.roteiro.tsx` passou do placeholder para a tela real.
+- **Arquivos novos**: `src/lib/itinerary.ts`, `src/lib/itinerary.test.ts` (23 testes), `src/hooks/useItinerary.ts`, `src/components/trip/roteiro/*`. Editado: `src/routes/trip.roteiro.tsx`.
+- **Tabelas/RLS**: nenhuma migration nova — usa `itinerary_days`/`itinerary_slots` já definidas e com RLS via `is_trip_member` desde a migration do VJT-001.
+- **Execução em paralelo**: rodou em paralelo com VJT-002 e VJT-003, bloqueado só por VJT-001; branch partiu de `claude/vjt-001` (só ali existiam schema/rotas/CI reais antes do merge) e foi rebaseada sobre `main` depois que VJT-001 mergeou, reduzindo o diff final ao escopo do ticket. Seção 0/8 não foram editadas no PR, por regra — consolidado agora.
+- **Como testar no celular**: `/trip/roteiro` sem trip → empty state; sem dias → CTA "Adicionar Dia 1"; até 15 dias editáveis (onde ir/onde comer/observações), duplicar, remover (renumera), mover com setas, colapsar/expandir; ao atingir 5 dias no plano free, "Adicionar dia" desabilita com aviso.
+- **Verificação local**: com bun 1.3.14 (igual ao CI) — lint (0 erros), typecheck (0 erros), test (23/23), build ok.
+- **Pendências deixadas para tickets futuros**: export PDF (VJT-010); paywall real (VJT-011 — hoje só desabilita com aviso); cálculo automático de `data` por dia a partir de `data_viagem`.
 
 ### 2026-07-24 — VJT-001 Fundação do repositório — **Mergeado** (PR [#11](https://github.com/mzinhoww-svg/viaja-junto-comigo/pull/11))
 - **O que foi feito**: schema completo do Trip versionado em migration; rotas `/trip/*` autenticadas (sessão compartilhada com o portal; sem login → redirect `/portal/login`) com bottom nav de 5 itens e placeholders; CI GitHub Actions (lint+typecheck+vitest+build via bun); Sentry no client gated por `VITE_SENTRY_DSN`; vitest com primeira suíte (`money.test.ts`). Commits de suporte: formatação prettier/eslint em 117 arquivos pré-existentes + correção de types Supabase desatualizados (`ab_events`/`ab_results`) — sem isso o CI nasceria vermelho.
