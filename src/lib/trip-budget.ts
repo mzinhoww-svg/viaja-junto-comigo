@@ -51,14 +51,24 @@ export const CATEGORIAS_DEFAULT: ReadonlyArray<{ nome: string; cor: string }> = 
   { nome: "Outros", cor: "#64748B" },
 ];
 
+/**
+ * Normaliza um nome de categoria para comparação: trim + lowercase + remoção
+ * de acentos (via decomposição NFD). Sem isso, "Alimentacao" (sem cedilha)
+ * não seria reconhecida como a mesma categoria que a padrão "Alimentação".
+ */
 function nomeNormalizado(nome: string): string {
-  return nome.trim().toLowerCase();
+  return nome
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
 /**
  * Categorias da paleta padrão que ainda não existem na trip (comparação por
- * nome, normalizada por trim + lowercase, para não duplicar uma categoria já
- * criada manualmente ou pelo wizard com o mesmo nome, ex.: "Geral").
+ * nome, normalizada por trim + lowercase + acentos, para não duplicar uma
+ * categoria já criada manualmente ou pelo wizard com o mesmo nome, ex.:
+ * "Geral", ou uma variação de capitalização/acento de um nome padrão).
  */
 export function categoriasDefaultFaltando(
   categoriasExistentes: BudgetCategoryRow[],

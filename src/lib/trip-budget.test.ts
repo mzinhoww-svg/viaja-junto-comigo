@@ -302,9 +302,31 @@ describe("categoriasDefaultFaltando", () => {
     expect(faltando.some((c) => c.nome === "Hospedagem")).toBe(false);
   });
 
+  it("reconhece variação de capitalização de um nome padrão (ex.: 'PASSAGENS' em caixa alta)", () => {
+    const existentes = [categoria({ id: "cat-1", nome: "PASSAGENS" })];
+    const faltando = categoriasDefaultFaltando(existentes);
+    expect(faltando).toHaveLength(8);
+    expect(faltando.some((c) => c.nome === "Passagens")).toBe(false);
+  });
+
+  it("reconhece variação de acento de um nome padrão (ex.: 'alimentacao' sem cedilha/til)", () => {
+    const existentes = [categoria({ id: "cat-1", nome: "alimentacao" })];
+    const faltando = categoriasDefaultFaltando(existentes);
+    expect(faltando).toHaveLength(8);
+    expect(faltando.some((c) => c.nome === "Alimentação")).toBe(false);
+  });
+
   it('não remove nenhuma categoria padrão da lista de faltantes por causa de uma categoria não-padrão (ex.: "Geral")', () => {
     const existentes = [categoria({ id: "cat-1", nome: "Geral" })];
     expect(categoriasDefaultFaltando(existentes)).toHaveLength(9);
+  });
+
+  it('categoria não-padrão em minúsculas (ex.: "geral") não gera duplicata nem falso-positivo ao rodar a função de novo (idempotente)', () => {
+    const existentes = [categoria({ id: "cat-1", nome: "geral" })];
+    const primeiraChamada = categoriasDefaultFaltando(existentes);
+    const segundaChamada = categoriasDefaultFaltando(existentes);
+    expect(primeiraChamada).toHaveLength(9);
+    expect(segundaChamada).toEqual(primeiraChamada);
   });
 
   it("retorna vazio quando a paleta padrão já está completa", () => {
