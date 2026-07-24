@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Compass, Loader2 } from "lucide-react";
 import { TripSectionPlaceholder } from "@/components/trip/SectionPlaceholder";
+import { JourneyDashboard } from "@/components/trip/dashboard/JourneyDashboard";
 import { useCurrentTrip } from "@/hooks/useItinerary";
 
 export const Route = createFileRoute("/trip/")({
@@ -34,11 +35,5 @@ function TripJornada() {
     );
   }
 
-  return (
-    <TripSectionPlaceholder
-      icon={Compass}
-      title={trip.data.nome}
-      description="Aqui você vai acompanhar o progresso da sua viagem: countdown, checklists e financeiro em um só lugar. Em breve."
-    />
-  );
+  return <JourneyDashboard tripId={trip.data.id} />;
 }
