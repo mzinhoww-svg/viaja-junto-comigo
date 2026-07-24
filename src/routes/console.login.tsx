@@ -22,6 +22,7 @@ function ConsoleLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const nav = useNavigate();
+  const search = Route.useSearch();
   const mut = useMutation({
     mutationFn: async () => {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -33,7 +34,7 @@ function ConsoleLogin() {
         throw new Error("Esta conta não tem acesso ao console.");
       }
     },
-    onSuccess: () => { toast.success("Bem-vinda"); nav({ to: "/console" }); },
+    onSuccess: () => { toast.success("Bem-vinda"); nav({ to: search.next ?? "/console" }); },
     onError: (e: Error) => toast.error(e.message),
   });
 
