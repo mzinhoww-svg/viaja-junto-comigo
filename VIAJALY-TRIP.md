@@ -37,6 +37,7 @@ sugestao_mensal       = max(0, (meta − acumulado) / meses_restantes)
 progresso_checklists  = itens done / itens totais                (global da trip)
 progresso_jornada     = 0.5 × progresso_checklists + 0.5 × progresso_financeiro   (pesos em constante, não hardcoded)
 ```
+**Distinção de dependência**: tickets que consomem valores agregados de trip-math (razões, percentuais, modo sonho/planejando/concluída) não dependem da completude do catálogo de checklists — a fórmula é agnóstica ao volume de itens. Só tickets que renderizam o CONTEÚDO individual dos itens (ex.: UI de checklists, packs por destino) dependem de catálogo completo. Ao definir "Bloqueado por" de um novo ticket, aplique essa distinção antes de adicionar dependência por precaução.
 **Edge cases obrigatórios em toda entrega**: sem data de viagem (modo sonho — sem countdown, sem sugestão mensal); data no passado (modo concluída — retrospectiva + NPS + CTA nova viagem); meta zero; valor pago > estimado na categoria (badge de estouro, nunca bloqueia); divisão por zero em qualquer fórmula acima.
 **Planos e paywall**:
 | Recurso | Free | Premium |
