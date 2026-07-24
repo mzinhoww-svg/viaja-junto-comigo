@@ -18,6 +18,7 @@ import { z } from "zod";
 const loginSearch = z.object({
   code: z.string().regex(/^\d{6}$/).optional(),
   name: z.string().min(1).max(80).optional(),
+  next: z.string().startsWith("/").max(500).optional(),
 });
 
 export const Route = createFileRoute("/portal/login")({
