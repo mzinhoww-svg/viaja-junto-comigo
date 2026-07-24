@@ -345,16 +345,17 @@ insert into public.checklist_templates (tipo, titulo, tier, marco, ordem) values
 ---
 ## 6. Protocolo de execução por ticket
 1. Confirme que o ticket está desbloqueado (seção 0)
-2. Abra uma issue no GitHub (repositório `mzinhoww-svg/viaja-junto-comigo`) com o corpo do ticket (título, problema, escopo IN/OUT, comportamento esperado, arquivos afetados, acceptance criteria, cenários de teste, rollout/kill switch se houver, eventos/métricas)
-3. Crie branch a partir de main atualizada: `claude/vjt-xxx`
-4. **Contrato antes do código**: defina assinaturas/tipos/erros da parte nova antes de implementar
-5. Implemente SOMENTE o escopo do ticket. Escreva os testes no mesmo commit/PR (nunca em ticket separado)
-6. QA manual simulado: percorra cada acceptance criterion como a persona P1 faria, em viewport mobile; verifique estados vazio/carregando/erro/sucesso
-7. Rode lint, typecheck, testes e build localmente antes do push
-8. Commit, push, abra PR contra main referenciando `Closes #N` da issue
-9. Atualize a seção 0 (ticket em aberto aguardando review) e adicione entrada na seção 8 com: o que foi feito, arquivos tocados, tabelas/RLS tocadas, como testar no celular, link do PR
-10. **Execução em paralelo**: se este ticket rodar simultaneamente com outros da mesma onda (sessões/ambientes separados), NÃO edite a Seção 0 nem a Seção 8 deste arquivo no seu PR — apenas descreva o resultado completo no corpo do PR e da issue. A consolidação da Seção 0 e do Log em VIAJALY-TRIP.md acontece em uma única sessão de fechamento de onda, depois que todos os PRs da onda estiverem mergeados na main
-11. Pare. Não mergeie. Não inicie o próximo ticket até essa entrada ser seguida de "Mergeado" no log (o humano avisa, ou você confere o status da issue/PR na próxima sessão)
+2. Antes de abrir uma issue nova para um ticket, busque no GitHub por issues/PRs existentes com o código do ticket no título (ex.: "VJT-003"). Se já existir, NÃO crie uma nova — continue a existente ou pare e avise, não duplique o trabalho
+3. Abra uma issue no GitHub (repositório `mzinhoww-svg/viaja-junto-comigo`) com o corpo do ticket (título, problema, escopo IN/OUT, comportamento esperado, arquivos afetados, acceptance criteria, cenários de teste, rollout/kill switch se houver, eventos/métricas)
+4. Crie branch a partir de main atualizada: `claude/vjt-xxx`
+5. **Contrato antes do código**: defina assinaturas/tipos/erros da parte nova antes de implementar
+6. Implemente SOMENTE o escopo do ticket. Escreva os testes no mesmo commit/PR (nunca em ticket separado)
+7. QA manual simulado: percorra cada acceptance criterion como a persona P1 faria, em viewport mobile; verifique estados vazio/carregando/erro/sucesso
+8. Rode lint, typecheck, testes e build localmente antes do push
+9. Commit, push, abra PR contra main referenciando `Closes #N` da issue
+10. Atualize a seção 0 (ticket em aberto aguardando review) e adicione entrada na seção 8 com: o que foi feito, arquivos tocados, tabelas/RLS tocadas, como testar no celular, link do PR
+11. **Execução em paralelo**: se este ticket rodar simultaneamente com outros da mesma onda (sessões/ambientes separados), NÃO edite a Seção 0 nem a Seção 8 deste arquivo no seu PR — apenas descreva o resultado completo no corpo do PR e da issue. A consolidação da Seção 0 e do Log em VIAJALY-TRIP.md acontece em uma única sessão de fechamento de onda, depois que todos os PRs da onda estiverem mergeados na main
+12. Pare. Não mergeie. Não inicie o próximo ticket até essa entrada ser seguida de "Mergeado" no log (o humano avisa, ou você confere o status da issue/PR na próxima sessão)
 ---
 ## 7. Backlog de tickets (19, com dependências)
 Formato: **VJT-XXX Título** — Problema · Escopo IN/OUT · Aceite · Bloqueado por.
