@@ -359,6 +359,16 @@ insert into public.checklist_templates (tipo, titulo, tier, marco, ordem) values
 10. Atualize a seção 0 (ticket em aberto aguardando review) e adicione entrada na seção 8 com: o que foi feito, arquivos tocados, tabelas/RLS tocadas, como testar no celular, link do PR
 11. **Execução em paralelo**: se este ticket rodar simultaneamente com outros da mesma onda (sessões/ambientes separados), NÃO edite a Seção 0 nem a Seção 8 deste arquivo no seu PR — apenas descreva o resultado completo no corpo do PR e da issue. A consolidação da Seção 0 e do Log em VIAJALY-TRIP.md acontece em uma única sessão de fechamento de onda, depois que todos os PRs da onda estiverem mergeados na main
 12. Pare. Não mergeie. Não inicie o próximo ticket até essa entrada ser seguida de "Mergeado" no log (o humano avisa, ou você confere o status da issue/PR na próxima sessão)
+
+### Revisor automatizado
+Além do CI, todo PR passa por uma sessão/rotina separada de revisão (Claude Code Remote, gatilho em PR aberto/sincronizado, nunca em comentário criado, para evitar auto-resposta). O revisor NUNCA implementa nem faz merge — só comenta no PR com achados concretos, sempre contra o diff real, nunca contra o resumo do próprio PR. Checklist obrigatório do revisor, nesta ordem:
+1. Toda fórmula/agregação nova reutiliza trip-math.ts (ou o módulo puro equivalente do domínio), ou reimplementa em paralelo?
+2. Se o PR toca dados que outra tela/hook também lê (ex.: budget_items, trips.cambio_manual), existe invalidação cruzada entre as queries, testada de verdade (não só argumentada)?
+3. Existe issue/PR duplicado para o mesmo ticket?
+4. Alguma dependência de backlog ou escopo de arquivo foi adicionada sem necessidade técnica real?
+5. Edge cases da Seção 2 (modo sonho, concluída, meta zero, estouro, divisão por zero) cobertos quando o ticket os toca?
+
+O implementador responde aos comentários do revisor na mesma branch, corrige, empurra novo commit, e pede nova revisão. Máximo 2 rodadas de revisor↔implementador; na 3ª rodada sem fechamento, o revisor para e escala para o humano com um resumo do que ainda diverge. Merge continua exclusivamente humano em qualquer cenário — o revisor não tem, e nunca deve ter, permissão de merge.
 ---
 ## 7. Backlog de tickets (19, com dependências)
 Formato: **VJT-XXX Título** — Problema · Escopo IN/OUT · Aceite · Bloqueado por.
