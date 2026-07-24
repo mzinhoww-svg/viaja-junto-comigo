@@ -3,7 +3,13 @@
  * Sem I/O, sem acesso a Supabase — mesma convenção do trip-math.ts. Reaproveita
  * `consolidarValorBRL`/`categoriaEstourada` de trip-math.ts em vez de duplicá-las.
  */
-import { categoriaEstourada, consolidarValorBRL, type ConsolidableAmount } from "./trip-math";
+import {
+  calcularAcumulado,
+  calcularMeta,
+  categoriaEstourada,
+  consolidarValorBRL,
+  type ConsolidableAmount,
+} from "./trip-math";
 
 export type BudgetCategoryRow = {
   id: string;
@@ -32,15 +38,34 @@ export type BudgetCategorySummary = {
   estourada: boolean;
 };
 
-/** Categorias sugeridas ao criar o orçamento pela primeira vez (empty state). */
+/** Categorias sugeridas ao criar o orçamento (PRD): paleta padrão de 9 categorias. */
 export const CATEGORIAS_DEFAULT: ReadonlyArray<{ nome: string; cor: string }> = [
+  { nome: "Passagens", cor: "#3B82F6" },
   { nome: "Hospedagem", cor: "#0EA5E9" },
-  { nome: "Transporte", cor: "#F97316" },
+  { nome: "Ingressos e Passeios", cor: "#A855F7" },
   { nome: "Alimentação", cor: "#22C55E" },
-  { nome: "Passeios", cor: "#A855F7" },
+  { nome: "Transporte", cor: "#F97316" },
+  { nome: "Seguro", cor: "#14B8A6" },
+  { nome: "Documentos", cor: "#6366F1" },
   { nome: "Compras", cor: "#EC4899" },
   { nome: "Outros", cor: "#64748B" },
 ];
+
+function nomeNormalizado(nome: string): string {
+  return nome.trim().toLowerCase();
+}
+
+/**
+ * Categorias da paleta padrão que ainda não existem na trip (comparação por
+ * nome, normalizada por trim + lowercase, para não duplicar uma categoria já
+ * criada manualmente ou pelo wizard com o mesmo nome, ex.: "Geral").
+ */
+export function categoriasDefaultFaltando(
+  categoriasExistentes: BudgetCategoryRow[],
+): ReadonlyArray<{ nome: string; cor: string }> {
+  const nomesExistentes = new Set(categoriasExistentes.map((c) => nomeNormalizado(c.nome)));
+  return CATEGORIAS_DEFAULT.filter((padrao) => !nomesExistentes.has(nomeNormalizado(padrao.nome)));
+}
 
 function estimadoConsolidavel(item: BudgetItemRow): ConsolidableAmount {
   return { brlCents: item.valorEstimadoBrlCents, destinoCents: item.valorEstimadoDestinoCents };
@@ -80,15 +105,20 @@ export type BudgetTotais = {
   totalPagoBrlCents: number;
 };
 
-/** Soma os totais de todas as categorias (orçamento geral da trip). */
-export function calcularTotaisGerais(resumos: BudgetCategorySummary[]): BudgetTotais {
-  return resumos.reduce(
-    (acc, resumo) => ({
-      totalEstimadoBrlCents: acc.totalEstimadoBrlCents + resumo.totalEstimadoBrlCents,
-      totalPagoBrlCents: acc.totalPagoBrlCents + resumo.totalPagoBrlCents,
-    }),
-    { totalEstimadoBrlCents: 0, totalPagoBrlCents: 0 },
-  );
+/**
+ * Totais gerais da trip (todas as categorias), delegando inteiramente para as
+ * fórmulas de trip-math.ts em vez de somar em paralelo: `calcularMeta` para o
+ * estimado (mesma fórmula "meta" da Seção 2) e `calcularAcumulado` (sem
+ * savings_entries, só os itens pagos) para o total pago.
+ */
+export function calcularTotaisGerais(
+  itens: BudgetItemRow[],
+  cambioManual: number | null,
+): BudgetTotais {
+  return {
+    totalEstimadoBrlCents: calcularMeta(itens.map(estimadoConsolidavel), cambioManual),
+    totalPagoBrlCents: calcularAcumulado(itens.map(pagoConsolidavel), [], cambioManual),
+  };
 }
 
 /** falta_pagar = max(0, estimado − pago). Estouro vira badge, nunca "falta" negativa. */

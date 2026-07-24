@@ -1,11 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { consolidarValorBRL } from "@/lib/trip-math";
 import {
-  CATEGORIAS_DEFAULT,
   calcularFaltaPagar,
   calcularResumoCategoria,
   calcularTotaisGerais,
+  categoriasDefaultFaltando,
   type BudgetCategoryRow,
   type BudgetCategorySummary,
   type BudgetItemRow,
@@ -22,6 +22,19 @@ export type TripBudgetData = {
 
 function queryKey(tripId: string | undefined) {
   return ["trip", "budget", tripId] as const;
+}
+
+/**
+ * budget_items e trips.cambio_manual também alimentam a Economia Mensal
+ * (VJT-005, `["trip","savings",tripId]`) e o Dashboard (VJT-004,
+ * `["trip","dashboard",tripId]`) — qualquer mutação daqui precisa invalidar
+ * as três, senão as outras abas/telas ficam com dado desatualizado até um
+ * reload.
+ */
+function invalidateFinanceiro(qc: QueryClient, tripId: string) {
+  qc.invalidateQueries({ queryKey: queryKey(tripId) });
+  qc.invalidateQueries({ queryKey: ["trip", "savings", tripId] });
+  qc.invalidateQueries({ queryKey: ["trip", "dashboard", tripId] });
 }
 
 export function useTripBudget(tripId: string | undefined) {
@@ -74,7 +87,10 @@ export function useTripBudget(tripId: string | undefined) {
 
       const cambioManual = tripRow.cambio_manual;
       const resumos = categorias.map((c) => calcularResumoCategoria(c, itens, cambioManual));
-      const { totalEstimadoBrlCents, totalPagoBrlCents } = calcularTotaisGerais(resumos);
+      const { totalEstimadoBrlCents, totalPagoBrlCents } = calcularTotaisGerais(
+        itens,
+        cambioManual,
+      );
 
       return {
         moedaDestino: tripRow.moeda_destino,
@@ -88,22 +104,45 @@ export function useTripBudget(tripId: string | undefined) {
   });
 }
 
+/**
+ * Cria só as categorias da paleta padrão que ainda não existem na trip (por
+ * nome) — idempotente, nunca duplica uma categoria já criada manualmente ou
+ * pelo wizard (ex.: "Geral").
+ */
 export function useCreateDefaultCategories(tripId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async () => {
+      const { data: existentes, error: fetchError } = await supabase
+        .from("budget_categories")
+        .select("nome, ordem")
+        .eq("trip_id", tripId);
+      if (fetchError) throw fetchError;
+
+      const faltando = categoriasDefaultFaltando(
+        (existentes ?? []).map((c) => ({
+          id: "",
+          nome: c.nome,
+          cor: "",
+          ordem: c.ordem,
+          isDefault: false,
+        })),
+      );
+      if (faltando.length === 0) return;
+
+      const ordemInicial = (existentes ?? []).reduce((max, c) => Math.max(max, c.ordem), -1) + 1;
       const { error } = await supabase.from("budget_categories").insert(
-        CATEGORIAS_DEFAULT.map((categoria, ordem) => ({
+        faltando.map((categoria, indice) => ({
           trip_id: tripId,
           nome: categoria.nome,
           cor: categoria.cor,
-          ordem,
+          ordem: ordemInicial + indice,
           is_default: true,
         })),
       );
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKey(tripId) }),
+    onSuccess: () => invalidateFinanceiro(qc, tripId),
   });
 }
 
@@ -118,7 +157,7 @@ export function useAddCategory(tripId: string) {
       });
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKey(tripId) }),
+    onSuccess: () => invalidateFinanceiro(qc, tripId),
   });
 }
 
@@ -129,7 +168,7 @@ export function useDeleteCategory(tripId: string) {
       const { error } = await supabase.from("budget_categories").delete().eq("id", categoryId);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKey(tripId) }),
+    onSuccess: () => invalidateFinanceiro(qc, tripId),
   });
 }
 
@@ -152,7 +191,7 @@ export function useAddBudgetItem(tripId: string) {
       });
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKey(tripId) }),
+    onSuccess: () => invalidateFinanceiro(qc, tripId),
   });
 }
 
@@ -163,7 +202,7 @@ export function useDeleteBudgetItem(tripId: string) {
       const { error } = await supabase.from("budget_items").delete().eq("id", itemId);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKey(tripId) }),
+    onSuccess: () => invalidateFinanceiro(qc, tripId),
   });
 }
 
@@ -201,7 +240,7 @@ export function useUpdateBudgetItemPago(tripId: string) {
         .eq("id", input.id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKey(tripId) }),
+    onSuccess: () => invalidateFinanceiro(qc, tripId),
   });
 }
 
@@ -219,6 +258,6 @@ export function useUpdateCambioManual(tripId: string) {
         .eq("id", tripId);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKey(tripId) }),
+    onSuccess: () => invalidateFinanceiro(qc, tripId),
   });
 }

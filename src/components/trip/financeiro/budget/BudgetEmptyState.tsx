@@ -17,8 +17,9 @@ export function BudgetEmptyState({ isCreating, onCreateDefaults }: Props) {
         <div>
           <p className="text-sm font-medium text-foreground">Ainda sem categorias de orçamento</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Comece com as categorias mais comuns (Hospedagem, Transporte, Alimentação, Passeios,
-            Compras, Outros) e ajuste depois do seu jeito.
+            Comece com as categorias mais comuns (Passagens, Hospedagem, Ingressos e Passeios,
+            Alimentação, Transporte, Seguro, Documentos, Compras, Outros) e ajuste depois do seu
+            jeito.
           </p>
         </div>
         <Button onClick={onCreateDefaults} disabled={isCreating}>

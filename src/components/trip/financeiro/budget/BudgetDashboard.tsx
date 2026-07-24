@@ -6,6 +6,7 @@ import { BudgetCategoryForm } from "@/components/trip/financeiro/budget/BudgetCa
 import { BudgetCurrencyCard } from "@/components/trip/financeiro/budget/BudgetCurrencyCard";
 import { BudgetDonutChart } from "@/components/trip/financeiro/budget/BudgetDonutChart";
 import { BudgetEmptyState } from "@/components/trip/financeiro/budget/BudgetEmptyState";
+import { BudgetMissingDefaultsBanner } from "@/components/trip/financeiro/budget/BudgetMissingDefaultsBanner";
 import { BudgetSummaryCards } from "@/components/trip/financeiro/budget/BudgetSummaryCards";
 import { useCurrentTrip } from "@/hooks/useItinerary";
 import {
@@ -18,7 +19,11 @@ import {
   useUpdateBudgetItemPago,
   useUpdateCambioManual,
 } from "@/hooks/useTripBudget";
-import { algumItemPrecisaCambio, montarDadosDonut } from "@/lib/trip-budget";
+import {
+  algumItemPrecisaCambio,
+  categoriasDefaultFaltando,
+  montarDadosDonut,
+} from "@/lib/trip-budget";
 
 function BudgetLoading() {
   return (
@@ -55,6 +60,7 @@ export function BudgetDashboard({ tripId }: { tripId: string }) {
 
   const todosOsItens = categorias.flatMap((c) => c.itens);
   const precisaCambio = algumItemPrecisaCambio(todosOsItens, cambioManual);
+  const defaultsFaltando = categoriasDefaultFaltando(categorias.map((c) => c.categoria));
 
   return (
     <div className="space-y-4 px-4 pb-8 pt-4">
@@ -87,6 +93,16 @@ export function BudgetDashboard({ tripId }: { tripId: string }) {
         />
       ) : (
         <>
+          <BudgetMissingDefaultsBanner
+            nomesFaltando={defaultsFaltando.map((c) => c.nome)}
+            isCreating={createDefaults.isPending}
+            onCreateDefaults={() =>
+              createDefaults.mutate(undefined, {
+                onError: (e) => toast.error((e as Error).message),
+              })
+            }
+          />
+
           <BudgetSummaryCards
             totalEstimadoBrlCents={totalEstimadoBrlCents}
             totalPagoBrlCents={totalPagoBrlCents}

@@ -4,6 +4,8 @@ import {
   calcularFaltaPagar,
   calcularResumoCategoria,
   calcularTotaisGerais,
+  CATEGORIAS_DEFAULT,
+  categoriasDefaultFaltando,
   itemPrecisaCambio,
   montarDadosDonut,
   validarNovaCategoria,
@@ -99,26 +101,63 @@ describe("calcularResumoCategoria", () => {
 });
 
 describe("calcularTotaisGerais", () => {
-  it("soma os totais de todas as categorias", () => {
-    const resumos = [
-      calcularResumoCategoria(
-        categoria({ id: "cat-1" }),
-        [item({ categoryId: "cat-1", valorEstimadoBrlCents: 100_00, valorPagoBrlCents: 50_00 })],
-        null,
-      ),
-      calcularResumoCategoria(
-        categoria({ id: "cat-2" }),
-        [item({ categoryId: "cat-2", valorEstimadoBrlCents: 200_00, valorPagoBrlCents: 200_00 })],
-        null,
-      ),
+  it("soma os totais de todos os itens da trip (delegando para trip-math)", () => {
+    const itens = [
+      item({
+        id: "i1",
+        categoryId: "cat-1",
+        valorEstimadoBrlCents: 100_00,
+        valorPagoBrlCents: 50_00,
+      }),
+      item({
+        id: "i2",
+        categoryId: "cat-2",
+        valorEstimadoBrlCents: 200_00,
+        valorPagoBrlCents: 200_00,
+      }),
     ];
-    const totais = calcularTotaisGerais(resumos);
+    const totais = calcularTotaisGerais(itens, null);
     expect(totais.totalEstimadoBrlCents).toBe(300_00);
     expect(totais.totalPagoBrlCents).toBe(250_00);
   });
 
+  it("consolida estimado em moeda destino usando o câmbio manual (mesma fórmula de calcularMeta)", () => {
+    const itens = [item({ valorEstimadoDestinoCents: 10_000 })];
+    expect(calcularTotaisGerais(itens, 5).totalEstimadoBrlCents).toBe(50_000);
+  });
+
+  it("bate com o total das categorias somadas individualmente", () => {
+    const categorias = [categoria({ id: "cat-1" }), categoria({ id: "cat-2" })];
+    const itens = [
+      item({
+        id: "i1",
+        categoryId: "cat-1",
+        valorEstimadoBrlCents: 100_00,
+        valorPagoBrlCents: 40_00,
+      }),
+      item({
+        id: "i2",
+        categoryId: "cat-2",
+        valorEstimadoBrlCents: 200_00,
+        valorPagoBrlCents: 200_00,
+      }),
+    ];
+    const resumos = categorias.map((c) => calcularResumoCategoria(c, itens, null));
+    const somaPorCategoria = resumos.reduce(
+      (acc, r) => ({
+        totalEstimadoBrlCents: acc.totalEstimadoBrlCents + r.totalEstimadoBrlCents,
+        totalPagoBrlCents: acc.totalPagoBrlCents + r.totalPagoBrlCents,
+      }),
+      { totalEstimadoBrlCents: 0, totalPagoBrlCents: 0 },
+    );
+    expect(calcularTotaisGerais(itens, null)).toEqual(somaPorCategoria);
+  });
+
   it("retorna zero para lista vazia", () => {
-    expect(calcularTotaisGerais([])).toEqual({ totalEstimadoBrlCents: 0, totalPagoBrlCents: 0 });
+    expect(calcularTotaisGerais([], null)).toEqual({
+      totalEstimadoBrlCents: 0,
+      totalPagoBrlCents: 0,
+    });
   });
 });
 
@@ -226,5 +265,52 @@ describe("validarNovoItem", () => {
     expect(
       validarNovoItem({ nome: "Hotel", estimadoBrlCents: 0, estimadoDestinoCents: 50_00 }),
     ).toBeNull();
+  });
+});
+
+describe("CATEGORIAS_DEFAULT", () => {
+  it("tem as 9 categorias do PRD", () => {
+    expect(CATEGORIAS_DEFAULT.map((c) => c.nome)).toEqual([
+      "Passagens",
+      "Hospedagem",
+      "Ingressos e Passeios",
+      "Alimentação",
+      "Transporte",
+      "Seguro",
+      "Documentos",
+      "Compras",
+      "Outros",
+    ]);
+  });
+});
+
+describe("categoriasDefaultFaltando", () => {
+  it("retorna todas as 9 quando a trip não tem nenhuma categoria", () => {
+    expect(categoriasDefaultFaltando([])).toHaveLength(9);
+  });
+
+  it("exclui as categorias padrão que já existem, por nome", () => {
+    const existentes = [categoria({ id: "cat-1", nome: "Hospedagem" })];
+    const faltando = categoriasDefaultFaltando(existentes);
+    expect(faltando).toHaveLength(8);
+    expect(faltando.some((c) => c.nome === "Hospedagem")).toBe(false);
+  });
+
+  it("compara nome normalizado (trim + case-insensitive)", () => {
+    const existentes = [categoria({ id: "cat-1", nome: "  hospedagem  " })];
+    const faltando = categoriasDefaultFaltando(existentes);
+    expect(faltando.some((c) => c.nome === "Hospedagem")).toBe(false);
+  });
+
+  it('não remove nenhuma categoria padrão da lista de faltantes por causa de uma categoria não-padrão (ex.: "Geral")', () => {
+    const existentes = [categoria({ id: "cat-1", nome: "Geral" })];
+    expect(categoriasDefaultFaltando(existentes)).toHaveLength(9);
+  });
+
+  it("retorna vazio quando a paleta padrão já está completa", () => {
+    const existentes = CATEGORIAS_DEFAULT.map((c, i) =>
+      categoria({ id: `cat-${i}`, nome: c.nome }),
+    );
+    expect(categoriasDefaultFaltando(existentes)).toEqual([]);
   });
 });
