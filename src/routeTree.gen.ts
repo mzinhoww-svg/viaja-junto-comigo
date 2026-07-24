@@ -52,6 +52,7 @@ import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]
 import { Route as ConsoleOrcamentoNovoRouteImport } from './routes/console.orcamento.novo'
 import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$id'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as ConsoleOrcamentoIdEditarRouteImport } from './routes/console.orcamento.$id.editar'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
@@ -273,6 +274,11 @@ const Char91DotmcpChar93InvokeToolToolRoute =
     path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConsoleOrcamentoIdEditarRoute =
   ConsoleOrcamentoIdEditarRouteImport.update({
     id: '/orcamento/$id/editar',
@@ -327,6 +333,7 @@ export interface FileRoutesByFullPath {
   '/portal/taxas': typeof PortalTaxasRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
   '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
@@ -372,6 +379,7 @@ export interface FileRoutesByTo {
   '/portal/taxas': typeof PortalTaxasRoute
   '/console': typeof ConsoleIndexRoute
   '/portal': typeof PortalIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
   '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
@@ -420,6 +428,7 @@ export interface FileRoutesById {
   '/portal/taxas': typeof PortalTaxasRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
   '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
@@ -469,6 +478,7 @@ export interface FileRouteTypes {
     | '/portal/taxas'
     | '/console/'
     | '/portal/'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/console/cliente/$id'
     | '/console/orcamento/novo'
@@ -514,6 +524,7 @@ export interface FileRouteTypes {
     | '/portal/taxas'
     | '/console'
     | '/portal'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/console/cliente/$id'
     | '/console/orcamento/novo'
@@ -561,6 +572,7 @@ export interface FileRouteTypes {
     | '/portal/taxas'
     | '/console/'
     | '/portal/'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/console/cliente/$id'
     | '/console/orcamento/novo'
@@ -582,6 +594,7 @@ export interface RootRouteChildren {
   VistosRoute: typeof VistosRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
@@ -889,6 +902,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/console/orcamento/$id/editar': {
       id: '/console/orcamento/$id/editar'
       path: '/orcamento/$id/editar'
@@ -1009,6 +1029,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
