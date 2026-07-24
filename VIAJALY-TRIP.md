@@ -351,7 +351,8 @@ insert into public.checklist_templates (tipo, titulo, tier, marco, ordem) values
 7. Rode lint, typecheck, testes e build localmente antes do push
 8. Commit, push, abra PR contra main referenciando `Closes #N` da issue
 9. Atualize a seção 0 (ticket em aberto aguardando review) e adicione entrada na seção 8 com: o que foi feito, arquivos tocados, tabelas/RLS tocadas, como testar no celular, link do PR
-10. Pare. Não mergeie. Não inicie o próximo ticket até essa entrada ser seguida de "Mergeado" no log (o humano avisa, ou você confere o status da issue/PR na próxima sessão)
+10. **Execução em paralelo**: se este ticket rodar simultaneamente com outros da mesma onda (sessões/ambientes separados), NÃO edite a Seção 0 nem a Seção 8 deste arquivo no seu PR — apenas descreva o resultado completo no corpo do PR e da issue. A consolidação da Seção 0 e do Log em VIAJALY-TRIP.md acontece em uma única sessão de fechamento de onda, depois que todos os PRs da onda estiverem mergeados na main
+11. Pare. Não mergeie. Não inicie o próximo ticket até essa entrada ser seguida de "Mergeado" no log (o humano avisa, ou você confere o status da issue/PR na próxima sessão)
 ---
 ## 7. Backlog de tickets (19, com dependências)
 Formato: **VJT-XXX Título** — Problema · Escopo IN/OUT · Aceite · Bloqueado por.
