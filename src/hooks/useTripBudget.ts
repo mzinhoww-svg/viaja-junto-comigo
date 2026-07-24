@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { consolidarValorBRL } from "@/lib/trip-math";
 import {
@@ -10,6 +10,7 @@ import {
   type BudgetCategorySummary,
   type BudgetItemRow,
 } from "@/lib/trip-budget";
+import { invalidateFinanceiro, tripBudgetQueryKey } from "@/lib/trip-query-keys";
 
 export type TripBudgetData = {
   moedaDestino: string | null;
@@ -20,26 +21,9 @@ export type TripBudgetData = {
   faltaPagarBrlCents: number;
 };
 
-function queryKey(tripId: string | undefined) {
-  return ["trip", "budget", tripId] as const;
-}
-
-/**
- * budget_items e trips.cambio_manual também alimentam a Economia Mensal
- * (VJT-005, `["trip","savings",tripId]`) e o Dashboard (VJT-004,
- * `["trip","dashboard",tripId]`) — qualquer mutação daqui precisa invalidar
- * as três, senão as outras abas/telas ficam com dado desatualizado até um
- * reload.
- */
-function invalidateFinanceiro(qc: QueryClient, tripId: string) {
-  qc.invalidateQueries({ queryKey: queryKey(tripId) });
-  qc.invalidateQueries({ queryKey: ["trip", "savings", tripId] });
-  qc.invalidateQueries({ queryKey: ["trip", "dashboard", tripId] });
-}
-
 export function useTripBudget(tripId: string | undefined) {
   return useQuery({
-    queryKey: queryKey(tripId),
+    queryKey: tripBudgetQueryKey(tripId),
     enabled: !!tripId,
     queryFn: async (): Promise<TripBudgetData> => {
       const id = tripId as string;
