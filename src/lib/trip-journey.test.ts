@@ -5,8 +5,15 @@ import {
   construirJourneySteps,
   type JourneyStepItem,
 } from "./trip-journey";
+import { MARCOS_CONHECIDOS as MARCOS_CONHECIDOS_TEMPLATES } from "./trip-templates";
 
 const HOJE = new Date(2026, 0, 1); // 2026-01-01
+
+describe("MARCOS_CONHECIDOS (VJT-004b)", () => {
+  it("trip-journey reexporta a mesma referência de trip-templates, sem redeclarar (fonte única)", () => {
+    expect(MARCOS_CONHECIDOS).toBe(MARCOS_CONHECIDOS_TEMPLATES);
+  });
+});
 
 describe("calcularDiasRestantes", () => {
   it("retorna null sem data de viagem (modo sonho)", () => {
