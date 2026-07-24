@@ -47,6 +47,18 @@ export const CHECKLIST_TIPO_LABEL: Record<Exclude<ChecklistTipo, "custom">, stri
 };
 
 /**
+ * Marcos de preparação conhecidos do produto (Seção 4, seeds de
+ * `checklist_templates`), do mais distante ao mais próximo. Fonte única —
+ * outros módulos (ex. `trip-journey.ts`, e futuramente VJT-007) reexportam
+ * em vez de redeclarar, para não divergir se um marco mudar.
+ */
+export const MARCOS_CONHECIDOS: readonly number[] = [90, 60, 30, 15, 7];
+
+export function labelMarco(marco: number): string {
+  return `${marco} dias antes`;
+}
+
+/**
  * Um template se aplica quando o tier do usuário cobre o tier do template e
  * toda restrição de variável presente no template (regiao/clima/destino_pack/
  * com_crianca/min_duracao) é satisfeita pelas variáveis da trip. Restrição

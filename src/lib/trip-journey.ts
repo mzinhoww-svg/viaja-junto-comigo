@@ -5,6 +5,9 @@
  * marcos de preparação. Módulo puro: sem I/O, sem acesso a Supabase.
  */
 import type { TripMode } from "./trip-math";
+import { MARCOS_CONHECIDOS, labelMarco } from "./trip-templates";
+
+export { MARCOS_CONHECIDOS, labelMarco };
 
 const MS_POR_DIA = 24 * 60 * 60 * 1000;
 
@@ -44,13 +47,6 @@ export type JourneyStep = {
   itensTotal: number;
   status: JourneyStepStatus;
 };
-
-/** Marcos conhecidos do produto (Seção 4, seeds de `checklist_templates`), do mais distante ao mais próximo. */
-export const MARCOS_CONHECIDOS: readonly number[] = [90, 60, 30, 15, 7];
-
-function labelMarco(marco: number): string {
-  return `${marco} dias antes`;
-}
 
 /**
  * Um marco está "atual" quando os dias restantes até a viagem já entraram na
