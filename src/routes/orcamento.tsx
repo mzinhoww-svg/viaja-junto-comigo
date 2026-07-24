@@ -8,9 +8,17 @@ export const Route = createFileRoute("/orcamento")({
   head: () => ({
     meta: [
       { title: "Solicitar orçamento — Viajaly" },
-      { name: "description", content: "Consultoria de vistos, passaporte, roteiros e milhas. Solicite um orçamento sem compromisso e receba uma proposta personalizada." },
+      {
+        name: "description",
+        content:
+          "Consultoria de vistos, passaporte, roteiros e milhas. Solicite um orçamento sem compromisso e receba uma proposta personalizada.",
+      },
       { property: "og:title", content: "Solicitar orçamento — Viajaly" },
-      { property: "og:description", content: "Peça um orçamento para visto, passaporte, roteiros ou milhas. Atendimento humano em português, sem compromisso." },
+      {
+        property: "og:description",
+        content:
+          "Peça um orçamento para visto, passaporte, roteiros ou milhas. Atendimento humano em português, sem compromisso.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://viajaly.com/orcamento" },
       { property: "og:image", content: "https://viajaly.com/og/viajaly-og-default.png" },
@@ -29,10 +37,20 @@ function PageOrcamento() {
         <div className="max-w-2xl mx-auto px-5 py-4 flex items-center justify-between">
           <Logo size={28} />
           <a
-            href={waLink(null, "Olá! Já sou cliente Viajaly e quero acessar o portal.", { source: "orcamento", campaign: "orcamento", content: "ja-cliente" })}
+            href={waLink(null, "Olá! Já sou cliente Viajaly e quero acessar o portal.", {
+              source: "orcamento",
+              campaign: "orcamento",
+              content: "ja-cliente",
+            })}
             target="_blank"
             rel="noopener"
-            onClick={() => trackWhatsAppClick({ source: "orcamento", campaign: "orcamento", content: "ja-cliente" })}
+            onClick={() =>
+              trackWhatsAppClick({
+                source: "orcamento",
+                campaign: "orcamento",
+                content: "ja-cliente",
+              })
+            }
             className="text-xs text-ink-soft hover:text-coral"
           >
             Já é cliente? Acesse o portal
@@ -41,15 +59,23 @@ function PageOrcamento() {
       </header>
 
       <main className="max-w-2xl mx-auto px-5 py-10">
-        <h1 className="text-3xl sm:text-4xl font-display font-extrabold text-navy">Vamos planejar sua viagem</h1>
-        <p className="mt-2 text-ink-soft">Conta pra gente o que precisa. A Letícia retorna em até 24h.</p>
+        <h1 className="text-3xl sm:text-4xl font-display font-extrabold text-navy">
+          Vamos planejar sua viagem
+        </h1>
+        <p className="mt-2 text-ink-soft">
+          Conta pra gente o que precisa. A Letícia retorna em até 24h.
+        </p>
 
         <div className="mt-8 bg-white border border-[var(--color-border)] rounded-3xl p-6 sm:p-8">
           <PublicLeadForm />
         </div>
 
         <p className="mt-6 text-xs text-ink-muted text-center">
-          Seus dados são tratados de acordo com a nossa <a href="/privacidade" className="underline">Política de Privacidade</a>.
+          Seus dados são tratados de acordo com a nossa{" "}
+          <a href="/privacidade" className="underline">
+            Política de Privacidade
+          </a>
+          .
         </p>
       </main>
     </div>

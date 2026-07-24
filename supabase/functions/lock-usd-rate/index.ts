@@ -36,7 +36,9 @@ async function fetchUsdAsk(): Promise<{ rate: number; as_of: string } | null> {
     const rate = Number(u.ask);
     if (!Number.isFinite(rate) || rate <= 0) return null;
     // create_date vem em "YYYY-MM-DD HH:MM:SS" no fuso BRT; tratamos como timestamptz BRT.
-    const asOf = u.create_date ? new Date(String(u.create_date).replace(" ", "T") + "-03:00").toISOString() : new Date().toISOString();
+    const asOf = u.create_date
+      ? new Date(String(u.create_date).replace(" ", "T") + "-03:00").toISOString()
+      : new Date().toISOString();
     return { rate, as_of: asOf };
   } catch {
     return null;
@@ -51,10 +53,15 @@ Deno.serve(async (req) => {
   if (!authHeader) return json({ error: "unauthorized" }, 401);
 
   let body: { request_id?: string; force?: boolean };
-  try { body = await req.json(); } catch { return json({ error: "invalid_body" }, 400); }
+  try {
+    body = await req.json();
+  } catch {
+    return json({ error: "invalid_body" }, 400);
+  }
   const requestId = body.request_id;
   const force = !!body.force;
-  if (!requestId || !/^[0-9a-f-]{36}$/i.test(requestId)) return json({ error: "invalid_request_id" }, 400);
+  if (!requestId || !/^[0-9a-f-]{36}$/i.test(requestId))
+    return json({ error: "invalid_request_id" }, 400);
 
   // Caller-scoped client: enforces membership via is_request_member in get_usd_rate
   const userClient = createClient(SUPABASE_URL, ANON_KEY, {
@@ -77,9 +84,10 @@ Deno.serve(async (req) => {
   // 3) Fallback to previous if API failed
   if (!fresh) {
     if (c.rate != null) {
-      const prevSource = c.source && !c.source.includes("(cotação anterior)")
-        ? `${c.source} (cotação anterior)`
-        : (c.source ?? "AwesomeAPI · USD-BRL (ask) (cotação anterior)");
+      const prevSource =
+        c.source && !c.source.includes("(cotação anterior)")
+          ? `${c.source} (cotação anterior)`
+          : (c.source ?? "AwesomeAPI · USD-BRL (ask) (cotação anterior)");
       return json({ rate: Number(c.rate), as_of: c.as_of, source: prevSource, cached: true });
     }
     return json({ error: "usd_rate_unavailable" }, 502);
@@ -103,7 +111,12 @@ Deno.serve(async (req) => {
   // admin client kept for future maintenance (e.g., audit), unused here
   void admin;
 
-  const out = (apply.data ?? {}) as { rate: number; as_of: string; source: string; cached: boolean };
+  const out = (apply.data ?? {}) as {
+    rate: number;
+    as_of: string;
+    source: string;
+    cached: boolean;
+  };
   return json({
     rate: Number(out.rate),
     as_of: out.as_of,

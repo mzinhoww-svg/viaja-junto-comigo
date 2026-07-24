@@ -18,7 +18,9 @@ function ConsoleConfig() {
       </div>
       <div className="mt-10">
         <h2 className="text-xl font-display font-extrabold text-navy mb-1">Template de contrato</h2>
-        <p className="text-sm text-ink-soft mb-4">Edite o texto do contrato assinado pelo cliente.</p>
+        <p className="text-sm text-ink-soft mb-4">
+          Edite o texto do contrato assinado pelo cliente.
+        </p>
         <ContractTemplateEditor />
       </div>
     </section>

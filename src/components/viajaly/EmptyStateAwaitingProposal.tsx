@@ -8,7 +8,8 @@ export function EmptyStateAwaitingProposal({ firstName }: { firstName?: string }
         {firstName ? `Olá, ${firstName}!` : "Olá!"}
       </h2>
       <p className="mt-2 text-sm text-ink-soft max-w-sm mx-auto">
-        Recebemos sua solicitação. A Letícia já está montando sua proposta personalizada e vai te chamar no WhatsApp em até 24 horas.
+        Recebemos sua solicitação. A Letícia já está montando sua proposta personalizada e vai te
+        chamar no WhatsApp em até 24 horas.
       </p>
       <p className="mt-4 text-xs text-ink-muted">
         Enquanto isso, fique tranquilo — qualquer novidade chega aqui no portal e no seu WhatsApp.

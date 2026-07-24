@@ -81,8 +81,7 @@ export function personalizedAccessLink(code: string, origin?: string) {
 
 export function buildHandoffMessage(args: { name: string; link: string; code: string }) {
   const first = (args.name || "").trim().split(/\s+/)[0] || "Olá";
-  return (
-`Oi, ${first}! Aqui é da Viajaly ✨
+  return `Oi, ${first}! Aqui é da Viajaly ✨
 
 Preparamos sua proposta personalizada. Para acessar é só clicar no link abaixo — o código já vai preenchido:
 
@@ -90,15 +89,10 @@ Preparamos sua proposta personalizada. Para acessar é só clicar no link abaixo
 
 Caso precise digitar manualmente, seu código é: ${args.code}
 
-Qualquer dúvida, é só responder por aqui. Até já! 💛`
-  );
+Qualquer dúvida, é só responder por aqui. Até já! 💛`;
 }
 
-export function openWhatsApp(
-  e164: string | null | undefined,
-  text: string,
-  tracking?: WaTracking,
-) {
+export function openWhatsApp(e164: string | null | undefined, text: string, tracking?: WaTracking) {
   if (typeof window === "undefined") return;
   trackWhatsAppClick(tracking);
   window.open(waLink(e164, text, tracking), "_blank", "noopener");

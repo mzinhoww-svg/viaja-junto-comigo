@@ -11,9 +11,11 @@ import { z } from "zod";
  */
 export const loginWithCode = createServerFn({ method: "POST" })
   .inputValidator((input) =>
-    z.object({
-      code: z.string().regex(/^\d{6}$/, "Código deve ter 6 dígitos"),
-    }).parse(input),
+    z
+      .object({
+        code: z.string().regex(/^\d{6}$/, "Código deve ter 6 dígitos"),
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -59,7 +61,8 @@ export const loginWithCode = createServerFn({ method: "POST" })
       .limit(2);
 
     const req = matches && matches.length === 1 ? matches[0] : null;
-    const expired = !!req && req.access_code_expires_at && new Date(req.access_code_expires_at) < now;
+    const expired =
+      !!req && req.access_code_expires_at && new Date(req.access_code_expires_at) < now;
     const ok = !!req && !expired;
     const email = req?.lead_email?.toLowerCase() ?? "";
     const maskedCode = data.code; // gravamos completo p/ correlacionar; UI mascara ao mostrar
@@ -99,9 +102,11 @@ export const loginWithCode = createServerFn({ method: "POST" })
  */
 export const requestCodeResend = createServerFn({ method: "POST" })
   .inputValidator((input) =>
-    z.object({
-      code: z.string().regex(/^\d{6}$/),
-    }).parse(input),
+    z
+      .object({
+        code: z.string().regex(/^\d{6}$/),
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

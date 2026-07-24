@@ -7,18 +7,28 @@ import { SERVICES, type Service, type Consulate } from "@/lib/schedule-shared";
 
 type Traveler = { id: string; name: string; is_lead: boolean; agency_id: string };
 
-export function ScheduleList({ requestId, variant }: { requestId: string; variant: "portal" | "console" }) {
+export function ScheduleList({
+  requestId,
+  variant,
+}: {
+  requestId: string;
+  variant: "portal" | "console";
+}) {
   const q = useQuery({
     queryKey: ["agenda", requestId],
     enabled: !!requestId,
     queryFn: async () => {
       const { data: reqRow, error: rErr } = await supabase
-        .from("requests_safe").select("id, agency_id").eq("id", requestId).maybeSingle();
+        .from("requests_safe")
+        .select("id, agency_id")
+        .eq("id", requestId)
+        .maybeSingle();
       if (rErr) throw rErr;
       const agency_id = reqRow?.agency_id;
 
       const { data: travelers, error: tErr } = await supabase
-        .from("travelers").select("id, name, is_lead")
+        .from("travelers")
+        .select("id, name, is_lead")
         .eq("request_id", requestId)
         .order("is_lead", { ascending: false });
       if (tErr) throw tErr;
@@ -28,7 +38,9 @@ export function ScheduleList({ requestId, variant }: { requestId: string; varian
       if (tids.length) {
         const { data, error } = await supabase
           .from("schedule_intents")
-          .select("id, traveler_id, service, status, wish_dates, wish_period, consulate, notes, confirmed_date")
+          .select(
+            "id, traveler_id, service, status, wish_dates, wish_period, consulate, notes, confirmed_date",
+          )
           .in("traveler_id", tids);
         if (error) throw error;
         intents = (data ?? []) as Intent[];
@@ -37,7 +49,10 @@ export function ScheduleList({ requestId, variant }: { requestId: string; varian
       let slots: Record<string, Record<string, string[]>> = {};
       if (agency_id) {
         const { data: win } = await supabase
-          .from("schedule_window").select("slots").eq("agency_id", agency_id).maybeSingle();
+          .from("schedule_window")
+          .select("slots")
+          .eq("agency_id", agency_id)
+          .maybeSingle();
         slots = (win?.slots as Record<string, Record<string, string[]>>) ?? {};
       }
 
@@ -57,12 +72,15 @@ export function ScheduleList({ requestId, variant }: { requestId: string; varian
         q.refetch();
       })
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestId]);
 
   if (q.isLoading) return <Skeleton className="h-40 rounded-2xl" />;
-  if (!q.data || q.data.travelers.length === 0) return <p className="text-ink-muted text-sm">Sem viajantes.</p>;
+  if (!q.data || q.data.travelers.length === 0)
+    return <p className="text-ink-muted text-sm">Sem viajantes.</p>;
 
   return (
     <div className="space-y-6">

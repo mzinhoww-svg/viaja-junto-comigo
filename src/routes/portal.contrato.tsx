@@ -31,7 +31,11 @@ function pickTemplate(
 ): string | null {
   const keys = Array.from(new Set(items.map((i) => i.product_key).filter(Boolean) as string[]));
   const scope = keys.length >= 2 ? "combo" : (keys[0] ?? "default");
-  return list.find((t) => t.scope === scope)?.body_html ?? list.find((t) => t.scope === "default")?.body_html ?? null;
+  return (
+    list.find((t) => t.scope === scope)?.body_html ??
+    list.find((t) => t.scope === "default")?.body_html ??
+    null
+  );
 }
 
 function ContratoPage() {
@@ -55,7 +59,10 @@ function ContratoPage() {
     enabled: !!req.data?.id,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("proposal_items").select("*").eq("request_id", req.data!.id).order("sort");
+        .from("proposal_items")
+        .select("*")
+        .eq("request_id", req.data!.id)
+        .order("sort");
       if (error) throw error;
       return data;
     },
@@ -69,7 +76,10 @@ function ContratoPage() {
         supabase.from("agencies").select("name").eq("id", req.data!.agency_id).maybeSingle(),
         supabase.from("travelers").select("name, is_lead").eq("request_id", req.data!.id),
       ]);
-      const travelers = (t.data ?? []).map((x) => ({ name: x.name, relation: x.is_lead ? "titular" : null }));
+      const travelers = (t.data ?? []).map((x) => ({
+        name: x.name,
+        relation: x.is_lead ? "titular" : null,
+      }));
       return { agencyName: a.data?.name ?? "Viajaly", travelers };
     },
   });
@@ -78,7 +88,11 @@ function ContratoPage() {
     queryKey: ["contract", req.data?.id],
     enabled: !!req.data?.id,
     queryFn: async () => {
-      const { data } = await supabase.from("contracts").select("*").eq("request_id", req.data!.id).maybeSingle();
+      const { data } = await supabase
+        .from("contracts")
+        .select("*")
+        .eq("request_id", req.data!.id)
+        .maybeSingle();
       return data;
     },
   });
@@ -87,28 +101,36 @@ function ContratoPage() {
     queryKey: ["contract-templates-for-request", req.data?.id],
     enabled: !!req.data?.id,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("list_contract_templates_for_request" as never, {
-        _request_id: req.data!.id,
-      } as never);
+      const { data, error } = await supabase.rpc(
+        "list_contract_templates_for_request" as never,
+        {
+          _request_id: req.data!.id,
+        } as never,
+      );
       if (error) throw error;
       return (data ?? []) as { scope: string; body_html: string }[];
     },
   });
 
-
   const bodyHtml = useMemo(() => {
     if (!req.data || !items.data || !ctx.data) return "";
-    return renderContract({
-      agencyName: ctx.data.agencyName,
-      clientName: req.data.lead_name,
-      clientEmail: req.data.lead_email,
-      travelers: ctx.data.travelers,
-      items: items.data.map((i) => ({
-        label: i.label, qty: i.qty, unit_price_cents: i.unit_price_cents, discount_cents: i.discount_cents,
-      })),
-      totalCents: req.data.proposal_total_cents,
-      todayISO: new Date().toISOString(),
-    }, pickTemplate(templates.data ?? [], items.data ?? []));
+    return renderContract(
+      {
+        agencyName: ctx.data.agencyName,
+        clientName: req.data.lead_name,
+        clientEmail: req.data.lead_email,
+        travelers: ctx.data.travelers,
+        items: items.data.map((i) => ({
+          label: i.label,
+          qty: i.qty,
+          unit_price_cents: i.unit_price_cents,
+          discount_cents: i.discount_cents,
+        })),
+        totalCents: req.data.proposal_total_cents,
+        todayISO: new Date().toISOString(),
+      },
+      pickTemplate(templates.data ?? [], items.data ?? []),
+    );
   }, [req.data, items.data, ctx.data, templates.data]);
 
   const signFn = useServerFn(signContract);
@@ -182,18 +204,24 @@ function ContratoPage() {
       <div className="px-5 pt-8 pb-32">
         <div className="flex items-center justify-between">
           <Logo size={32} />
-          <button onClick={signOut} className="text-xs text-ink-muted hover:text-coral">Sair</button>
+          <button onClick={signOut} className="text-xs text-ink-muted hover:text-coral">
+            Sair
+          </button>
         </div>
 
         <div className="mt-6">
           <p className="text-xs uppercase tracking-wider text-coral font-bold">Etapa 3 de 7</p>
-          <h1 className="mt-1 text-3xl font-display font-extrabold text-navy leading-tight">Contrato</h1>
+          <h1 className="mt-1 text-3xl font-display font-extrabold text-navy leading-tight">
+            Contrato
+          </h1>
           <p className="mt-2 text-sm text-ink-soft">Leia com calma e assine digitalmente abaixo.</p>
         </div>
 
         <article
           className="mt-6 rounded-2xl bg-white border border-[var(--color-border)] p-5 text-sm text-ink leading-relaxed prose-contract"
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(displayHtml, { USE_PROFILES: { html: true } }) }}
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(displayHtml, { USE_PROFILES: { html: true } }),
+          }}
         />
 
         <div className="mt-4">
@@ -203,14 +231,21 @@ function ContratoPage() {
         {signed ? (
           <div className="mt-6 rounded-2xl bg-[var(--color-success-bg)] border border-[color-mix(in_oklab,var(--color-success-fg)_25%,transparent)] p-6 text-center">
             <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-white shadow-sm">
-              <CheckCircle2 className="text-[var(--color-success-fg)]" size={36} strokeWidth={2.4} />
+              <CheckCircle2
+                className="text-[var(--color-success-fg)]"
+                size={36}
+                strokeWidth={2.4}
+              />
             </div>
-            <h2 className="mt-4 font-display font-extrabold text-navy text-xl">Contrato assinado</h2>
+            <h2 className="mt-4 font-display font-extrabold text-navy text-xl">
+              Contrato assinado
+            </h2>
             <p className="mt-1 text-sm text-ink-soft">
               Assinado digitalmente por <b className="text-navy">{req.data?.sign_name}</b>
               {req.data?.signed_at && (
                 <> em {new Date(req.data.signed_at).toLocaleDateString("pt-BR")}</>
-              )}.
+              )}
+              .
             </p>
             <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-2">
               <Button
@@ -232,7 +267,11 @@ function ContratoPage() {
         ) : (
           <div className="mt-6 rounded-2xl bg-cream border border-coral/30 p-5 space-y-3">
             <label className="block text-sm font-semibold text-navy">Seu nome completo</label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Como aparece no passaporte" />
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Como aparece no passaporte"
+            />
             <label className="flex items-start gap-2 text-sm text-ink cursor-pointer">
               <Checkbox checked={agree} onCheckedChange={(v) => setAgree(!!v)} className="mt-0.5" />
               <span>Li, compreendi e concordo com todas as cláusulas deste contrato.</span>

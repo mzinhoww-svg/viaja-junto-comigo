@@ -1,6 +1,11 @@
 import { formatBRL } from "./money";
 
-export type ContractItem = { label: string; qty: number; unit_price_cents: number; discount_cents: number };
+export type ContractItem = {
+  label: string;
+  qty: number;
+  unit_price_cents: number;
+  discount_cents: number;
+};
 export type ContractCtx = {
   agencyName: string;
   clientName: string;
@@ -12,30 +17,44 @@ export type ContractCtx = {
 };
 
 const esc = (s: string) =>
-  s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
+  s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
 
 export function renderContract(c: ContractCtx, templateHtml?: string | null): string {
-  const today = new Date(c.todayISO).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
+  const today = new Date(c.todayISO).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
   const itemsHtml = c.items
     .map(
-      (it) => `<li><b>${esc(it.label)}</b> — ${it.qty}× ${formatBRL(it.unit_price_cents)}${
-        it.discount_cents > 0 ? ` (desc. ${formatBRL(it.discount_cents)})` : ""
-      }</li>`,
+      (it) =>
+        `<li><b>${esc(it.label)}</b> — ${it.qty}× ${formatBRL(it.unit_price_cents)}${
+          it.discount_cents > 0 ? ` (desc. ${formatBRL(it.discount_cents)})` : ""
+        }</li>`,
     )
     .join("");
   const travHtml = c.travelers
-    .map((t) => `<li>${esc(t.name)}${t.relation ? ` <span class="muted">(${esc(t.relation)})</span>` : ""}</li>`)
+    .map(
+      (t) =>
+        `<li>${esc(t.name)}${t.relation ? ` <span class="muted">(${esc(t.relation)})</span>` : ""}</li>`,
+    )
     .join("");
 
   // Template editável (admin): preenche placeholders. Qualquer ausência cai no padrão abaixo.
   if (templateHtml && templateHtml.trim()) {
     return templateHtml
-      .split("{{AGENCY}}").join(esc(c.agencyName))
-      .split("{{CLIENT}}").join(`${esc(c.clientName)} — ${esc(c.clientEmail)}`)
-      .split("{{TRAVELERS}}").join(travHtml || "<li>Titular</li>")
-      .split("{{ITEMS}}").join(itemsHtml)
-      .split("{{TOTAL}}").join(formatBRL(c.totalCents))
-      .split("{{DATE}}").join(today);
+      .split("{{AGENCY}}")
+      .join(esc(c.agencyName))
+      .split("{{CLIENT}}")
+      .join(`${esc(c.clientName)} — ${esc(c.clientEmail)}`)
+      .split("{{TRAVELERS}}")
+      .join(travHtml || "<li>Titular</li>")
+      .split("{{ITEMS}}")
+      .join(itemsHtml)
+      .split("{{TOTAL}}")
+      .join(formatBRL(c.totalCents))
+      .split("{{DATE}}")
+      .join(today);
   }
 
   return `

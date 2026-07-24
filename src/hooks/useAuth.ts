@@ -16,7 +16,12 @@ export type AuthState = {
  * defers any supabase calls via setTimeout to avoid the documented deadlock.
  */
 export function useAuth(): AuthState {
-  const [state, setState] = useState<AuthState>({ loading: true, user: null, role: null, agencyId: null });
+  const [state, setState] = useState<AuthState>({
+    loading: true,
+    user: null,
+    role: null,
+    agencyId: null,
+  });
 
   useEffect(() => {
     let mounted = true;

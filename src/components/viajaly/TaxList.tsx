@@ -2,18 +2,22 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  lockUsdRate,
-  confirmTaxPayment,
-  adminSetTaxStatus,
-} from "@/lib/taxes.functions";
+import { lockUsdRate, confirmTaxPayment, adminSetTaxStatus } from "@/lib/taxes.functions";
 import { createTaxesCheckout } from "@/lib/payments-stripe.functions";
 import { getStripe, getStripeEnvironment, paymentsConfigured } from "@/lib/stripe";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Loader2, CheckCircle2, Clock, ShieldOff, RefreshCcw, CreditCard, QrCode } from "lucide-react";
+import {
+  Loader2,
+  CheckCircle2,
+  Clock,
+  ShieldOff,
+  RefreshCcw,
+  CreditCard,
+  QrCode,
+} from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Traveler = { id: string; name: string; is_lead: boolean };
@@ -51,7 +55,13 @@ const KIND_LABEL: Record<TaxKind, string> = {
 const formatBRL = (cents: number) =>
   (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-export function TaxList({ requestId, variant }: { requestId: string; variant: "portal" | "console" }) {
+export function TaxList({
+  requestId,
+  variant,
+}: {
+  requestId: string;
+  variant: "portal" | "console";
+}) {
   const qc = useQueryClient();
   const lockFn = useServerFn(lockUsdRate);
   const confirmFn = useServerFn(confirmTaxPayment);
@@ -80,7 +90,9 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
       if (ids.length > 0) {
         const { data, error } = await supabase
           .from("tax_payments")
-          .select("id, traveler_id, kind, amount_usd_cents, amount_brl_cents, status, notes, paid_at")
+          .select(
+            "id, traveler_id, kind, amount_usd_cents, amount_brl_cents, status, notes, paid_at",
+          )
           .in("traveler_id", ids);
         if (error) throw error;
         taxes = (data ?? []) as TaxRow[];
@@ -128,7 +140,10 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
       qc.invalidateQueries({ queryKey: ["request", requestId] });
     }, 2500);
     const stop = setTimeout(() => clearInterval(id), 60000);
-    return () => { clearInterval(id); clearTimeout(stop); };
+    return () => {
+      clearInterval(id);
+      clearTimeout(stop);
+    };
   }, [variant, qc, requestId]);
 
   const relockMut = useMutation({
@@ -164,13 +179,22 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
 
   if (q.isLoading) return <p className="text-ink-muted text-sm">Carregando taxas…</p>;
   if (q.isError) return <p className="text-coral text-sm">Erro ao carregar taxas.</p>;
-  if (!q.data || q.data.travelers.length === 0) return <p className="text-ink-muted text-sm">Sem viajantes.</p>;
+  if (!q.data || q.data.travelers.length === 0)
+    return <p className="text-ink-muted text-sm">Sem viajantes.</p>;
 
   const { request, travelers, taxes, upsells } = q.data;
-  const totalPendingBrl = taxes.filter((t) => t.status === "pending").reduce((s, t) => s + t.amount_brl_cents, 0);
-  const upsellTotalBrl = upsells.reduce((s, it) => s + (it.qty * it.unit_price_cents - (it.discount_cents ?? 0)), 0);
-  const totalAllBrl = taxes.filter((t) => t.status !== "waived").reduce((s, t) => s + t.amount_brl_cents, 0);
-  const allPaid = taxes.length > 0 && taxes.every((t) => t.status !== "pending") && upsells.length === 0;
+  const totalPendingBrl = taxes
+    .filter((t) => t.status === "pending")
+    .reduce((s, t) => s + t.amount_brl_cents, 0);
+  const upsellTotalBrl = upsells.reduce(
+    (s, it) => s + (it.qty * it.unit_price_cents - (it.discount_cents ?? 0)),
+    0,
+  );
+  const totalAllBrl = taxes
+    .filter((t) => t.status !== "waived")
+    .reduce((s, t) => s + t.amount_brl_cents, 0);
+  const allPaid =
+    taxes.length > 0 && taxes.every((t) => t.status !== "pending") && upsells.length === 0;
   const grandTotal = totalPendingBrl + upsellTotalBrl;
   const rate = request.usd_rate ? Number(request.usd_rate) : null;
   const asOf = request.usd_as_of ? new Date(request.usd_as_of as string) : null;
@@ -181,14 +205,16 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
       <div className="rounded-2xl bg-navy text-cream p-4">
         <p className="text-xs uppercase tracking-wider opacity-70">Cobrança de taxas</p>
         <p className="mt-1 text-sm leading-relaxed">
-          A Viajaly paga as taxas oficiais (consulado e Polícia Federal). Você paga em reais via Pix ou cartão
-          no checkout seguro abaixo, com o valor já convertido pela cotação travada.
+          A Viajaly paga as taxas oficiais (consulado e Polícia Federal). Você paga em reais via Pix
+          ou cartão no checkout seguro abaixo, com o valor já convertido pela cotação travada.
         </p>
         {rate != null && (
           <div className="mt-3 text-xs opacity-90 flex flex-wrap items-center gap-2">
             <span>
               Dólar comercial <b>R$ {rate.toFixed(2).replace(".", ",")}</b>
-              {asOf ? ` · consultado em ${asOf.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}` : ""}
+              {asOf
+                ? ` · consultado em ${asOf.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}`
+                : ""}
               {source ? ` · fonte: ${source}` : ""}
             </span>
             {variant === "console" && (
@@ -197,7 +223,11 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
                 disabled={relockMut.isPending}
                 className="inline-flex items-center gap-1 underline decoration-coral underline-offset-4"
               >
-                {relockMut.isPending ? <Loader2 size={12} className="animate-spin" /> : <RefreshCcw size={12} />}
+                {relockMut.isPending ? (
+                  <Loader2 size={12} className="animate-spin" />
+                ) : (
+                  <RefreshCcw size={12} />
+                )}
                 Atualizar cotação
               </button>
             )}
@@ -221,9 +251,14 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
                   {items.map((it) => {
                     const meta = STATUS[it.status];
                     return (
-                      <li key={it.id} className="flex items-center justify-between gap-2 text-ink-soft">
+                      <li
+                        key={it.id}
+                        className="flex items-center justify-between gap-2 text-ink-soft"
+                      >
                         <span className="flex items-center gap-2">
-                          <span className={`inline-flex items-center gap-1 text-xs uppercase tracking-wider font-bold px-2 py-0.5 rounded-full ${meta.cls}`}>
+                          <span
+                            className={`inline-flex items-center gap-1 text-xs uppercase tracking-wider font-bold px-2 py-0.5 rounded-full ${meta.cls}`}
+                          >
                             <meta.Icon size={12} /> {meta.label}
                           </span>
                           <span>
@@ -241,7 +276,12 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
                             disabled={adminItemMut.isPending}
                             current={it.status}
                             onSet={(status, notes) =>
-                              adminItemMut.mutate({ traveler_id: t.id, kind: it.kind, status, notes })
+                              adminItemMut.mutate({
+                                traveler_id: t.id,
+                                kind: it.kind,
+                                status,
+                                notes,
+                              })
                             }
                           />
                         )}
@@ -255,11 +295,18 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
         </ul>
         {upsells.length > 0 && (
           <div className="mt-3 border-t border-[var(--color-border)] pt-3">
-            <p className="text-xs uppercase tracking-wider text-coral font-bold">Renovação de passaporte</p>
+            <p className="text-xs uppercase tracking-wider text-coral font-bold">
+              Renovação de passaporte
+            </p>
             <ul className="mt-1 space-y-1 text-sm">
               {upsells.map((u) => (
                 <li key={u.id} className="flex items-center justify-between text-ink-soft">
-                  <span>{u.label} <span className="text-xs uppercase tracking-wider text-coral">· preço especial</span></span>
+                  <span>
+                    {u.label}{" "}
+                    <span className="text-xs uppercase tracking-wider text-coral">
+                      · preço especial
+                    </span>
+                  </span>
                   <span className="font-mono text-ink">
                     {formatBRL(u.qty * u.unit_price_cents - (u.discount_cents ?? 0))}
                   </span>
@@ -284,7 +331,6 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
         <TaxesCheckout requestId={requestId} amount={grandTotal} />
       )}
 
-
       {variant === "portal" && allPaid && (
         <p className="text-sm text-vgreen text-center">Todas as taxas estão confirmadas.</p>
       )}
@@ -293,8 +339,8 @@ export function TaxList({ requestId, variant }: { requestId: string; variant: "p
         <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4 md:p-5">
           <h3 className="font-display font-bold text-navy text-sm">Override de admin</h3>
           <p className="text-xs text-ink-soft mt-1">
-            O caminho principal é o cliente pagar pelo checkout Stripe. Use estes botões só para corrigir
-            manualmente (ex.: pagamento fora do app, isenção).
+            O caminho principal é o cliente pagar pelo checkout Stripe. Use estes botões só para
+            corrigir manualmente (ex.: pagamento fora do app, isenção).
           </p>
           <div className="flex flex-wrap gap-2 mt-3">
             <Button
@@ -327,8 +373,8 @@ function TaxesCheckout({ requestId, amount }: { requestId: string; amount: numbe
   if (!paymentsConfigured()) {
     return (
       <div className="rounded-2xl bg-[var(--color-danger-bg)] text-[var(--color-danger-fg)] p-5 text-sm">
-        Pagamentos online ainda não configurados. Entre em contato com a Letícia para finalizar o pagamento
-        das taxas.
+        Pagamentos online ainda não configurados. Entre em contato com a Letícia para finalizar o
+        pagamento das taxas.
       </div>
     );
   }
@@ -336,8 +382,12 @@ function TaxesCheckout({ requestId, amount }: { requestId: string; amount: numbe
   return (
     <Tabs value={method} onValueChange={(v) => setMethod(v as "pix" | "card")}>
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="pix"><QrCode size={14} className="mr-1.5" /> Pix</TabsTrigger>
-        <TabsTrigger value="card"><CreditCard size={14} className="mr-1.5" /> Cartão</TabsTrigger>
+        <TabsTrigger value="pix">
+          <QrCode size={14} className="mr-1.5" /> Pix
+        </TabsTrigger>
+        <TabsTrigger value="card">
+          <CreditCard size={14} className="mr-1.5" /> Cartão
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="pix" className="mt-4">
         <TaxesCheckoutPanel key="pix" requestId={requestId} method="pix" amount={amount} />
@@ -349,7 +399,15 @@ function TaxesCheckout({ requestId, amount }: { requestId: string; amount: numbe
   );
 }
 
-function TaxesCheckoutPanel({ requestId, method, amount }: { requestId: string; method: "pix" | "card"; amount: number }) {
+function TaxesCheckoutPanel({
+  requestId,
+  method,
+  amount,
+}: {
+  requestId: string;
+  method: "pix" | "card";
+  amount: number;
+}) {
   const create = useServerFn(createTaxesCheckout);
   const [error, setError] = useState<string | null>(null);
 
@@ -375,7 +433,14 @@ function TaxesCheckoutPanel({ requestId, method, amount }: { requestId: string; 
       <div className="rounded-2xl bg-[var(--color-danger-bg)] text-[var(--color-danger-fg)] p-4 text-sm">
         <p className="font-semibold">Não foi possível abrir o checkout.</p>
         <p className="mt-1">{error}</p>
-        <Button onClick={() => { setError(null); toast.info("Tente novamente."); }} variant="outline" className="mt-3 h-9">
+        <Button
+          onClick={() => {
+            setError(null);
+            toast.info("Tente novamente.");
+          }}
+          variant="outline"
+          className="mt-3 h-9"
+        >
           Tentar de novo
         </Button>
       </div>
@@ -433,18 +498,42 @@ function AdminInline({
             maxLength={500}
           />
           <div className="mt-2 grid grid-cols-3 gap-1">
-            <Button size="sm" variant="outline" className="text-vgreen border-vgreen/40 text-xs min-h-10"
-              onClick={() => { onSet("paid", notes); setOpen(false); }}
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-vgreen border-vgreen/40 text-xs min-h-10"
+              onClick={() => {
+                onSet("paid", notes);
+                setOpen(false);
+              }}
               disabled={current === "paid"}
-            >Pago</Button>
-            <Button size="sm" variant="outline" className="text-xs min-h-10"
-              onClick={() => { onSet("pending", notes); setOpen(false); }}
+            >
+              Pago
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs min-h-10"
+              onClick={() => {
+                onSet("pending", notes);
+                setOpen(false);
+              }}
               disabled={current === "pending"}
-            >Pend.</Button>
-            <Button size="sm" variant="outline" className="text-amber-700 border-amber-300 text-xs min-h-10"
-              onClick={() => { onSet("waived", notes); setOpen(false); }}
+            >
+              Pend.
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-amber-700 border-amber-300 text-xs min-h-10"
+              onClick={() => {
+                onSet("waived", notes);
+                setOpen(false);
+              }}
               disabled={current === "waived"}
-            >Isentar</Button>
+            >
+              Isentar
+            </Button>
           </div>
         </div>
       )}

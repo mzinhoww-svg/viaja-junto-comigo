@@ -15,10 +15,13 @@ export function InviteMemberModal({ onClose }: { onClose: () => void }) {
 
   const invite = useMutation({
     mutationFn: async () => {
-      const { data, error } = await supabase.rpc("invite_member" as never, {
-        _email: email,
-        _role: role,
-      } as never);
+      const { data, error } = await supabase.rpc(
+        "invite_member" as never,
+        {
+          _email: email,
+          _role: role,
+        } as never,
+      );
       if (error) throw error;
       return data as unknown as { token: string };
     },
@@ -39,22 +42,39 @@ export function InviteMemberModal({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-3" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-3"
+      onClick={onClose}
+    >
       <div className="bg-white rounded-2xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--color-border)]">
           <h3 className="font-display font-bold text-navy">Convidar pessoa</h3>
-          <button onClick={onClose} className="text-ink-soft hover:text-coral"><X size={18} /></button>
+          <button onClick={onClose} className="text-ink-soft hover:text-coral">
+            <X size={18} />
+          </button>
         </div>
         <div className="p-5 space-y-4">
           {!link ? (
             <>
               <div>
-                <label className="text-xs font-semibold text-ink-soft uppercase tracking-wider">E-mail</label>
-                <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="pessoa@agencia.com" />
+                <label className="text-xs font-semibold text-ink-soft uppercase tracking-wider">
+                  E-mail
+                </label>
+                <Input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="pessoa@agencia.com"
+                />
               </div>
               <div>
-                <label className="text-xs font-semibold text-ink-soft uppercase tracking-wider">Papel</label>
-                <select value={role} onChange={(e) => setRole(e.target.value as "consultor" | "admin")} className="w-full border border-[var(--color-border)] rounded-md px-3 h-10 text-sm bg-white">
+                <label className="text-xs font-semibold text-ink-soft uppercase tracking-wider">
+                  Papel
+                </label>
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value as "consultor" | "admin")}
+                  className="w-full border border-[var(--color-border)] rounded-md px-3 h-10 text-sm bg-white"
+                >
                   <option value="consultor">Consultor (operação)</option>
                   <option value="admin">Admin (tudo)</option>
                 </select>
@@ -62,7 +82,11 @@ export function InviteMemberModal({ onClose }: { onClose: () => void }) {
                   A pessoa precisa criar conta com este e-mail e abrir o link de convite.
                 </p>
               </div>
-              <Button onClick={() => invite.mutate()} disabled={invite.isPending || !email} className="w-full bg-coral hover:bg-[var(--color-coral-pressed)] text-cream">
+              <Button
+                onClick={() => invite.mutate()}
+                disabled={invite.isPending || !email}
+                className="w-full bg-coral hover:bg-[var(--color-coral-pressed)] text-cream"
+              >
                 {invite.isPending ? "Criando…" : "Criar convite"}
               </Button>
             </>
@@ -75,8 +99,15 @@ export function InviteMemberModal({ onClose }: { onClose: () => void }) {
                   {copied ? <Check size={14} /> : <Copy size={14} />}
                 </Button>
               </div>
-              <p className="text-[11px] text-ink-muted">Válido por 7 dias. Só pode ser usado pelo e-mail convidado.</p>
-              <Button onClick={onClose} className="w-full bg-navy hover:bg-[var(--color-navy-light)] text-cream">Fechar</Button>
+              <p className="text-[11px] text-ink-muted">
+                Válido por 7 dias. Só pode ser usado pelo e-mail convidado.
+              </p>
+              <Button
+                onClick={onClose}
+                className="w-full bg-navy hover:bg-[var(--color-navy-light)] text-cream"
+              >
+                Fechar
+              </Button>
             </>
           )}
         </div>

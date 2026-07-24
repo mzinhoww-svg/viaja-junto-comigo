@@ -63,7 +63,9 @@ export function AccessAuditCard({ requestId }: { requestId: string }) {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const expiresAt = reqQ.data?.access_code_expires_at ? new Date(reqQ.data.access_code_expires_at) : null;
+  const expiresAt = reqQ.data?.access_code_expires_at
+    ? new Date(reqQ.data.access_code_expires_at)
+    : null;
   const expired = expiresAt ? expiresAt < new Date() : false;
   const code = reqQ.data?.access_code ?? "------";
 
@@ -71,9 +73,14 @@ export function AccessAuditCard({ requestId }: { requestId: string }) {
     <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-display font-bold text-navy">Acesso do cliente</h2>
-        <Button size="sm" variant="outline" disabled={regenMut.isPending} onClick={() => {
-          if (confirm("Gerar novo código? O atual deixará de funcionar.")) regenMut.mutate();
-        }}>
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={regenMut.isPending}
+          onClick={() => {
+            if (confirm("Gerar novo código? O atual deixará de funcionar.")) regenMut.mutate();
+          }}
+        >
           <RotateCw size={14} className={`mr-1.5 ${regenMut.isPending ? "animate-spin" : ""}`} />
           Gerar novo código
         </Button>
@@ -81,7 +88,9 @@ export function AccessAuditCard({ requestId }: { requestId: string }) {
 
       <div className="flex items-center gap-3">
         <div className="flex-1 bg-[var(--color-muted)] rounded-xl px-4 py-3">
-          <p className="text-[10px] uppercase tracking-wider text-ink-muted font-bold">Código atual</p>
+          <p className="text-[10px] uppercase tracking-wider text-ink-muted font-bold">
+            Código atual
+          </p>
           <p className="font-mono text-2xl font-bold text-navy tracking-widest mt-0.5">{code}</p>
         </div>
         <Button
@@ -121,7 +130,10 @@ export function AccessAuditCard({ requestId }: { requestId: string }) {
                     <ShieldAlert size={14} className="text-coral shrink-0" />
                   )}
                   <span className="text-ink-soft">
-                    {new Date(a.at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}
+                    {new Date(a.at).toLocaleString("pt-BR", {
+                      dateStyle: "short",
+                      timeStyle: "short",
+                    })}
                   </span>
                   <span className="font-mono text-ink-muted">{maskCode(a.attempted_code)}</span>
                 </div>

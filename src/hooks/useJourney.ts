@@ -20,18 +20,48 @@ export function useRequestRealtime(requestId: string | undefined) {
     if (!requestId) return;
     const channel = supabase
       .channel(`request:${requestId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "requests", filter: `id=eq.${requestId}` },
-        () => { qc.invalidateQueries({ queryKey: ["request", requestId] }); qc.invalidateQueries({ queryKey: ["journey", requestId] }); })
-      .on("postgres_changes", { event: "*", schema: "public", table: "documents" },
-        () => { qc.invalidateQueries({ queryKey: ["journey", requestId] }); qc.invalidateQueries({ queryKey: ["documents", requestId] }); })
-      .on("postgres_changes", { event: "*", schema: "public", table: "schedule_intents" },
-        () => qc.invalidateQueries({ queryKey: ["journey", requestId] }))
-      .on("postgres_changes", { event: "*", schema: "public", table: "proposal_items", filter: `request_id=eq.${requestId}` },
-        () => { qc.invalidateQueries({ queryKey: ["proposal_items", requestId] }); qc.invalidateQueries({ queryKey: ["request", requestId] }); })
-      .on("postgres_changes", { event: "*", schema: "public", table: "notifications", filter: `request_id=eq.${requestId}` },
-        () => qc.invalidateQueries({ queryKey: ["notifications", requestId] }))
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "requests", filter: `id=eq.${requestId}` },
+        () => {
+          qc.invalidateQueries({ queryKey: ["request", requestId] });
+          qc.invalidateQueries({ queryKey: ["journey", requestId] });
+        },
+      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "documents" }, () => {
+        qc.invalidateQueries({ queryKey: ["journey", requestId] });
+        qc.invalidateQueries({ queryKey: ["documents", requestId] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "schedule_intents" }, () =>
+        qc.invalidateQueries({ queryKey: ["journey", requestId] }),
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "proposal_items",
+          filter: `request_id=eq.${requestId}`,
+        },
+        () => {
+          qc.invalidateQueries({ queryKey: ["proposal_items", requestId] });
+          qc.invalidateQueries({ queryKey: ["request", requestId] });
+        },
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "notifications",
+          filter: `request_id=eq.${requestId}`,
+        },
+        () => qc.invalidateQueries({ queryKey: ["notifications", requestId] }),
+      )
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [requestId, qc]);
 }
 
@@ -40,7 +70,9 @@ export function useJourney(requestId: string | undefined) {
     queryKey: ["journey", requestId],
     enabled: !!requestId,
     queryFn: async (): Promise<JourneyStep[]> => {
-      const { data, error } = await supabase.rpc("compute_journey_steps", { _request_id: requestId! });
+      const { data, error } = await supabase.rpc("compute_journey_steps", {
+        _request_id: requestId!,
+      });
       if (error) throw error;
       return (data ?? []) as JourneyStep[];
     },
@@ -72,4 +104,3 @@ export function useMyRequest() {
 }
 
 export { REQUEST_SAFE_COLUMNS };
-

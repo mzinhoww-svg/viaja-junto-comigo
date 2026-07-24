@@ -37,11 +37,20 @@ function useRoteiro(requestId: string) {
 
 async function viewSigned(path: string) {
   const { data, error } = await supabase.storage.from("documents").createSignedUrl(path, 60 * 5);
-  if (error) { toast.error(error.message); return; }
+  if (error) {
+    toast.error(error.message);
+    return;
+  }
   window.open(data.signedUrl, "_blank", "noopener");
 }
 
-export function RoteiroCardPortal({ requestId, phone }: { requestId: string; phone?: string | null }) {
+export function RoteiroCardPortal({
+  requestId,
+  phone,
+}: {
+  requestId: string;
+  phone?: string | null;
+}) {
   const r = useRoteiro(requestId);
   const rot = r.data;
 
@@ -50,7 +59,8 @@ export function RoteiroCardPortal({ requestId, phone }: { requestId: string; pho
       <div className="rounded-2xl bg-white border border-[var(--color-border)] p-5">
         <h3 className="font-display font-bold text-navy">Roteiro</h3>
         <p className="text-sm text-ink-soft mt-2">
-          Estamos preparando seu roteiro. Assim que estiver pronto, ele aparece aqui automaticamente.
+          Estamos preparando seu roteiro. Assim que estiver pronto, ele aparece aqui
+          automaticamente.
         </p>
       </div>
     );
@@ -64,7 +74,6 @@ export function RoteiroCardPortal({ requestId, phone }: { requestId: string; pho
     window.open(waLink(null, msg, tracking), "_blank", "noopener");
   }
 
-
   return (
     <div className="rounded-2xl bg-white border border-[var(--color-border)] p-5">
       <div className="flex items-start justify-between gap-3">
@@ -75,7 +84,9 @@ export function RoteiroCardPortal({ requestId, phone }: { requestId: string; pho
         <CheckCircle2 className="text-emerald-500" size={20} />
       </div>
 
-      {rot.release_notes && <p className="mt-3 text-sm text-ink whitespace-pre-line">{rot.release_notes}</p>}
+      {rot.release_notes && (
+        <p className="mt-3 text-sm text-ink whitespace-pre-line">{rot.release_notes}</p>
+      )}
 
       <div className="mt-4 space-y-2">
         {rot.share_url && (
@@ -85,7 +96,9 @@ export function RoteiroCardPortal({ requestId, phone }: { requestId: string; pho
             rel="noopener noreferrer"
             className="flex items-center justify-between gap-2 px-4 h-11 rounded-full bg-coral hover:bg-[var(--color-coral-pressed)] text-cream font-semibold text-sm"
           >
-            <span className="inline-flex items-center gap-2"><ExternalLink size={14} /> Abrir roteiro interativo</span>
+            <span className="inline-flex items-center gap-2">
+              <ExternalLink size={14} /> Abrir roteiro interativo
+            </span>
           </a>
         )}
         {(rot.anexos ?? []).map((a) => (
@@ -104,7 +117,11 @@ export function RoteiroCardPortal({ requestId, phone }: { requestId: string; pho
         )}
       </div>
 
-      {rot.nota && <p className="mt-4 text-xs text-ink-soft border-t border-[var(--color-border)] pt-3 whitespace-pre-line">{rot.nota}</p>}
+      {rot.nota && (
+        <p className="mt-4 text-xs text-ink-soft border-t border-[var(--color-border)] pt-3 whitespace-pre-line">
+          {rot.nota}
+        </p>
+      )}
     </div>
   );
 }
@@ -125,8 +142,12 @@ export function RoteiroCardConsole({ requestId }: { requestId: string }) {
   // sync when remote loads
   useEffect(() => {
     if (rot) {
-      setTrip(rot.trip ?? ""); setShareUrl(rot.share_url ?? ""); setNotes(rot.release_notes ?? "");
-      setNota(rot.nota ?? ""); setVersion(rot.version ?? 1); setAnexos(rot.anexos ?? []);
+      setTrip(rot.trip ?? "");
+      setShareUrl(rot.share_url ?? "");
+      setNotes(rot.release_notes ?? "");
+      setNota(rot.nota ?? "");
+      setVersion(rot.version ?? 1);
+      setAnexos(rot.anexos ?? []);
     }
   }, [rot]);
 
@@ -136,13 +157,20 @@ export function RoteiroCardConsole({ requestId }: { requestId: string }) {
         _request_id: requestId,
         payload: {
           id: rot?.id ?? null,
-          trip, share_url: shareUrl, release_notes: notes, nota,
-          version, anexos: anexos,
+          trip,
+          share_url: shareUrl,
+          release_notes: notes,
+          nota,
+          version,
+          anexos: anexos,
         },
       });
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Roteiro salvo"); qc.invalidateQueries({ queryKey: ["roteiro", requestId] }); },
+    onSuccess: () => {
+      toast.success("Roteiro salvo");
+      qc.invalidateQueries({ queryKey: ["roteiro", requestId] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -152,58 +180,90 @@ export function RoteiroCardConsole({ requestId }: { requestId: string }) {
       const { error } = await supabase.rpc("publish_roteiro", { _roteiro_id: rot.id });
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Publicado para o cliente"); qc.invalidateQueries({ queryKey: ["roteiro", requestId] }); },
+    onSuccess: () => {
+      toast.success("Publicado para o cliente");
+      qc.invalidateQueries({ queryKey: ["roteiro", requestId] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
   async function handleFile(file: File) {
-    if (file.size > 16 * 1024 * 1024) { toast.error("Arquivo maior que 16 MB"); return; }
-    const safe = file.name.replace(/[^\w.\-]+/g, "_");
+    if (file.size > 16 * 1024 * 1024) {
+      toast.error("Arquivo maior que 16 MB");
+      return;
+    }
+    const safe = file.name.replace(/[^\w.-]+/g, "_");
     const path = `roteiros/${requestId}/v${version}-${Date.now()}-${safe}`;
     setUploading(true);
     try {
       const { error } = await supabase.storage.from("documents").upload(path, file, {
-        upsert: true, contentType: file.type || undefined,
+        upsert: true,
+        contentType: file.type || undefined,
       });
       if (error) throw error;
       setAnexos((a) => [...a, { name: file.name, path }]);
       toast.success("Anexado");
-    } catch (e) { toast.error((e as Error).message); }
-    finally { setUploading(false); }
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setUploading(false);
+    }
   }
 
   return (
     <div className="rounded-2xl bg-white border border-[var(--color-border)] p-5 space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="font-display font-bold text-navy">Roteiro</h3>
-        <span className="text-xs text-ink-soft">{rot?.status === "entregue" ? `Publicado v${rot.version}` : "Em produção"}</span>
+        <span className="text-xs text-ink-soft">
+          {rot?.status === "entregue" ? `Publicado v${rot.version}` : "Em produção"}
+        </span>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <label className="text-xs text-ink-soft col-span-2">
           Título da viagem
-          <input value={trip} onChange={(e) => setTrip(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-[var(--color-border)] px-3 h-10 text-sm text-ink" />
+          <input
+            value={trip}
+            onChange={(e) => setTrip(e.target.value)}
+            className="mt-1 w-full rounded-lg border border-[var(--color-border)] px-3 h-10 text-sm text-ink"
+          />
         </label>
         <label className="text-xs text-ink-soft col-span-2">
           Link compartilhável (site interativo)
-          <input value={shareUrl} onChange={(e) => setShareUrl(e.target.value)} placeholder="https://..."
-            className="mt-1 w-full rounded-lg border border-[var(--color-border)] px-3 h-10 text-sm text-ink" />
+          <input
+            value={shareUrl}
+            onChange={(e) => setShareUrl(e.target.value)}
+            placeholder="https://..."
+            className="mt-1 w-full rounded-lg border border-[var(--color-border)] px-3 h-10 text-sm text-ink"
+          />
         </label>
         <label className="text-xs text-ink-soft">
           Versão
-          <input type="number" min={1} value={version} onChange={(e) => setVersion(parseInt(e.target.value || "1", 10))}
-            className="mt-1 w-full rounded-lg border border-[var(--color-border)] px-3 h-10 text-sm text-ink" />
+          <input
+            type="number"
+            min={1}
+            value={version}
+            onChange={(e) => setVersion(parseInt(e.target.value || "1", 10))}
+            className="mt-1 w-full rounded-lg border border-[var(--color-border)] px-3 h-10 text-sm text-ink"
+          />
         </label>
         <label className="text-xs text-ink-soft col-span-2">
           Nota da versão (release notes)
-          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2}
-            className="mt-1 w-full rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm text-ink" />
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={2}
+            className="mt-1 w-full rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm text-ink"
+          />
         </label>
         <label className="text-xs text-ink-soft col-span-2">
           Observações internas
-          <textarea value={nota} onChange={(e) => setNota(e.target.value)} rows={2}
-            className="mt-1 w-full rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm text-ink" />
+          <textarea
+            value={nota}
+            onChange={(e) => setNota(e.target.value)}
+            rows={2}
+            className="mt-1 w-full rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm text-ink"
+          />
         </label>
       </div>
 
@@ -211,23 +271,65 @@ export function RoteiroCardConsole({ requestId }: { requestId: string }) {
         <p className="text-xs text-ink-soft mb-2">Anexos PDF</p>
         <div className="space-y-1">
           {anexos.map((a, i) => (
-            <div key={i} className="flex items-center justify-between gap-2 text-sm bg-[var(--color-muted)] px-3 py-2 rounded-lg">
-              <button onClick={() => viewSigned(a.path)} className="text-ink hover:text-coral truncate text-left">{a.name}</button>
-              <button onClick={() => setAnexos((arr) => arr.filter((_, j) => j !== i))} className="text-ink-muted hover:text-coral text-xs">remover</button>
+            <div
+              key={i}
+              className="flex items-center justify-between gap-2 text-sm bg-[var(--color-muted)] px-3 py-2 rounded-lg"
+            >
+              <button
+                onClick={() => viewSigned(a.path)}
+                className="text-ink hover:text-coral truncate text-left"
+              >
+                {a.name}
+              </button>
+              <button
+                onClick={() => setAnexos((arr) => arr.filter((_, j) => j !== i))}
+                className="text-ink-muted hover:text-coral text-xs"
+              >
+                remover
+              </button>
             </div>
           ))}
         </div>
-        <input ref={inputRef} type="file" accept="application/pdf,image/*" className="hidden"
-          onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.currentTarget.value = ""; }} />
-        <Button size="sm" variant="outline" className="mt-2" disabled={uploading} onClick={() => inputRef.current?.click()}>
-          {uploading ? <Loader2 size={14} className="animate-spin mr-1.5" /> : <Upload size={14} className="mr-1.5" />} Adicionar PDF
+        <input
+          ref={inputRef}
+          type="file"
+          accept="application/pdf,image/*"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) handleFile(f);
+            e.currentTarget.value = "";
+          }}
+        />
+        <Button
+          size="sm"
+          variant="outline"
+          className="mt-2"
+          disabled={uploading}
+          onClick={() => inputRef.current?.click()}
+        >
+          {uploading ? (
+            <Loader2 size={14} className="animate-spin mr-1.5" />
+          ) : (
+            <Upload size={14} className="mr-1.5" />
+          )}{" "}
+          Adicionar PDF
         </Button>
       </div>
 
       <div className="flex gap-2 pt-2 border-t border-[var(--color-border)]">
-        <Button onClick={() => save.mutate()} disabled={save.isPending} className="bg-navy text-cream hover:bg-[var(--color-navy-light)]">Salvar</Button>
-        <Button onClick={() => publish.mutate()} disabled={publish.isPending || !rot?.id}
-          className="bg-coral text-cream hover:bg-[var(--color-coral-pressed)]">
+        <Button
+          onClick={() => save.mutate()}
+          disabled={save.isPending}
+          className="bg-navy text-cream hover:bg-[var(--color-navy-light)]"
+        >
+          Salvar
+        </Button>
+        <Button
+          onClick={() => publish.mutate()}
+          disabled={publish.isPending || !rot?.id}
+          className="bg-coral text-cream hover:bg-[var(--color-coral-pressed)]"
+        >
           {rot?.status === "entregue" ? "Republicar" : "Publicar"}
         </Button>
       </div>

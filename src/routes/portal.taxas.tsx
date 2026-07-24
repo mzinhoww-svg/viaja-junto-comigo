@@ -31,25 +31,39 @@ function PortalTaxes() {
     <PhoneFrame>
       <div className="px-5 pt-8 pb-24 anim-vfade">
         <div className="flex items-center justify-between">
-          <button onClick={() => nav({ to: "/portal" })} className="flex items-center gap-1 text-ink-soft text-sm hover:text-coral">
+          <button
+            onClick={() => nav({ to: "/portal" })}
+            className="flex items-center gap-1 text-ink-soft text-sm hover:text-coral"
+          >
             <ChevronLeft size={16} /> Jornada
           </button>
           <Logo size={28} />
-          <button onClick={signOut} className="text-ink-muted hover:text-coral p-2" aria-label="Sair">
+          <button
+            onClick={signOut}
+            className="text-ink-muted hover:text-coral p-2"
+            aria-label="Sair"
+          >
             <LogOut size={18} />
           </button>
         </div>
 
-        <h1 className="mt-6 text-2xl font-display font-extrabold text-navy">Taxas governamentais</h1>
-        <p className="mt-1 text-ink-soft text-sm">Pague em reais via Pix ou cartão no checkout seguro — a Viajaly recolhe as taxas oficiais.</p>
-
+        <h1 className="mt-6 text-2xl font-display font-extrabold text-navy">
+          Taxas governamentais
+        </h1>
+        <p className="mt-1 text-ink-soft text-sm">
+          Pague em reais via Pix ou cartão no checkout seguro — a Viajaly recolhe as taxas oficiais.
+        </p>
 
         <div className="mt-4">
           <LegalDisclaimer taxes />
         </div>
 
         <div className="mt-4">
-          {!req.data ? <Skeleton className="h-40 rounded-2xl" /> : <TaxList requestId={req.data.id} variant="portal" />}
+          {!req.data ? (
+            <Skeleton className="h-40 rounded-2xl" />
+          ) : (
+            <TaxList requestId={req.data.id} variant="portal" />
+          )}
         </div>
       </div>
     </PhoneFrame>

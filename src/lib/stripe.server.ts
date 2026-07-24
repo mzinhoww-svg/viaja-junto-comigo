@@ -11,9 +11,7 @@ export type StripeEnv = "sandbox" | "live";
 const GATEWAY_STRIPE_BASE = "https://connector-gateway.lovable.dev/stripe";
 
 export function getConnectionApiKey(env: StripeEnv): string {
-  return env === "sandbox"
-    ? getEnv("STRIPE_SANDBOX_API_KEY")
-    : getEnv("STRIPE_LIVE_API_KEY");
+  return env === "sandbox" ? getEnv("STRIPE_SANDBOX_API_KEY") : getEnv("STRIPE_LIVE_API_KEY");
 }
 
 export function createStripeClient(env: StripeEnv): Stripe {
@@ -29,7 +27,9 @@ export function createStripeClient(env: StripeEnv): Stripe {
         ...init,
         headers: {
           ...Object.fromEntries(
-            new Headers(init?.headers ?? (input instanceof Request ? input.headers : undefined)).entries(),
+            new Headers(
+              init?.headers ?? (input instanceof Request ? input.headers : undefined),
+            ).entries(),
           ),
           "X-Connection-Api-Key": connectionApiKey,
           "Lovable-API-Key": lovableApiKey,
@@ -42,8 +42,20 @@ export function createStripeClient(env: StripeEnv): Stripe {
 export function getStripeErrorMessage(error: unknown): string {
   if (error && typeof error === "object") {
     const e = error as {
-      message?: string; type?: string; code?: string; decline_code?: string; param?: string; requestId?: string;
-      raw?: { message?: string; type?: string; code?: string; decline_code?: string; param?: string; requestId?: string };
+      message?: string;
+      type?: string;
+      code?: string;
+      decline_code?: string;
+      param?: string;
+      requestId?: string;
+      raw?: {
+        message?: string;
+        type?: string;
+        code?: string;
+        decline_code?: string;
+        param?: string;
+        requestId?: string;
+      };
     };
     const message = e.raw?.message ?? e.message;
     if (message) {
@@ -60,12 +72,16 @@ export function getStripeErrorMessage(error: unknown): string {
   return "Stripe request failed";
 }
 
-export async function verifyWebhook(req: Request, env: StripeEnv): Promise<{ type: string; id: string; data: { object: any } }> {
+export async function verifyWebhook(
+  req: Request,
+  env: StripeEnv,
+): Promise<{ type: string; id: string; data: { object: unknown } }> {
   const signature = req.headers.get("stripe-signature");
   const body = await req.text();
-  const secret = env === "sandbox"
-    ? getEnv("PAYMENTS_SANDBOX_WEBHOOK_SECRET")
-    : getEnv("PAYMENTS_LIVE_WEBHOOK_SECRET");
+  const secret =
+    env === "sandbox"
+      ? getEnv("PAYMENTS_SANDBOX_WEBHOOK_SECRET")
+      : getEnv("PAYMENTS_LIVE_WEBHOOK_SECRET");
 
   if (!signature || !body) throw new Error("Missing signature or body");
 
@@ -88,7 +104,11 @@ export async function verifyWebhook(req: Request, env: StripeEnv): Promise<{ typ
     false,
     ["sign"],
   );
-  const signed = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`${timestamp}.${body}`));
+  const signed = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    new TextEncoder().encode(`${timestamp}.${body}`),
+  );
   const expected = Buffer.from(new Uint8Array(signed)).toString("hex");
   if (!v1Signatures.includes(expected)) throw new Error("Invalid webhook signature");
 

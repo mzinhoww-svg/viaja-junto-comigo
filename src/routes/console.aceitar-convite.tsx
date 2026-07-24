@@ -19,14 +19,23 @@ export const Route = createFileRoute("/console/aceitar-convite")({
 function AcceptInvite() {
   const { token } = Route.useSearch();
   const nav = useNavigate();
-  const [state, setState] = useState<"loading" | "needs_auth" | "ready" | "ok" | "error">("loading");
+  const [state, setState] = useState<"loading" | "needs_auth" | "ready" | "ok" | "error">(
+    "loading",
+  );
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      if (!token) { setState("error"); setError("Link inválido"); return; }
+      if (!token) {
+        setState("error");
+        setError("Link inválido");
+        return;
+      }
       const { data } = await supabase.auth.getSession();
-      if (!data.session) { setState("needs_auth"); return; }
+      if (!data.session) {
+        setState("needs_auth");
+        return;
+      }
       setState("ready");
     })();
   }, [token]);
@@ -53,7 +62,12 @@ function AcceptInvite() {
         {state === "needs_auth" && (
           <>
             <p className="mt-4 text-sm text-ink">Faça login com o e-mail convidado para aceitar.</p>
-            <Button onClick={() => { window.location.href = `/console/login?redirect=${encodeURIComponent(`/console/aceitar-convite?token=${token}`)}`; }} className="mt-5 w-full bg-coral hover:bg-[var(--color-coral-pressed)] text-cream">
+            <Button
+              onClick={() => {
+                window.location.href = `/console/login?redirect=${encodeURIComponent(`/console/aceitar-convite?token=${token}`)}`;
+              }}
+              className="mt-5 w-full bg-coral hover:bg-[var(--color-coral-pressed)] text-cream"
+            >
               Entrar
             </Button>
           </>
@@ -61,16 +75,23 @@ function AcceptInvite() {
         {state === "ready" && (
           <>
             <p className="mt-4 text-sm text-ink">Clique abaixo para entrar na equipe da agência.</p>
-            <Button onClick={accept} className="mt-5 w-full bg-coral hover:bg-[var(--color-coral-pressed)] text-cream">
+            <Button
+              onClick={accept}
+              className="mt-5 w-full bg-coral hover:bg-[var(--color-coral-pressed)] text-cream"
+            >
               Aceitar convite
             </Button>
           </>
         )}
         {state === "ok" && (
-          <p className="mt-6 text-emerald-700 inline-flex items-center gap-2"><Check size={16} /> Bem-vindo! Redirecionando…</p>
+          <p className="mt-6 text-emerald-700 inline-flex items-center gap-2">
+            <Check size={16} /> Bem-vindo! Redirecionando…
+          </p>
         )}
         {state === "error" && (
-          <div className="mt-6 text-sm text-rose-700 inline-flex items-center gap-2"><AlertTriangle size={16} /> {error}</div>
+          <div className="mt-6 text-sm text-rose-700 inline-flex items-center gap-2">
+            <AlertTriangle size={16} /> {error}
+          </div>
         )}
       </div>
     </div>

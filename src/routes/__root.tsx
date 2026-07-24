@@ -81,23 +81,42 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Viajaly — Consultoria de viagem" },
-      { name: "description", content: "Portal Viajaly: consultoria especializada para vistos, passaporte, roteiros e milhas." },
+      {
+        name: "description",
+        content:
+          "Portal Viajaly: consultoria especializada para vistos, passaporte, roteiros e milhas.",
+      },
       { property: "og:title", content: "Viajaly — Consultoria de viagem" },
-      { property: "og:description", content: "Portal Viajaly: consultoria especializada para vistos, passaporte, roteiros e milhas." },
+      {
+        property: "og:description",
+        content:
+          "Portal Viajaly: consultoria especializada para vistos, passaporte, roteiros e milhas.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Viajaly" },
       { property: "og:url", content: "https://viajaly.com/" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Viajaly — Consultoria de viagem" },
-      { name: "twitter:description", content: "Portal Viajaly: consultoria especializada para vistos, passaporte, roteiros e milhas." },
+      {
+        name: "twitter:description",
+        content:
+          "Portal Viajaly: consultoria especializada para vistos, passaporte, roteiros e milhas.",
+      },
       { property: "og:image", content: "https://viajaly.com/og/viajaly-og-default.png" },
       { name: "twitter:image", content: "https://viajaly.com/og/viajaly-og-default.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "preconnect", href: "https://urrlqljlibpzaqnemlwf.supabase.co", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" },
+      {
+        rel: "preconnect",
+        href: "https://urrlqljlibpzaqnemlwf.supabase.co",
+        crossOrigin: "anonymous",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap",
+      },
       { rel: "stylesheet", href: appCss },
     ],
   }),

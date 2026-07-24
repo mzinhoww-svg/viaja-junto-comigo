@@ -5,7 +5,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ChevronLeft, Plus, Trash2, Check } from "lucide-react";
 import { toast } from "sonner";
 import { formatBRL, brlToCents } from "@/lib/money";
@@ -31,7 +37,13 @@ const RELATIONS = ["titular", "cônjuge", "filho(a)", "pai/mãe", "outro"];
 
 function NovoOrcamento() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [lead, setLead] = useState({ name: "", email: "", phone: "", isGroup: false, groupName: "" });
+  const [lead, setLead] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    isGroup: false,
+    groupName: "",
+  });
   const [travelers, setTravelers] = useState<Traveler[]>([{ name: "", relation: "titular" }]);
   const [items, setItems] = useState<Item[]>([]);
   const [vistoPlan, setVistoPlan] = useState<string | null>(null);
@@ -54,7 +66,10 @@ function NovoOrcamento() {
   const plans = useQuery({
     queryKey: ["visto_plans"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("visto_plans").select("key, label, price").order("price");
+      const { data, error } = await supabase
+        .from("visto_plans")
+        .select("key, label, price")
+        .order("price");
       if (error) throw error;
       return data;
     },
@@ -105,7 +120,10 @@ function NovoOrcamento() {
 
   return (
     <section className="max-w-3xl mx-auto">
-      <Link to="/console" className="inline-flex items-center gap-1 text-ink-soft text-sm hover:text-coral">
+      <Link
+        to="/console"
+        className="inline-flex items-center gap-1 text-ink-soft text-sm hover:text-coral"
+      >
         <ChevronLeft size={16} /> Pipeline
       </Link>
       <h1 className="mt-2 text-3xl font-display font-extrabold text-navy">Novo orçamento</h1>
@@ -118,20 +136,39 @@ function NovoOrcamento() {
           <div className="grid sm:grid-cols-2 gap-4 mt-4">
             <div>
               <Label>Nome completo</Label>
-              <Input value={lead.name} onChange={(e) => setLead({ ...lead, name: e.target.value })} className="mt-1" />
+              <Input
+                value={lead.name}
+                onChange={(e) => setLead({ ...lead, name: e.target.value })}
+                className="mt-1"
+              />
             </div>
             <div>
               <Label>E-mail</Label>
-              <Input type="email" value={lead.email} onChange={(e) => setLead({ ...lead, email: e.target.value })} className="mt-1" />
+              <Input
+                type="email"
+                value={lead.email}
+                onChange={(e) => setLead({ ...lead, email: e.target.value })}
+                className="mt-1"
+              />
             </div>
             <div>
               <Label>WhatsApp</Label>
-              <Input placeholder="+55 11 9..." value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })} className="mt-1" />
+              <Input
+                placeholder="+55 11 9..."
+                value={lead.phone}
+                onChange={(e) => setLead({ ...lead, phone: e.target.value })}
+                className="mt-1"
+              />
             </div>
             <div>
               <Label>Tipo</Label>
-              <Select value={lead.isGroup ? "grupo" : "individual"} onValueChange={(v) => setLead({ ...lead, isGroup: v === "grupo" })}>
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+              <Select
+                value={lead.isGroup ? "grupo" : "individual"}
+                onValueChange={(v) => setLead({ ...lead, isGroup: v === "grupo" })}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="individual">Individual</SelectItem>
                   <SelectItem value="grupo">Grupo / família</SelectItem>
@@ -141,28 +178,66 @@ function NovoOrcamento() {
             {lead.isGroup && (
               <div className="sm:col-span-2">
                 <Label>Nome do grupo</Label>
-                <Input value={lead.groupName} onChange={(e) => setLead({ ...lead, groupName: e.target.value })} className="mt-1" />
+                <Input
+                  value={lead.groupName}
+                  onChange={(e) => setLead({ ...lead, groupName: e.target.value })}
+                  className="mt-1"
+                />
               </div>
             )}
           </div>
 
           <div className="mt-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-display font-semibold text-navy text-sm uppercase tracking-wider">Viajantes</h3>
-              <Button size="sm" variant="outline" onClick={() => setTravelers([...travelers, { name: "", relation: "outro" }])}>
+              <h3 className="font-display font-semibold text-navy text-sm uppercase tracking-wider">
+                Viajantes
+              </h3>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setTravelers([...travelers, { name: "", relation: "outro" }])}
+              >
                 <Plus size={14} className="mr-1" /> Adicionar
               </Button>
             </div>
             <div className="space-y-2">
               {travelers.map((t, i) => (
                 <div key={i} className="grid grid-cols-[1fr_180px_40px] gap-2">
-                  <Input placeholder="Nome" value={t.name} onChange={(e) => { const c = [...travelers]; c[i] = { ...t, name: e.target.value }; setTravelers(c); }} />
-                  <Select value={t.relation} onValueChange={(v) => { const c = [...travelers]; c[i] = { ...t, relation: v }; setTravelers(c); }}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>{RELATIONS.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
+                  <Input
+                    placeholder="Nome"
+                    value={t.name}
+                    onChange={(e) => {
+                      const c = [...travelers];
+                      c[i] = { ...t, name: e.target.value };
+                      setTravelers(c);
+                    }}
+                  />
+                  <Select
+                    value={t.relation}
+                    onValueChange={(v) => {
+                      const c = [...travelers];
+                      c[i] = { ...t, relation: v };
+                      setTravelers(c);
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {RELATIONS.map((r) => (
+                        <SelectItem key={r} value={r}>
+                          {r}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
                   </Select>
-                  <Button size="icon" variant="ghost" aria-label="Remover" disabled={travelers.length === 1}
-                    onClick={() => setTravelers(travelers.filter((_, j) => j !== i))}>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    aria-label="Remover"
+                    disabled={travelers.length === 1}
+                    onClick={() => setTravelers(travelers.filter((_, j) => j !== i))}
+                  >
                     <Trash2 size={16} />
                   </Button>
                 </div>
@@ -171,7 +246,11 @@ function NovoOrcamento() {
           </div>
 
           <Footer>
-            <Button onClick={() => setStep(2)} disabled={!canStep1} className="bg-navy hover:bg-[var(--color-navy-light)] text-cream">
+            <Button
+              onClick={() => setStep(2)}
+              disabled={!canStep1}
+              className="bg-navy hover:bg-[var(--color-navy-light)] text-cream"
+            >
               Continuar
             </Button>
           </Footer>
@@ -183,25 +262,37 @@ function NovoOrcamento() {
           <h2 className="font-display font-bold text-navy">Itens da proposta</h2>
           {/* Planos de Vistos (Start+ / Pro+ / Premium+) */}
           <div className="mt-4">
-            <p className="text-xs uppercase tracking-wider text-ink-muted font-bold mb-1.5">Vistos — escolha o plano</p>
+            <p className="text-xs uppercase tracking-wider text-ink-muted font-bold mb-1.5">
+              Vistos — escolha o plano
+            </p>
             <div className="flex flex-wrap gap-2">
               {plans.data?.map((pl) => {
                 const active = vistoPlan === pl.key;
                 const cents = Math.round(Number(pl.price) * 100);
                 return (
-                  <button key={pl.key} type="button"
+                  <button
+                    key={pl.key}
+                    type="button"
                     onClick={() => {
                       setVistoPlan(pl.key);
                       setItems((cur) => {
                         const existing = cur.find((i) => i.product_key === "vistos");
                         const rest = cur.filter((i) => i.product_key !== "vistos");
-                        return [...rest, {
-                          product_key: "vistos", kind: "visto", label: `Viajaly Vistos · ${pl.label}`,
-                          qty: existing?.qty ?? 1, unit_price_cents: cents, discount_cents: existing?.discount_cents ?? 0,
-                        }];
+                        return [
+                          ...rest,
+                          {
+                            product_key: "vistos",
+                            kind: "visto",
+                            label: `Viajaly Vistos · ${pl.label}`,
+                            qty: existing?.qty ?? 1,
+                            unit_price_cents: cents,
+                            discount_cents: existing?.discount_cents ?? 0,
+                          },
+                        ];
                       });
                     }}
-                    className={`text-xs px-3 py-1.5 rounded-full border ${active ? "border-coral bg-coral/10 text-coral" : "border-[var(--color-border)] hover:border-teal hover:text-teal"}`}>
+                    className={`text-xs px-3 py-1.5 rounded-full border ${active ? "border-coral bg-coral/10 text-coral" : "border-[var(--color-border)] hover:border-teal hover:text-teal"}`}
+                  >
                     {pl.label} · {formatBRL(cents)}
                   </button>
                 );
@@ -209,36 +300,107 @@ function NovoOrcamento() {
             </div>
           </div>
 
-          <p className="mt-4 text-xs uppercase tracking-wider text-ink-muted font-bold mb-1.5">Outros produtos</p>
+          <p className="mt-4 text-xs uppercase tracking-wider text-ink-muted font-bold mb-1.5">
+            Outros produtos
+          </p>
           <div className="flex flex-wrap gap-2">
-            {catalog.data?.filter((p) => p.key !== "vistos").map((p) => (
-              <button key={p.key} type="button"
-                onClick={() => setItems([...items, {
-                  product_key: p.key, kind: "consultoria",
-                  label: p.name, qty: 1, unit_price_cents: Math.round(Number(p.price) * 100), discount_cents: 0,
-                }])}
-                className="text-xs px-3 py-1.5 rounded-full border border-[var(--color-border)] hover:border-teal hover:text-teal">
-                + {p.name} · {formatBRL(Math.round(Number(p.price) * 100))}
-              </button>
-            ))}
-            <button type="button"
-              onClick={() => setItems([...items, { product_key: null, kind: "extra", label: "", qty: 1, unit_price_cents: 0, discount_cents: 0 }])}
-              className="text-xs px-3 py-1.5 rounded-full border border-dashed border-coral text-coral hover:bg-coral/5">
+            {catalog.data
+              ?.filter((p) => p.key !== "vistos")
+              .map((p) => (
+                <button
+                  key={p.key}
+                  type="button"
+                  onClick={() =>
+                    setItems([
+                      ...items,
+                      {
+                        product_key: p.key,
+                        kind: "consultoria",
+                        label: p.name,
+                        qty: 1,
+                        unit_price_cents: Math.round(Number(p.price) * 100),
+                        discount_cents: 0,
+                      },
+                    ])
+                  }
+                  className="text-xs px-3 py-1.5 rounded-full border border-[var(--color-border)] hover:border-teal hover:text-teal"
+                >
+                  + {p.name} · {formatBRL(Math.round(Number(p.price) * 100))}
+                </button>
+              ))}
+            <button
+              type="button"
+              onClick={() =>
+                setItems([
+                  ...items,
+                  {
+                    product_key: null,
+                    kind: "extra",
+                    label: "",
+                    qty: 1,
+                    unit_price_cents: 0,
+                    discount_cents: 0,
+                  },
+                ])
+              }
+              className="text-xs px-3 py-1.5 rounded-full border border-dashed border-coral text-coral hover:bg-coral/5"
+            >
               + Item manual
             </button>
           </div>
 
           <div className="mt-5 space-y-2">
-            {items.length === 0 && <p className="text-sm text-ink-muted">Adicione ao menos um item.</p>}
+            {items.length === 0 && (
+              <p className="text-sm text-ink-muted">Adicione ao menos um item.</p>
+            )}
             {items.map((it, i) => (
-              <div key={i} className="grid grid-cols-[1fr_70px_120px_120px_40px] gap-2 items-center">
-                <Input placeholder="Descrição" value={it.label} onChange={(e) => { const c = [...items]; c[i] = { ...it, label: e.target.value }; setItems(c); }} />
-                <Input type="number" min={1} value={it.qty} onChange={(e) => { const c = [...items]; c[i] = { ...it, qty: Math.max(1, Number(e.target.value) || 1) }; setItems(c); }} />
-                <Input placeholder="Preço" value={(it.unit_price_cents / 100).toFixed(2).replace(".", ",")}
-                  onChange={(e) => { const c = [...items]; c[i] = { ...it, unit_price_cents: brlToCents(e.target.value) }; setItems(c); }} />
-                <Input placeholder="Desc." value={(it.discount_cents / 100).toFixed(2).replace(".", ",")}
-                  onChange={(e) => { const c = [...items]; c[i] = { ...it, discount_cents: brlToCents(e.target.value) }; setItems(c); }} />
-                <Button size="icon" variant="ghost" aria-label="Remover" onClick={() => setItems(items.filter((_, j) => j !== i))}>
+              <div
+                key={i}
+                className="grid grid-cols-[1fr_70px_120px_120px_40px] gap-2 items-center"
+              >
+                <Input
+                  placeholder="Descrição"
+                  value={it.label}
+                  onChange={(e) => {
+                    const c = [...items];
+                    c[i] = { ...it, label: e.target.value };
+                    setItems(c);
+                  }}
+                />
+                <Input
+                  type="number"
+                  min={1}
+                  value={it.qty}
+                  onChange={(e) => {
+                    const c = [...items];
+                    c[i] = { ...it, qty: Math.max(1, Number(e.target.value) || 1) };
+                    setItems(c);
+                  }}
+                />
+                <Input
+                  placeholder="Preço"
+                  value={(it.unit_price_cents / 100).toFixed(2).replace(".", ",")}
+                  onChange={(e) => {
+                    const c = [...items];
+                    c[i] = { ...it, unit_price_cents: brlToCents(e.target.value) };
+                    setItems(c);
+                  }}
+                />
+                <Input
+                  placeholder="Desc."
+                  value={(it.discount_cents / 100).toFixed(2).replace(".", ",")}
+                  onChange={(e) => {
+                    const c = [...items];
+                    c[i] = { ...it, discount_cents: brlToCents(e.target.value) };
+                    setItems(c);
+                  }}
+                />
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  aria-label="Remover"
+                  onClick={() => setItems(items.filter((_, j) => j !== i))}
+                >
                   <Trash2 size={16} />
                 </Button>
               </div>
@@ -247,14 +409,23 @@ function NovoOrcamento() {
 
           <div className="mt-5 flex items-center justify-end gap-2">
             <Label className="text-xs text-ink-soft">Desconto adicional (R$)</Label>
-            <Input className="w-32" value={(manualDiscountCents / 100).toFixed(2).replace(".", ",")}
-              onChange={(e) => setManualDiscountCents(brlToCents(e.target.value))} />
+            <Input
+              className="w-32"
+              value={(manualDiscountCents / 100).toFixed(2).replace(".", ",")}
+              onChange={(e) => setManualDiscountCents(brlToCents(e.target.value))}
+            />
           </div>
           <Totals {...totals} />
 
           <Footer>
-            <Button variant="outline" onClick={() => setStep(1)}>Voltar</Button>
-            <Button onClick={() => setStep(3)} disabled={!canStep2} className="bg-navy hover:bg-[var(--color-navy-light)] text-cream">
+            <Button variant="outline" onClick={() => setStep(1)}>
+              Voltar
+            </Button>
+            <Button
+              onClick={() => setStep(3)}
+              disabled={!canStep2}
+              className="bg-navy hover:bg-[var(--color-navy-light)] text-cream"
+            >
               Revisar
             </Button>
           </Footer>
@@ -265,18 +436,28 @@ function NovoOrcamento() {
         <Card>
           <h2 className="font-display font-bold text-navy">Revisar & enviar</h2>
           <dl className="mt-4 grid grid-cols-2 gap-y-2 text-sm">
-            <dt className="text-ink-soft">Cliente</dt><dd className="text-ink font-semibold">{lead.name}</dd>
-            <dt className="text-ink-soft">E-mail</dt><dd className="text-ink">{lead.email}</dd>
-            <dt className="text-ink-soft">WhatsApp</dt><dd className="text-ink">{lead.phone || "—"}</dd>
-            <dt className="text-ink-soft">Viajantes</dt><dd className="text-ink">{travelers.map((t) => t.name).join(", ")}</dd>
+            <dt className="text-ink-soft">Cliente</dt>
+            <dd className="text-ink font-semibold">{lead.name}</dd>
+            <dt className="text-ink-soft">E-mail</dt>
+            <dd className="text-ink">{lead.email}</dd>
+            <dt className="text-ink-soft">WhatsApp</dt>
+            <dd className="text-ink">{lead.phone || "—"}</dd>
+            <dt className="text-ink-soft">Viajantes</dt>
+            <dd className="text-ink">{travelers.map((t) => t.name).join(", ")}</dd>
           </dl>
           <div className="mt-5 border-t border-[var(--color-border)] pt-4">
-            <h3 className="text-sm font-display font-bold text-navy uppercase tracking-wider mb-2">Itens</h3>
+            <h3 className="text-sm font-display font-bold text-navy uppercase tracking-wider mb-2">
+              Itens
+            </h3>
             <ul className="space-y-1 text-sm">
               {items.map((it, i) => (
                 <li key={i} className="flex justify-between">
-                  <span>{it.label} <span className="text-ink-muted">× {it.qty}</span></span>
-                  <span className="font-mono">{formatBRL(it.qty * it.unit_price_cents - it.discount_cents)}</span>
+                  <span>
+                    {it.label} <span className="text-ink-muted">× {it.qty}</span>
+                  </span>
+                  <span className="font-mono">
+                    {formatBRL(it.qty * it.unit_price_cents - it.discount_cents)}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -284,9 +465,14 @@ function NovoOrcamento() {
           <Totals {...totals} />
 
           <Footer>
-            <Button variant="outline" onClick={() => setStep(2)}>Voltar</Button>
-            <Button onClick={() => createMut.mutate()} disabled={createMut.isPending}
-              className="bg-coral hover:bg-[var(--color-coral-pressed)] text-cream">
+            <Button variant="outline" onClick={() => setStep(2)}>
+              Voltar
+            </Button>
+            <Button
+              onClick={() => createMut.mutate()}
+              disabled={createMut.isPending}
+              className="bg-coral hover:bg-[var(--color-coral-pressed)] text-cream"
+            >
               {createMut.isPending ? "Criando…" : "Criar caso"}
             </Button>
           </Footer>
@@ -306,7 +492,9 @@ function Stepper({ step }: { step: 1 | 2 | 3 }) {
         const done = step > n;
         return (
           <li key={l} className="flex items-center gap-2">
-            <span className={`w-7 h-7 rounded-full grid place-items-center font-bold text-xs ${done ? "bg-[var(--color-success-bg)] text-[var(--color-success-fg)]" : active ? "bg-navy text-cream" : "bg-[var(--color-muted)] text-ink-muted"}`}>
+            <span
+              className={`w-7 h-7 rounded-full grid place-items-center font-bold text-xs ${done ? "bg-[var(--color-success-bg)] text-[var(--color-success-fg)]" : active ? "bg-navy text-cream" : "bg-[var(--color-muted)] text-ink-muted"}`}
+            >
               {done ? <Check size={14} /> : n}
             </span>
             <span className={active ? "text-navy font-semibold" : "text-ink-soft"}>{l}</span>
@@ -319,25 +507,67 @@ function Stepper({ step }: { step: 1 | 2 | 3 }) {
 }
 
 function Card({ children }: { children: React.ReactNode }) {
-  return <div className="bg-white rounded-2xl border border-[var(--color-border)] p-6">{children}</div>;
+  return (
+    <div className="bg-white rounded-2xl border border-[var(--color-border)] p-6">{children}</div>
+  );
 }
 function Footer({ children }: { children: React.ReactNode }) {
   return <div className="mt-8 flex justify-end gap-2">{children}</div>;
 }
-function Totals({ sub, disc, combo = 0, manual = 0, total }: { sub: number; disc: number; combo?: number; manual?: number; total: number }) {
+function Totals({
+  sub,
+  disc,
+  combo = 0,
+  manual = 0,
+  total,
+}: {
+  sub: number;
+  disc: number;
+  combo?: number;
+  manual?: number;
+  total: number;
+}) {
   return (
     <div className="mt-6 border-t border-[var(--color-border)] pt-4 space-y-1 text-sm">
-      <div className="flex justify-between text-ink-soft"><span>Subtotal</span><span className="font-mono">{formatBRL(sub)}</span></div>
-      {disc > 0 && <div className="flex justify-between text-ink-soft"><span>Descontos por item</span><span className="font-mono">- {formatBRL(disc)}</span></div>}
-      {combo > 0 && <div className="flex justify-between text-[var(--color-success-fg)]"><span>Desconto combo (10%)</span><span className="font-mono">- {formatBRL(combo)}</span></div>}
-      {manual > 0 && <div className="flex justify-between text-ink-soft"><span>Desconto adicional</span><span className="font-mono">- {formatBRL(manual)}</span></div>}
-      <div className="flex justify-between text-navy font-display font-extrabold text-lg"><span>Total</span><span className="font-mono">{formatBRL(total)}</span></div>
+      <div className="flex justify-between text-ink-soft">
+        <span>Subtotal</span>
+        <span className="font-mono">{formatBRL(sub)}</span>
+      </div>
+      {disc > 0 && (
+        <div className="flex justify-between text-ink-soft">
+          <span>Descontos por item</span>
+          <span className="font-mono">- {formatBRL(disc)}</span>
+        </div>
+      )}
+      {combo > 0 && (
+        <div className="flex justify-between text-[var(--color-success-fg)]">
+          <span>Desconto combo (10%)</span>
+          <span className="font-mono">- {formatBRL(combo)}</span>
+        </div>
+      )}
+      {manual > 0 && (
+        <div className="flex justify-between text-ink-soft">
+          <span>Desconto adicional</span>
+          <span className="font-mono">- {formatBRL(manual)}</span>
+        </div>
+      )}
+      <div className="flex justify-between text-navy font-display font-extrabold text-lg">
+        <span>Total</span>
+        <span className="font-mono">{formatBRL(total)}</span>
+      </div>
     </div>
   );
 }
 
-
-function Handoff({ name, phone, data }: { name: string; phone: string; data: { request_id: string; access_code: string } }) {
+function Handoff({
+  name,
+  phone,
+  data,
+}: {
+  name: string;
+  phone: string;
+  data: { request_id: string; access_code: string };
+}) {
   return (
     <section className="max-w-xl mx-auto">
       <div className="text-center mb-6">
@@ -345,17 +575,25 @@ function Handoff({ name, phone, data }: { name: string; phone: string; data: { r
           <Check size={28} />
         </div>
         <h1 className="mt-4 text-2xl font-display font-extrabold text-navy">Orçamento criado</h1>
-        <p className="mt-1 text-ink-soft text-sm">Compartilhe o link personalizado abaixo com {name.split(" ")[0]}.</p>
+        <p className="mt-1 text-ink-soft text-sm">
+          Compartilhe o link personalizado abaixo com {name.split(" ")[0]}.
+        </p>
       </div>
 
       <HandoffCard clientName={name} accessCode={data.access_code} phone={phone} />
 
       <div className="mt-6 flex justify-center gap-3 text-sm">
-        <Link to="/console/cliente/$id" params={{ id: data.request_id }} className="text-coral font-semibold hover:underline">
+        <Link
+          to="/console/cliente/$id"
+          params={{ id: data.request_id }}
+          className="text-coral font-semibold hover:underline"
+        >
           Abrir ficha do cliente →
         </Link>
         <span className="text-ink-muted">·</span>
-        <Link to="/console" className="text-ink-soft hover:text-navy">Voltar ao pipeline</Link>
+        <Link to="/console" className="text-ink-soft hover:text-navy">
+          Voltar ao pipeline
+        </Link>
       </div>
     </section>
   );

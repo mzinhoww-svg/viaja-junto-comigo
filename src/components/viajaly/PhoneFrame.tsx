@@ -12,7 +12,15 @@ import { PortalBottomNav } from "@/components/viajaly/PortalBottomNav";
  * `showNav` (default true): barra de navegação inferior fixa do portal (Início/Proposta/
  * Documentos/Agenda). Telas sem sessão (login) passam `showNav={false}`.
  */
-export function PhoneFrame({ children, className, showNav = true }: { children: ReactNode; className?: string; showNav?: boolean }) {
+export function PhoneFrame({
+  children,
+  className,
+  showNav = true,
+}: {
+  children: ReactNode;
+  className?: string;
+  showNav?: boolean;
+}) {
   return (
     <div className={cn("min-h-[100dvh] w-full bg-appbg flex justify-center", className)}>
       <div

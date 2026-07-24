@@ -8,7 +8,9 @@ import { useSignOut } from "./portal";
 import { ChevronLeft, LogOut } from "lucide-react";
 
 // DS160Form é o maior componente do portal — carrega sob demanda nesta rota.
-const DS160Form = lazy(() => import("@/components/viajaly/DS160Form").then((m) => ({ default: m.DS160Form })));
+const DS160Form = lazy(() =>
+  import("@/components/viajaly/DS160Form").then((m) => ({ default: m.DS160Form })),
+);
 
 export const Route = createFileRoute("/portal/ds160")({
   ssr: false,
@@ -32,17 +34,26 @@ function PortalDS160() {
     <PhoneFrame>
       <div className="px-5 pt-8 pb-24 anim-vfade">
         <div className="flex items-center justify-between">
-          <button onClick={() => nav({ to: "/portal" })} className="flex items-center gap-1 text-ink-soft text-sm hover:text-coral">
+          <button
+            onClick={() => nav({ to: "/portal" })}
+            className="flex items-center gap-1 text-ink-soft text-sm hover:text-coral"
+          >
             <ChevronLeft size={16} /> Jornada
           </button>
           <Logo size={28} />
-          <button onClick={signOut} className="text-ink-muted hover:text-coral p-2" aria-label="Sair">
+          <button
+            onClick={signOut}
+            className="text-ink-muted hover:text-coral p-2"
+            aria-label="Sair"
+          >
             <LogOut size={18} />
           </button>
         </div>
 
         <div className="mt-6">
-          {!req.data ? <Skeleton className="h-40 rounded-2xl" /> : (
+          {!req.data ? (
+            <Skeleton className="h-40 rounded-2xl" />
+          ) : (
             <Suspense fallback={<Skeleton className="h-40 rounded-2xl" />}>
               <DS160Form requestId={req.data.id} variant="portal" />
             </Suspense>

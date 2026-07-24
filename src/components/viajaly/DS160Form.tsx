@@ -89,7 +89,8 @@ export function DS160Form({
   }, [q.data, activeTraveler]);
 
   if (q.isLoading) return <p className="text-ink-muted text-sm">Carregando DS-160…</p>;
-  if (!q.data || q.data.travelers.length === 0) return <p className="text-ink-muted text-sm">Sem viajantes cadastrados.</p>;
+  if (!q.data || q.data.travelers.length === 0)
+    return <p className="text-ink-muted text-sm">Sem viajantes cadastrados.</p>;
 
   const refresh = () => qc.invalidateQueries({ queryKey: ["ds160", requestId] });
 
@@ -421,12 +422,7 @@ function TravelerDS160({
   // ============ WIZARD (portal + draft) ============
 
   if (step === -1) {
-    return (
-      <IntroCard
-        travelerName={traveler.name}
-        onStart={() => setStep(0)}
-      />
-    );
+    return <IntroCard travelerName={traveler.name} onStart={() => setStep(0)} />;
   }
 
   const stepIndex = step; // 0..10
@@ -481,18 +477,9 @@ function TravelerDS160({
       </div>
 
       {/* Conteúdo do passo */}
-      {section && (
-        <SectionStep
-          section={section}
-          form={form}
-          update={update}
-          readOnly={readOnly}
-        />
-      )}
+      {section && <SectionStep section={section} form={form} update={update} readOnly={readOnly} />}
 
-      {isDocs && (
-        <DocumentsStep requestId={requestId} />
-      )}
+      {isDocs && <DocumentsStep requestId={requestId} />}
 
       {isReview && (
         <ReviewStep
@@ -508,7 +495,8 @@ function TravelerDS160({
           <AlertTriangle size={16} className="shrink-0 mt-0.5" />
           <div>
             <b>Revisão humana obrigatória.</b> Você respondeu "Sim" a {flags.length} pergunta(s) de
-            elegibilidade. Detalhe no campo da seção 9. A Letícia revisa antes de qualquer envio oficial.
+            elegibilidade. Detalhe no campo da seção 9. A Letícia revisa antes de qualquer envio
+            oficial.
           </div>
         </div>
       )}
@@ -556,10 +544,7 @@ function TravelerDS160({
           <ChevronLeft size={16} className="mr-1" /> Anterior
         </Button>
         {!isReview ? (
-          <Button
-            className="flex-1 bg-navy hover:bg-navy/90 text-cream min-h-12"
-            onClick={goNext}
-          >
+          <Button className="flex-1 bg-navy hover:bg-navy/90 text-cream min-h-12" onClick={goNext}>
             {isDocs ? "Revisar tudo" : "Avançar"} <ChevronRight size={16} className="ml-1" />
           </Button>
         ) : (
@@ -640,7 +625,8 @@ function IntroCard({ travelerName, onStart }: { travelerName: string; onStart: (
           Começar
         </Button>
         <p className="text-xs text-ink-soft text-center flex items-center justify-center gap-1">
-          <ShieldCheck size={12} /> Seus dados são tratados conforme a LGPD, apenas para o preenchimento do DS-160.
+          <ShieldCheck size={12} /> Seus dados são tratados conforme a LGPD, apenas para o
+          preenchimento do DS-160.
         </p>
       </div>
     </div>
@@ -697,9 +683,7 @@ function SectionStep({
           <h2 className="font-display font-extrabold text-navy text-xl leading-tight">
             {section.title}
           </h2>
-          {section.subtitle && (
-            <p className="text-sm text-ink-soft mt-0.5">{section.subtitle}</p>
-          )}
+          {section.subtitle && <p className="text-sm text-ink-soft mt-0.5">{section.subtitle}</p>}
           {section.officialChip && (
             <span className="inline-flex items-center gap-1.5 mt-2 text-xs font-semibold text-navy bg-cream border border-coral/20 px-2.5 py-1 rounded-full">
               🇺🇸 Alimenta o DS-160 · {section.officialChip}
@@ -757,7 +741,8 @@ function DocumentsStep({ requestId }: { requestId: string }) {
             Documentos
           </h2>
           <p className="text-sm text-ink-soft mt-0.5">
-            Envie cada item em JPG, PNG ou PDF (até 10 MB). Os condicionais aparecem conforme suas respostas.
+            Envie cada item em JPG, PNG ou PDF (até 10 MB). Os condicionais aparecem conforme suas
+            respostas.
           </p>
           <span className="inline-flex items-center gap-1.5 mt-2 text-xs font-semibold text-navy bg-cream border border-coral/20 px-2.5 py-1 rounded-full">
             🇺🇸 Alimenta o DS-160 · Documentos anexos
@@ -802,9 +787,7 @@ function ReviewStep({
             <ClipboardCheck size={18} className="text-navy" />
           </div>
           <div>
-            <h2 className="font-display font-extrabold text-navy text-xl leading-tight">
-              Revisão
-            </h2>
+            <h2 className="font-display font-extrabold text-navy text-xl leading-tight">Revisão</h2>
             <p className="text-sm text-ink-soft mt-0.5">Confira antes de enviar.</p>
           </div>
         </div>
@@ -878,9 +861,7 @@ function ReviewStep({
           </div>
           <span
             className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${
-              docsPending === 0
-                ? "bg-vgreen/15 text-vgreen"
-                : "bg-amber-100 text-amber-700"
+              docsPending === 0 ? "bg-vgreen/15 text-vgreen" : "bg-amber-100 text-amber-700"
             }`}
           >
             {docsPending === 0 ? "OK" : "Pendente"}
@@ -918,9 +899,7 @@ function ConsoleSectionRead({
         {visible.map((f) => (
           <div key={f.key} className="min-w-0">
             <dt className="text-ink-muted">{f.label}</dt>
-            <dd className="text-navy font-semibold truncate">
-              {(form[f.key] as string) || "—"}
-            </dd>
+            <dd className="text-navy font-semibold truncate">{(form[f.key] as string) || "—"}</dd>
           </div>
         ))}
       </dl>

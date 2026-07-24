@@ -7,11 +7,15 @@ import { LogOut, Menu, X } from "lucide-react";
 export const Route = createFileRoute("/console")({
   ssr: false,
   beforeLoad: async ({ location }) => {
-    if (location.pathname === "/console/login" || location.pathname === "/console/aceitar-convite") return;
+    if (location.pathname === "/console/login" || location.pathname === "/console/aceitar-convite")
+      return;
     const { data } = await supabase.auth.getSession();
     if (!data.session) throw redirect({ to: "/console/login" });
     const { data: prof } = await supabase
-      .from("profiles").select("role").eq("id", data.session.user.id).maybeSingle();
+      .from("profiles")
+      .select("role")
+      .eq("id", data.session.user.id)
+      .maybeSingle();
     if (prof?.role !== "admin" && prof?.role !== "consultor") throw redirect({ to: "/portal" });
   },
   component: ConsoleLayout,
@@ -33,7 +37,10 @@ const NAV = [
 function ConsoleLayout() {
   const nav = useNavigate();
   const [open, setOpen] = useState(false);
-  const isLogin = typeof window !== "undefined" && (window.location.pathname === "/console/login" || window.location.pathname === "/console/aceitar-convite");
+  const isLogin =
+    typeof window !== "undefined" &&
+    (window.location.pathname === "/console/login" ||
+      window.location.pathname === "/console/aceitar-convite");
   if (isLogin) return <Outlet />;
   return (
     <div className="min-h-screen bg-appbg">
@@ -43,19 +50,34 @@ function ConsoleLayout() {
             <Logo size={28} />
             <nav className="hidden lg:flex items-center gap-5 text-sm font-medium">
               {NAV.map((n) => (
-                <Link key={n.to} to={n.to} className="text-ink hover:text-coral" activeOptions={{ exact: n.to === "/console" }} activeProps={{ className: "text-coral" }}>{n.label}</Link>
+                <Link
+                  key={n.to}
+                  to={n.to}
+                  className="text-ink hover:text-coral"
+                  activeOptions={{ exact: n.to === "/console" }}
+                  activeProps={{ className: "text-coral" }}
+                >
+                  {n.label}
+                </Link>
               ))}
             </nav>
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={async () => { await supabase.auth.signOut(); nav({ to: "/console/login" }); }}
+              onClick={async () => {
+                await supabase.auth.signOut();
+                nav({ to: "/console/login" });
+              }}
               className="text-ink-muted hover:text-coral p-2"
               aria-label="Sair"
             >
               <LogOut size={18} />
             </button>
-            <button onClick={() => setOpen((v) => !v)} className="lg:hidden p-2 text-ink hover:text-coral" aria-label="Menu">
+            <button
+              onClick={() => setOpen((v) => !v)}
+              className="lg:hidden p-2 text-ink hover:text-coral"
+              aria-label="Menu"
+            >
               {open ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
@@ -64,7 +86,14 @@ function ConsoleLayout() {
           <nav className="lg:hidden border-t border-[var(--color-border)] bg-white">
             <div className="max-w-6xl mx-auto px-4 py-2 flex flex-col">
               {NAV.map((n) => (
-                <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="py-2.5 text-sm font-medium text-ink hover:text-coral" activeOptions={{ exact: n.to === "/console" }} activeProps={{ className: "text-coral" }}>
+                <Link
+                  key={n.to}
+                  to={n.to}
+                  onClick={() => setOpen(false)}
+                  className="py-2.5 text-sm font-medium text-ink hover:text-coral"
+                  activeOptions={{ exact: n.to === "/console" }}
+                  activeProps={{ className: "text-coral" }}
+                >
                   {n.label}
                 </Link>
               ))}

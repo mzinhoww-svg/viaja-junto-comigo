@@ -23,13 +23,19 @@ function ConsoleLogin() {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       const { data: prof } = await supabase
-        .from("profiles").select("role").eq("id", data.user.id).maybeSingle();
+        .from("profiles")
+        .select("role")
+        .eq("id", data.user.id)
+        .maybeSingle();
       if (prof?.role !== "admin") {
         await supabase.auth.signOut();
         throw new Error("Esta conta não tem acesso ao console.");
       }
     },
-    onSuccess: () => { toast.success("Bem-vinda"); nav({ to: "/console" }); },
+    onSuccess: () => {
+      toast.success("Bem-vinda");
+      nav({ to: "/console" });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -43,13 +49,25 @@ function ConsoleLogin() {
         <div className="mt-6 space-y-3">
           <div>
             <Label htmlFor="email">E-mail</Label>
-            <Input id="email" type="email" autoComplete="email" value={email}
-              onChange={(e) => setEmail(e.target.value)} className="mt-1" />
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1"
+            />
           </div>
           <div>
             <Label htmlFor="pwd">Senha</Label>
-            <Input id="pwd" type="password" autoComplete="current-password" value={password}
-              onChange={(e) => setPassword(e.target.value)} className="mt-1" />
+            <Input
+              id="pwd"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1"
+            />
           </div>
         </div>
 
@@ -62,7 +80,10 @@ function ConsoleLogin() {
         </Button>
 
         <p className="mt-6 text-xs text-ink-muted text-center">
-          É cliente? <Link to="/portal/login" className="text-teal font-semibold">Portal do cliente</Link>
+          É cliente?{" "}
+          <Link to="/portal/login" className="text-teal font-semibold">
+            Portal do cliente
+          </Link>
         </p>
       </div>
     </div>

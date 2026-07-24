@@ -16,7 +16,10 @@ import { AlertCircle, RefreshCw, Mail } from "lucide-react";
 import { z } from "zod";
 
 const loginSearch = z.object({
-  code: z.string().regex(/^\d{6}$/).optional(),
+  code: z
+    .string()
+    .regex(/^\d{6}$/)
+    .optional(),
   name: z.string().min(1).max(80).optional(),
 });
 
@@ -26,10 +29,18 @@ export const Route = createFileRoute("/portal/login")({
   head: () => ({
     meta: [
       { title: "Entrar — Viajaly" },
-      { name: "description", content: "Acesse o portal do cliente Viajaly para acompanhar sua proposta, contrato, documentos e agendamento de visto." },
+      {
+        name: "description",
+        content:
+          "Acesse o portal do cliente Viajaly para acompanhar sua proposta, contrato, documentos e agendamento de visto.",
+      },
       { name: "robots", content: "noindex,follow" },
       { property: "og:title", content: "Entrar no portal — Viajaly" },
-      { property: "og:description", content: "Login do portal do cliente Viajaly: acompanhe sua jornada de visto em um só lugar." },
+      {
+        property: "og:description",
+        content:
+          "Login do portal do cliente Viajaly: acompanhe sua jornada de visto em um só lugar.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://viajaly.com/portal/login" },
     ],
@@ -96,14 +107,17 @@ function PortalLogin() {
 
   // Se chegou com ?code= já preenchido e não bloqueado, dispara o login.
   useEffect(() => {
-    if (search.code && search.code.length === 6 && readCooldown() === 0 && submittedRef.current !== search.code) {
+    if (
+      search.code &&
+      search.code.length === 6 &&
+      readCooldown() === 0 &&
+      submittedRef.current !== search.code
+    ) {
       submittedRef.current = search.code;
       codeMutRef.current?.(search.code);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search.code]);
   const codeMutRef = useRef<((c: string) => void) | null>(null);
-
 
   // tick countdowns
   useEffect(() => {
@@ -138,13 +152,23 @@ function PortalLogin() {
         const secs = Number(msg.split(":")[1]) || 1800;
         setCooldown(secs);
         setLockSecs(secs);
-        setErr({ kind: "BLOCKED", message: "Muitas tentativas. Aguarde o tempo abaixo para tentar de novo." });
+        setErr({
+          kind: "BLOCKED",
+          message: "Muitas tentativas. Aguarde o tempo abaixo para tentar de novo.",
+        });
       } else if (msg === "CODE_BLOCKED") {
         setCooldown(30 * 60);
         setLockSecs(30 * 60);
-        setErr({ kind: "BLOCKED", message: "Este código foi bloqueado temporariamente após várias tentativas." });
+        setErr({
+          kind: "BLOCKED",
+          message: "Este código foi bloqueado temporariamente após várias tentativas.",
+        });
       } else if (msg === "EXPIRED") {
-        setErr({ kind: "EXPIRED", message: "Este código expirou. Peça um novo para o seu consultor ou solicite reenvio abaixo." });
+        setErr({
+          kind: "EXPIRED",
+          message:
+            "Este código expirou. Peça um novo para o seu consultor ou solicite reenvio abaixo.",
+        });
       } else if (msg === "INVALID") {
         setErr({ kind: "INVALID", message: "Código inválido. Confira os 6 dígitos." });
       } else {
@@ -155,7 +179,6 @@ function PortalLogin() {
     },
   });
   codeMutRef.current = (c: string) => codeMut.mutate(c);
-
 
   const resendMut = useMutation({
     mutationFn: async () => {
@@ -229,7 +252,8 @@ function PortalLogin() {
           {firstName ? `Olá, ${firstName}.` : "Olá!"}
         </h1>
         <p className="mt-1 text-ink-soft text-sm">
-          Sua consultora preparou tudo pra sua viagem aos EUA. Acesse com o código que ela te enviou.
+          Sua consultora preparou tudo pra sua viagem aos EUA. Acesse com o código que ela te
+          enviou.
         </p>
 
         {/* Segmented control Código / Magic link */}
@@ -245,7 +269,10 @@ function PortalLogin() {
                 key={m}
                 role="tab"
                 aria-selected={active}
-                onClick={() => { setMode(m); setErr(null); }}
+                onClick={() => {
+                  setMode(m);
+                  setErr(null);
+                }}
                 className={`h-9 rounded-full text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral/60 ${
                   active
                     ? "bg-navy text-cream shadow-sm"
@@ -269,7 +296,10 @@ function PortalLogin() {
             <div className="mt-2">
               <OTPInput
                 value={code}
-                onChange={(v) => { setCode(v); if (err) setErr(null); }}
+                onChange={(v) => {
+                  setCode(v);
+                  if (err) setErr(null);
+                }}
                 onComplete={handleComplete}
                 disabled={blocked || codeMut.isPending}
                 autoFocus
@@ -286,8 +316,8 @@ function PortalLogin() {
                   err.kind === "BLOCKED"
                     ? "bg-coral/10 text-coral"
                     : err.kind === "EXPIRED"
-                    ? "bg-amber-50 text-amber-700 border border-amber-200"
-                    : "bg-coral/10 text-coral"
+                      ? "bg-amber-50 text-amber-700 border border-amber-200"
+                      : "bg-coral/10 text-coral"
                 }`}
               >
                 <AlertCircle size={16} className="mt-0.5 shrink-0" />
@@ -362,7 +392,10 @@ function PortalLogin() {
         )}
 
         <p className="mt-8 text-xs text-ink-muted text-center">
-          É administrador? <Link to="/console/login" className="text-teal font-semibold">Acessar console</Link>
+          É administrador?{" "}
+          <Link to="/console/login" className="text-teal font-semibold">
+            Acessar console
+          </Link>
         </p>
 
         <div className="mt-6">

@@ -6,16 +6,56 @@ import { supabase } from "@/integrations/supabase/client";
 import { addProductToRequest } from "@/lib/taxes.functions";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Stamp, BookOpen, Plane, Sparkles, ChevronRight, BadgePercent, MessageCircle } from "lucide-react";
-
+import {
+  Stamp,
+  BookOpen,
+  Plane,
+  Sparkles,
+  ChevronRight,
+  BadgePercent,
+  MessageCircle,
+} from "lucide-react";
 
 type ProductKey = "vistos" | "pass" | "rot" | "mil";
 
-const META: Record<ProductKey, { label: string; sub: string; cross: string; Icon: typeof Stamp; route: "/portal/conclusao" | "/portal/passaporte" | "/portal/roteiro" | "/portal/milhas" }> = {
-  vistos: { label: "Vistos",     sub: "Sua jornada e o resultado", cross: "Assessoria completa de visto", Icon: Stamp,     route: "/portal/conclusao" },
-  pass:   { label: "Passaporte", sub: "Status da emissão",         cross: "Emissão / renovação com a Viajaly", Icon: Plane,     route: "/portal/passaporte" },
-  rot:    { label: "Roteiro",    sub: "Itinerário da viagem",      cross: "Itinerário sob medida feito pela Letícia", Icon: BookOpen,  route: "/portal/roteiro" },
-  mil:    { label: "Milhas",     sub: "Plano e alertas",           cross: "Plano de milhas para essa viagem", Icon: Sparkles,  route: "/portal/milhas" },
+const META: Record<
+  ProductKey,
+  {
+    label: string;
+    sub: string;
+    cross: string;
+    Icon: typeof Stamp;
+    route: "/portal/conclusao" | "/portal/passaporte" | "/portal/roteiro" | "/portal/milhas";
+  }
+> = {
+  vistos: {
+    label: "Vistos",
+    sub: "Sua jornada e o resultado",
+    cross: "Assessoria completa de visto",
+    Icon: Stamp,
+    route: "/portal/conclusao",
+  },
+  pass: {
+    label: "Passaporte",
+    sub: "Status da emissão",
+    cross: "Emissão / renovação com a Viajaly",
+    Icon: Plane,
+    route: "/portal/passaporte",
+  },
+  rot: {
+    label: "Roteiro",
+    sub: "Itinerário da viagem",
+    cross: "Itinerário sob medida feito pela Letícia",
+    Icon: BookOpen,
+    route: "/portal/roteiro",
+  },
+  mil: {
+    label: "Milhas",
+    sub: "Plano e alertas",
+    cross: "Plano de milhas para essa viagem",
+    Icon: Sparkles,
+    route: "/portal/milhas",
+  },
 };
 
 export function ProductsHub({ requestId }: { requestId: string }) {
@@ -83,7 +123,9 @@ export function ProductsHub({ requestId }: { requestId: string }) {
         .select("traveler_id, form")
         .in("traveler_id", ids);
       const flagged = (subs ?? []).find((s) => {
-        const exp = (s.form as Record<string, unknown> | null)?.passport_expiry_date as string | undefined;
+        const exp = (s.form as Record<string, unknown> | null)?.passport_expiry_date as
+          | string
+          | undefined;
         if (!exp) return false;
         const d = new Date(exp);
         if (isNaN(d.getTime())) return false;
@@ -128,11 +170,27 @@ export function ProductsHub({ requestId }: { requestId: string }) {
     if (k === "vistos") {
       const o = s.req?.visa_outcome;
       if (!o) return "Acompanhe a jornada";
-      return ({ aprovado: "Visto aprovado", recusado: "Caso encerrado", admin_processing: "Em análise consular", cancelado: "Cancelado" } as const)[o];
+      return (
+        {
+          aprovado: "Visto aprovado",
+          recusado: "Caso encerrado",
+          admin_processing: "Em análise consular",
+          cancelado: "Cancelado",
+        } as const
+      )[o];
     }
     if (k === "pass") {
       const p = s.req?.passport_status ?? "coletando";
-      return ({ coletando: "Coletando dados", em_emissao: "Em emissão", pronto: "Pronto para retirada", entregue: "Entregue" } as Record<string,string>)[p] ?? p;
+      return (
+        (
+          {
+            coletando: "Coletando dados",
+            em_emissao: "Em emissão",
+            pronto: "Pronto para retirada",
+            entregue: "Entregue",
+          } as Record<string, string>
+        )[p] ?? p
+      );
     }
     if (k === "rot") {
       if (!s.rot) return "Em briefing";
@@ -147,7 +205,9 @@ export function ProductsHub({ requestId }: { requestId: string }) {
 
   return (
     <div className="mt-6">
-      <h2 className="mb-3 text-sm font-display font-bold text-navy uppercase tracking-wider">Seus produtos</h2>
+      <h2 className="mb-3 text-sm font-display font-bold text-navy uppercase tracking-wider">
+        Seus produtos
+      </h2>
       <div className="grid grid-cols-2 gap-2">
         {owned.map((k) => {
           const m = META[k];
@@ -159,7 +219,10 @@ export function ProductsHub({ requestId }: { requestId: string }) {
             >
               <div className="flex items-start justify-between">
                 <m.Icon size={20} className="text-coral" />
-                <ChevronRight size={16} className="text-ink-muted group-hover:text-coral transition" />
+                <ChevronRight
+                  size={16}
+                  className="text-ink-muted group-hover:text-coral transition"
+                />
               </div>
               <p className="mt-2 font-display font-bold text-navy text-sm">{m.label}</p>
               <p className="text-xs text-ink-soft mt-0.5">{statusLine(k)}</p>
@@ -173,10 +236,12 @@ export function ProductsHub({ requestId }: { requestId: string }) {
           <div className="flex items-start gap-2">
             <BadgePercent size={18} className="text-coral mt-0.5 shrink-0" />
             <div>
-              <p className="font-display font-bold text-navy">Renovação com preço especial — R$ 259</p>
+              <p className="font-display font-bold text-navy">
+                Renovação com preço especial — R$ 259
+              </p>
               <p className="text-xs text-ink-soft mt-0.5">
-                Detectamos passaporte com validade curta para <b>{renovation.data.traveler_name}</b>. Assessoria
-                R$ 259 + taxa PF R$ 259, paga no checkout de Taxas.
+                Detectamos passaporte com validade curta para <b>{renovation.data.traveler_name}</b>
+                . Assessoria R$ 259 + taxa PF R$ 259, paga no checkout de Taxas.
               </p>
             </div>
           </div>
@@ -193,7 +258,9 @@ export function ProductsHub({ requestId }: { requestId: string }) {
 
       {missing.length > 0 && (
         <div className="mt-5">
-          <h3 className="mb-2 text-xs font-display font-bold text-ink-muted uppercase tracking-wider">Pode te interessar</h3>
+          <h3 className="mb-2 text-xs font-display font-bold text-ink-muted uppercase tracking-wider">
+            Pode te interessar
+          </h3>
           <div className="space-y-2">
             {missing.map((k) => {
               const m = META[k];
@@ -220,4 +287,3 @@ export function ProductsHub({ requestId }: { requestId: string }) {
     </div>
   );
 }
-

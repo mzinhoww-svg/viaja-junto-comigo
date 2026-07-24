@@ -5,10 +5,12 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 export const lockUsdRate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({
-      request_id: z.string().uuid(),
-      force: z.boolean().optional(),
-    }).parse(input),
+    z
+      .object({
+        request_id: z.string().uuid(),
+        force: z.boolean().optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     // Cotação real via AwesomeAPI (Edge Function). Mantém a trava por requisição:
@@ -23,15 +25,15 @@ export const lockUsdRate = createServerFn({ method: "POST" })
     return out as { rate: number; as_of: string; source: string; cached: boolean };
   });
 
-
-
 export const confirmTaxPayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({
-      request_id: z.string().uuid(),
-      paid: z.boolean(),
-    }).parse(input),
+    z
+      .object({
+        request_id: z.string().uuid(),
+        paid: z.boolean(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("confirm_tax_payment", {
@@ -45,12 +47,14 @@ export const confirmTaxPayment = createServerFn({ method: "POST" })
 export const adminSetTaxStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({
-      traveler_id: z.string().uuid(),
-      kind: z.enum(["consular_mrv", "passaporte_pf"]),
-      status: z.enum(["pending", "paid", "waived"]),
-      notes: z.string().max(500).optional(),
-    }).parse(input),
+    z
+      .object({
+        traveler_id: z.string().uuid(),
+        kind: z.enum(["consular_mrv", "passaporte_pf"]),
+        status: z.enum(["pending", "paid", "waived"]),
+        notes: z.string().max(500).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("admin_set_tax_status", {
@@ -66,12 +70,14 @@ export const adminSetTaxStatus = createServerFn({ method: "POST" })
 export const addProductToRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({
-      request_id: z.string().uuid(),
-      traveler_id: z.string().uuid().nullable(),
-      product_key: z.enum(["vistos", "pass", "rot", "mil"]),
-      origin: z.enum(["upsell_renovacao"]).optional(),
-    }).parse(input),
+    z
+      .object({
+        request_id: z.string().uuid(),
+        traveler_id: z.string().uuid().nullable(),
+        product_key: z.enum(["vistos", "pass", "rot", "mil"]),
+        origin: z.enum(["upsell_renovacao"]).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { data: out, error } = await context.supabase.rpc("add_product_to_request", {
@@ -83,4 +89,3 @@ export const addProductToRequest = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return out as { ok: boolean; product_key: string; price_cents: number; origin: string | null };
   });
-

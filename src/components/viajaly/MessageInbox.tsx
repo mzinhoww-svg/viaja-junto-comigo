@@ -20,15 +20,21 @@ export function MessageInbox() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("messages")
-        .select("request_id, text, created_at, read_at, internal, from, requests:request_id(lead_name)")
+        .select(
+          "request_id, text, created_at, read_at, internal, from, requests:request_id(lead_name)",
+        )
         .eq("internal", false)
         .order("created_at", { ascending: false })
         .limit(200);
       if (error) throw error;
 
       const rows = (data ?? []) as unknown as Array<{
-        request_id: string; text: string | null; created_at: string; read_at: string | null;
-        from: "client" | "consultant"; requests: { lead_name: string } | null;
+        request_id: string;
+        text: string | null;
+        created_at: string;
+        read_at: string | null;
+        from: "client" | "consultant";
+        requests: { lead_name: string } | null;
       }>;
 
       const map = new Map<string, Conv>();
@@ -55,10 +61,13 @@ export function MessageInbox() {
   useEffect(() => {
     const ch = supabase
       .channel("inbox-messages")
-      .on("postgres_changes", { event: "*", schema: "public", table: "messages" },
-        () => qc.invalidateQueries({ queryKey: ["message-inbox"] }))
+      .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, () =>
+        qc.invalidateQueries({ queryKey: ["message-inbox"] }),
+      )
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    return () => {
+      supabase.removeChannel(ch);
+    };
   }, [qc]);
 
   const convs = q.data ?? [];
@@ -72,8 +81,12 @@ export function MessageInbox() {
       {convs.length === 0 && <p className="text-xs text-ink-soft">Nenhuma conversa ativa.</p>}
       <div className="space-y-1">
         {convs.slice(0, 8).map((c) => (
-          <Link key={c.request_id} to="/console/cliente/$id" params={{ id: c.request_id }}
-            className="flex items-center justify-between p-2 rounded-xl hover:bg-[var(--color-muted)]">
+          <Link
+            key={c.request_id}
+            to="/console/cliente/$id"
+            params={{ id: c.request_id }}
+            className="flex items-center justify-between p-2 rounded-xl hover:bg-[var(--color-muted)]"
+          >
             <div className="min-w-0">
               <p className="text-sm font-semibold text-navy truncate">{c.lead_name}</p>
               <p className="text-xs text-ink-soft truncate">{c.last_text ?? "—"}</p>

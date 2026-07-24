@@ -5,11 +5,13 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 export const saveDs160Draft = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({
-      traveler_id: z.string().uuid(),
-      form: z.record(z.string(), z.unknown()),
-      completion_pct: z.number().int().min(0).max(100),
-    }).parse(input),
+    z
+      .object({
+        traveler_id: z.string().uuid(),
+        form: z.record(z.string(), z.unknown()),
+        completion_pct: z.number().int().min(0).max(100),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("save_ds160_draft", {
@@ -35,11 +37,13 @@ export const submitDs160 = createServerFn({ method: "POST" })
 export const validateDs160 = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({
-      traveler_id: z.string().uuid(),
-      approve: z.boolean(),
-      notes: z.string().max(500).optional(),
-    }).parse(input),
+    z
+      .object({
+        traveler_id: z.string().uuid(),
+        approve: z.boolean(),
+        notes: z.string().max(500).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("validate_ds160", {

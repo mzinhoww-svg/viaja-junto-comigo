@@ -27,7 +27,11 @@ export function ContractPanel({
   const items = useQuery({
     queryKey: ["contract-items-console", requestId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("proposal_items").select("*").eq("request_id", requestId).order("sort");
+      const { data, error } = await supabase
+        .from("proposal_items")
+        .select("*")
+        .eq("request_id", requestId)
+        .order("sort");
       if (error) throw error;
       return data;
     },
@@ -41,14 +45,21 @@ export function ContractPanel({
       ]);
       return {
         agencyName: a.data?.name ?? "Viajaly",
-        travelers: (t.data ?? []).map((x) => ({ name: x.name, relation: x.is_lead ? "titular" : null })),
+        travelers: (t.data ?? []).map((x) => ({
+          name: x.name,
+          relation: x.is_lead ? "titular" : null,
+        })),
       };
     },
   });
   const existing = useQuery({
     queryKey: ["contract-console", requestId],
     queryFn: async () => {
-      const { data } = await supabase.from("contracts").select("*").eq("request_id", requestId).maybeSingle();
+      const { data } = await supabase
+        .from("contracts")
+        .select("*")
+        .eq("request_id", requestId)
+        .maybeSingle();
       return data;
     },
   });
@@ -61,7 +72,12 @@ export function ContractPanel({
       clientName: request.lead_name,
       clientEmail: request.lead_email,
       travelers: ctx.data.travelers,
-      items: items.data.map((i) => ({ label: i.label, qty: i.qty, unit_price_cents: i.unit_price_cents, discount_cents: i.discount_cents })),
+      items: items.data.map((i) => ({
+        label: i.label,
+        qty: i.qty,
+        unit_price_cents: i.unit_price_cents,
+        discount_cents: i.discount_cents,
+      })),
       totalCents: request.proposal_total_cents,
       todayISO: new Date().toISOString(),
     });
@@ -76,7 +92,9 @@ export function ContractPanel({
             <CheckCircle2 size={14} /> Assinado
           </span>
         ) : (
-          <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[var(--color-muted)] text-ink-soft">Não assinado</span>
+          <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[var(--color-muted)] text-ink-soft">
+            Não assinado
+          </span>
         )}
       </div>
       {request.contract_signed && (
@@ -87,7 +105,8 @@ export function ContractPanel({
           </p>
           {existing.data?.body_sha256 && (
             <p className="text-xs text-ink-muted break-all">
-              <b>IP:</b> {existing.data?.signed_ip || "—"} · <b>SHA-256:</b> {existing.data.body_sha256}
+              <b>IP:</b> {existing.data?.signed_ip || "—"} · <b>SHA-256:</b>{" "}
+              {existing.data.body_sha256}
             </p>
           )}
           {existing.data?.pdf_path && (
@@ -114,7 +133,9 @@ export function ContractPanel({
       {bodyHtml ? (
         <article
           className="rounded-2xl bg-white border border-[var(--color-border)] p-5 text-sm text-ink leading-relaxed prose-contract"
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(bodyHtml, { USE_PROFILES: { html: true } }) }}
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(bodyHtml, { USE_PROFILES: { html: true } }),
+          }}
         />
       ) : (
         <p className="text-sm text-ink-muted">Sem itens para gerar o contrato ainda.</p>

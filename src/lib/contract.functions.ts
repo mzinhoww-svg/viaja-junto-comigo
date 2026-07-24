@@ -35,14 +35,16 @@ function sha256Hex(s: string): string {
 export const signContract = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({
-      request_id: z.string().uuid(),
-      name: z.string().min(4).max(200),
-      body_html: z.string().min(50),
-      body_sha256: z.string().length(64),
-      accepted_terms: z.literal(true),
-      cpf: z.string().max(20).optional().nullable(),
-    }).parse(input),
+    z
+      .object({
+        request_id: z.string().uuid(),
+        name: z.string().min(4).max(200),
+        body_html: z.string().min(50),
+        body_sha256: z.string().length(64),
+        accepted_terms: z.literal(true),
+        cpf: z.string().max(20).optional().nullable(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     // Recomputa hash no servidor — garante integridade do snapshot enviado.
@@ -78,10 +80,12 @@ export const signContract = createServerFn({ method: "POST" })
 export const setContractPdfPath = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({
-      contract_id: z.string().uuid(),
-      path: z.string().min(5),
-    }).parse(input),
+    z
+      .object({
+        contract_id: z.string().uuid(),
+        path: z.string().min(5),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("set_contract_pdf_path", {

@@ -5,10 +5,12 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 export const submitDocument = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({
-      doc_id: z.string().uuid(),
-      file_url: z.string().min(1).max(500),
-    }).parse(input),
+    z
+      .object({
+        doc_id: z.string().uuid(),
+        file_url: z.string().min(1).max(500),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("submit_document", {
@@ -22,11 +24,13 @@ export const submitDocument = createServerFn({ method: "POST" })
 export const reviewDocument = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({
-      doc_id: z.string().uuid(),
-      approve: z.boolean(),
-      reason: z.string().max(500).optional(),
-    }).parse(input),
+    z
+      .object({
+        doc_id: z.string().uuid(),
+        approve: z.boolean(),
+        reason: z.string().max(500).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("review_document", {

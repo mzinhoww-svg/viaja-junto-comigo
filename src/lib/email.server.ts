@@ -54,39 +54,54 @@ function shell(title: string, inner: string): string {
 const TEMPLATES: Record<TemplateKey, (v: EmailVars) => { subject: string; html: string }> = {
   access_code: (v) => ({
     subject: "Seu código de acesso — Viajaly",
-    html: shell("Seu código de acesso", `
+    html: shell(
+      "Seu código de acesso",
+      `
       <p>Olá${v.name ? `, <b>${esc(v.name)}</b>` : ""}!</p>
       <p>Use o código abaixo para entrar no portal:</p>
       <p style="font-size:28px;font-weight:bold;letter-spacing:4px;color:#0B234F">${esc(v.code)}</p>
-      <p>Se você não solicitou este código, ignore esta mensagem.</p>`),
+      <p>Se você não solicitou este código, ignore esta mensagem.</p>`,
+    ),
   }),
   proposal_sent: (v) => ({
     subject: "Sua proposta personalizada chegou — Viajaly",
-    html: shell("Sua proposta está pronta", `
+    html: shell(
+      "Sua proposta está pronta",
+      `
       <p>Oi${v.name ? `, <b>${esc(v.name)}</b>` : ""}! Preparamos uma proposta para você.</p>
       <p><a href="${esc(v.link)}" style="background:#FF6F61;color:#fff;padding:12px 20px;border-radius:24px;text-decoration:none;display:inline-block;font-weight:bold">Abrir minha proposta</a></p>
-      <p>Código de acesso: <b>${esc(v.code)}</b></p>`),
+      <p>Código de acesso: <b>${esc(v.code)}</b></p>`,
+    ),
   }),
   payment_confirmed: (v) => ({
     subject: "Pagamento confirmado — Viajaly",
-    html: shell("Pagamento confirmado ✅", `
+    html: shell(
+      "Pagamento confirmado ✅",
+      `
       <p>Oi${v.name ? `, <b>${esc(v.name)}</b>` : ""}! Recebemos seu pagamento.</p>
       <p>Já liberamos as próximas etapas no portal. Bora seguir? 💛</p>
-      <p><a href="${esc(v.link ?? "https://viajaly.app/portal")}" style="color:#0B234F">Abrir portal</a></p>`),
+      <p><a href="${esc(v.link ?? "https://viajaly.app/portal")}" style="color:#0B234F">Abrir portal</a></p>`,
+    ),
   }),
   document_rejected: (v) => ({
     subject: "Precisamos reenviar um documento — Viajaly",
-    html: shell("Documento precisa de ajuste", `
+    html: shell(
+      "Documento precisa de ajuste",
+      `
       <p>Oi${v.name ? `, <b>${esc(v.name)}</b>` : ""}! Revisamos seu documento <b>${esc(v.document)}</b> e ele precisa ser reenviado.</p>
       ${v.reason ? `<p><b>Motivo:</b> ${esc(v.reason)}</p>` : ""}
-      <p><a href="${esc(v.link ?? "https://viajaly.app/portal/documentos")}" style="color:#0B234F">Abrir portal e reenviar</a></p>`),
+      <p><a href="${esc(v.link ?? "https://viajaly.app/portal/documentos")}" style="color:#0B234F">Abrir portal e reenviar</a></p>`,
+    ),
   }),
   schedule_confirmed: (v) => ({
     subject: "Agendamento confirmado — Viajaly",
-    html: shell("Seu agendamento está confirmado", `
+    html: shell(
+      "Seu agendamento está confirmado",
+      `
       <p>Oi${v.name ? `, <b>${esc(v.name)}</b>` : ""}!</p>
       <p>Seu agendamento ficou marcado para <b>${esc(v.when)}</b>.</p>
-      ${v.location ? `<p><b>Local:</b> ${esc(v.location)}</p>` : ""}`),
+      ${v.location ? `<p><b>Local:</b> ${esc(v.location)}</p>` : ""}`,
+    ),
   }),
 };
 
@@ -129,7 +144,7 @@ export async function sendTransactionalEmail(input: SendEmailInput): Promise<Sen
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${lovableKey}`,
+        Authorization: `Bearer ${lovableKey}`,
         "X-Connection-Api-Key": brevoKey,
       },
       body: JSON.stringify({
