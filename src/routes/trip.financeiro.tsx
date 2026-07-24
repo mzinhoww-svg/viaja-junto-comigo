@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Loader2, PiggyBank } from "lucide-react";
 import { SavingsDashboard } from "@/components/trip/financeiro/SavingsDashboard";
+import { BudgetDashboard } from "@/components/trip/financeiro/budget/BudgetDashboard";
 import { TripSectionPlaceholder } from "@/components/trip/SectionPlaceholder";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCurrentTrip } from "@/hooks/useItinerary";
 
 export const Route = createFileRoute("/trip/financeiro")({
@@ -35,5 +37,24 @@ function TripFinanceiro() {
     );
   }
 
-  return <SavingsDashboard tripId={trip.data.id} />;
+  return (
+    <Tabs defaultValue="economia" className="pt-4">
+      <div className="px-4">
+        <TabsList className="w-full">
+          <TabsTrigger value="economia" className="flex-1">
+            Economia Mensal
+          </TabsTrigger>
+          <TabsTrigger value="orcamento" className="flex-1">
+            Orçamento por Categoria
+          </TabsTrigger>
+        </TabsList>
+      </div>
+      <TabsContent value="economia" className="mt-0">
+        <SavingsDashboard tripId={trip.data.id} />
+      </TabsContent>
+      <TabsContent value="orcamento" className="mt-0">
+        <BudgetDashboard tripId={trip.data.id} />
+      </TabsContent>
+    </Tabs>
+  );
 }
