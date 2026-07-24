@@ -32,6 +32,11 @@ export function isDayLimitReached(currentDayCount: number, tier: ItineraryPlanTi
   return limit !== null && currentDayCount >= limit;
 }
 
+/** Ponto plugável: VJT-011 substitui por um lookup real de `entitlements`. */
+export function canExportItineraryPdf(tier: ItineraryPlanTier): boolean {
+  return tier === "premium";
+}
+
 /** dia_numero/ordem nunca são digitados pelo usuário — sempre o próximo da sequência. */
 export function nextDayPosition(days: ItineraryDay[]): { diaNumero: number; ordem: number } {
   const maxDiaNumero = days.reduce((max, d) => Math.max(max, d.diaNumero), 0);

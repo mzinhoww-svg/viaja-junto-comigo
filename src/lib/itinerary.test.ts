@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  canExportItineraryPdf,
   computeMovePlan,
   duplicateSlots,
   emptySlotsForNewDay,
@@ -40,6 +41,13 @@ describe("getItineraryDayLimit / isDayLimitReached", () => {
 
   it("nunca atinge o limite no premium", () => {
     expect(isDayLimitReached(1000, "premium")).toBe(false);
+  });
+});
+
+describe("canExportItineraryPdf", () => {
+  it("permite export só no plano premium", () => {
+    expect(canExportItineraryPdf("premium")).toBe(true);
+    expect(canExportItineraryPdf("free")).toBe(false);
   });
 });
 
