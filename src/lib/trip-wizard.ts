@@ -3,6 +3,7 @@
  * Módulo puro: sem I/O, sem acesso a Supabase.
  */
 
+import { determinarModoTrip } from "./trip-math";
 import type { TripVariables } from "./trip-templates";
 
 export type WizardDestino = {
@@ -32,8 +33,11 @@ export type NovaTripInput = {
   orcamento: WizardOrcamentoItem[];
 };
 
-/** Nunca lança exceção: devolve a lista de mensagens de erro (vazia = válido). */
-export function validarNovaTripInput(input: NovaTripInput): string[] {
+/**
+ * Nunca lança exceção: devolve a lista de mensagens de erro (vazia = válido).
+ * `hoje` é injetável para testes; em produção usa a data corrente.
+ */
+export function validarNovaTripInput(input: NovaTripInput, hoje: Date = new Date()): string[] {
   const erros: string[] = [];
 
   if (!input.destino.pais.trim()) {
@@ -49,8 +53,14 @@ export function validarNovaTripInput(input: NovaTripInput): string[] {
     erros.push("O número de crianças não pode ser maior que o total de viajantes.");
   }
 
-  if (input.dataViagem != null && Number.isNaN(Date.parse(input.dataViagem))) {
-    erros.push("Data da viagem inválida.");
+  if (input.dataViagem != null) {
+    if (Number.isNaN(Date.parse(input.dataViagem))) {
+      erros.push("Data da viagem inválida.");
+    } else if (determinarModoTrip(input.dataViagem, hoje) === "concluida") {
+      erros.push(
+        "Data da viagem não pode estar no passado. Escolha uma data futura ou ative o modo sonho.",
+      );
+    }
   }
 
   for (const item of input.orcamento) {

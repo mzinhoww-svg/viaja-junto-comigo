@@ -41,6 +41,24 @@ describe("validarNovaTripInput", () => {
     );
   });
 
+  it("data no passado gera erro (não cria trip 'concluída' silenciosamente)", () => {
+    const hoje = new Date(2026, 6, 24);
+    const erros = validarNovaTripInput(input({ dataViagem: "2026-07-01" }), hoje);
+    expect(erros).toContain(
+      "Data da viagem não pode estar no passado. Escolha uma data futura ou ative o modo sonho.",
+    );
+  });
+
+  it("data igual a hoje não é considerada passado", () => {
+    const hoje = new Date(2026, 6, 24);
+    expect(validarNovaTripInput(input({ dataViagem: "2026-07-24" }), hoje)).toEqual([]);
+  });
+
+  it("data futura não gera erro de data passada", () => {
+    const hoje = new Date(2026, 6, 24);
+    expect(validarNovaTripInput(input({ dataViagem: "2027-01-10" }), hoje)).toEqual([]);
+  });
+
   it.each([0, 11])("número de viajantes fora de 1-10 (%i) gera erro", (numPessoas) => {
     const erros = validarNovaTripInput(input({ viajantes: { numPessoas, numCriancas: 0 } }));
     expect(erros).toContain("O número de viajantes deve ser entre 1 e 10.");
