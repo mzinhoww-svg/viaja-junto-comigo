@@ -17,6 +17,8 @@ export type CurrentTrip = {
   nome: string;
   destinoPais: string;
   destinoCidade: string | null;
+  dataViagem: string | null;
+  numPessoas: number;
 };
 
 export function useCurrentTrip() {
@@ -25,7 +27,7 @@ export function useCurrentTrip() {
     queryFn: async (): Promise<CurrentTrip | null> => {
       const { data, error } = await supabase
         .from("trips")
-        .select("id, nome, destino_pais, destino_cidade")
+        .select("id, nome, destino_pais, destino_cidade, data_viagem, num_pessoas")
         .order("created_at", { ascending: true })
         .limit(1)
         .maybeSingle();
@@ -36,6 +38,8 @@ export function useCurrentTrip() {
         nome: data.nome,
         destinoPais: data.destino_pais,
         destinoCidade: data.destino_cidade,
+        dataViagem: data.data_viagem,
+        numPessoas: data.num_pessoas,
       };
     },
   });
