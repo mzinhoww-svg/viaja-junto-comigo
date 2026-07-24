@@ -1924,6 +1924,7 @@ export type Database = {
           id: string;
           moeda_destino: string | null;
           nome: string;
+          num_criancas: number;
           num_pessoas: number;
           owner_id: string;
           status: Database["public"]["Enums"]["trip_status"];
@@ -1938,6 +1939,7 @@ export type Database = {
           id?: string;
           moeda_destino?: string | null;
           nome?: string;
+          num_criancas?: number;
           num_pessoas?: number;
           owner_id: string;
           status?: Database["public"]["Enums"]["trip_status"];
@@ -1952,6 +1954,7 @@ export type Database = {
           id?: string;
           moeda_destino?: string | null;
           nome?: string;
+          num_criancas?: number;
           num_pessoas?: number;
           owner_id?: string;
           status?: Database["public"]["Enums"]["trip_status"];

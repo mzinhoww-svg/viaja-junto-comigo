@@ -32,6 +32,8 @@ export function ItineraryBoard() {
         icon={Map}
         title="Nenhuma viagem ainda"
         description="Crie sua viagem para começar a montar o roteiro dia a dia."
+        ctaTo="/trip/novo"
+        ctaLabel="Criar minha viagem"
       />
     );
   }

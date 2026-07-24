@@ -9,107 +9,63 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VistosRouteImport } from './routes/vistos'
-import { Route as TripRouteImport } from './routes/trip'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as RoteirosRouteImport } from './routes/roteiros'
-import { Route as PrivacidadeRouteImport } from './routes/privacidade'
-import { Route as PortalRouteImport } from './routes/portal'
-import { Route as PassaporteRouteImport } from './routes/passaporte'
-import { Route as OrcamentoRouteImport } from './routes/orcamento'
-import { Route as MilhasRouteImport } from './routes/milhas'
-import { Route as McpRouteImport } from './routes/mcp'
-import { Route as ConsoleRouteImport } from './routes/console'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TripIndexRouteImport } from './routes/trip.index'
-import { Route as PortalIndexRouteImport } from './routes/portal.index'
-import { Route as ConsoleIndexRouteImport } from './routes/console.index'
-import { Route as TripRoteiroRouteImport } from './routes/trip.roteiro'
-import { Route as TripMaisRouteImport } from './routes/trip.mais'
-import { Route as TripFinanceiroRouteImport } from './routes/trip.financeiro'
-import { Route as TripChecklistsRouteImport } from './routes/trip.checklists'
-import { Route as PortalTaxasRouteImport } from './routes/portal.taxas'
-import { Route as PortalRoteiroRouteImport } from './routes/portal.roteiro'
-import { Route as PortalPropostaRouteImport } from './routes/portal.proposta'
-import { Route as PortalPassaporteRouteImport } from './routes/portal.passaporte'
-import { Route as PortalPagamentoRouteImport } from './routes/portal.pagamento'
-import { Route as PortalMilhasRouteImport } from './routes/portal.milhas'
-import { Route as PortalMensagensRouteImport } from './routes/portal.mensagens'
-import { Route as PortalLoginRouteImport } from './routes/portal.login'
-import { Route as PortalDs160RouteImport } from './routes/portal.ds160'
-import { Route as PortalDocumentosRouteImport } from './routes/portal.documentos'
-import { Route as PortalContratoRouteImport } from './routes/portal.contrato'
-import { Route as PortalConclusaoRouteImport } from './routes/portal.conclusao'
-import { Route as PortalAgendaRouteImport } from './routes/portal.agenda'
-import { Route as OrcamentoSucessoRouteImport } from './routes/orcamento.sucesso'
-import { Route as ConsoleTemplatesRouteImport } from './routes/console.templates'
-import { Route as ConsoleRelatorioRouteImport } from './routes/console.relatorio'
-import { Route as ConsoleProdutosRouteImport } from './routes/console.produtos'
-import { Route as ConsoleLoginRouteImport } from './routes/console.login'
-import { Route as ConsoleJanelasRouteImport } from './routes/console.janelas'
-import { Route as ConsoleFinanceiroRouteImport } from './routes/console.financeiro'
-import { Route as ConsoleEquipeRouteImport } from './routes/console.equipe'
-import { Route as ConsoleConfiguracoesRouteImport } from './routes/console.configuracoes'
-import { Route as ConsoleAuditoriaRouteImport } from './routes/console.auditoria'
-import { Route as ConsoleAgendaRouteImport } from './routes/console.agenda'
-import { Route as ConsoleAceitarConviteRouteImport } from './routes/console.aceitar-convite'
-import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as ConsoleRouteImport } from './routes/console'
+import { Route as McpRouteImport } from './routes/mcp'
+import { Route as MilhasRouteImport } from './routes/milhas'
+import { Route as OrcamentoRouteImport } from './routes/orcamento'
+import { Route as PassaporteRouteImport } from './routes/passaporte'
+import { Route as PortalRouteImport } from './routes/portal'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as RoteirosRouteImport } from './routes/roteiros'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TripRouteImport } from './routes/trip'
+import { Route as VistosRouteImport } from './routes/vistos'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
-import { Route as ConsoleOrcamentoNovoRouteImport } from './routes/console.orcamento.novo'
-import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$id'
-import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as ConsoleIndexRouteImport } from './routes/console.index'
+import { Route as ConsoleAceitarConviteRouteImport } from './routes/console.aceitar-convite'
+import { Route as ConsoleAgendaRouteImport } from './routes/console.agenda'
+import { Route as ConsoleAuditoriaRouteImport } from './routes/console.auditoria'
+import { Route as ConsoleConfiguracoesRouteImport } from './routes/console.configuracoes'
+import { Route as ConsoleEquipeRouteImport } from './routes/console.equipe'
+import { Route as ConsoleFinanceiroRouteImport } from './routes/console.financeiro'
+import { Route as ConsoleJanelasRouteImport } from './routes/console.janelas'
+import { Route as ConsoleLoginRouteImport } from './routes/console.login'
+import { Route as ConsoleProdutosRouteImport } from './routes/console.produtos'
+import { Route as ConsoleRelatorioRouteImport } from './routes/console.relatorio'
+import { Route as ConsoleTemplatesRouteImport } from './routes/console.templates'
+import { Route as OrcamentoSucessoRouteImport } from './routes/orcamento.sucesso'
+import { Route as PortalIndexRouteImport } from './routes/portal.index'
+import { Route as PortalAgendaRouteImport } from './routes/portal.agenda'
+import { Route as PortalConclusaoRouteImport } from './routes/portal.conclusao'
+import { Route as PortalContratoRouteImport } from './routes/portal.contrato'
+import { Route as PortalDocumentosRouteImport } from './routes/portal.documentos'
+import { Route as PortalDs160RouteImport } from './routes/portal.ds160'
+import { Route as PortalLoginRouteImport } from './routes/portal.login'
+import { Route as PortalMensagensRouteImport } from './routes/portal.mensagens'
+import { Route as PortalMilhasRouteImport } from './routes/portal.milhas'
+import { Route as PortalPagamentoRouteImport } from './routes/portal.pagamento'
+import { Route as PortalPassaporteRouteImport } from './routes/portal.passaporte'
+import { Route as PortalPropostaRouteImport } from './routes/portal.proposta'
+import { Route as PortalRoteiroRouteImport } from './routes/portal.roteiro'
+import { Route as PortalTaxasRouteImport } from './routes/portal.taxas'
+import { Route as TripIndexRouteImport } from './routes/trip.index'
+import { Route as TripChecklistsRouteImport } from './routes/trip.checklists'
+import { Route as TripFinanceiroRouteImport } from './routes/trip.financeiro'
+import { Route as TripMaisRouteImport } from './routes/trip.mais'
+import { Route as TripNovoRouteImport } from './routes/trip.novo'
+import { Route as TripRoteiroRouteImport } from './routes/trip.roteiro'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
-import { Route as ConsoleOrcamentoIdEditarRouteImport } from './routes/console.orcamento.$id.editar'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$id'
+import { Route as ConsoleOrcamentoNovoRouteImport } from './routes/console.orcamento.novo'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ConsoleOrcamentoIdEditarRouteImport } from './routes/console.orcamento.$id.editar'
 
-const VistosRoute = VistosRouteImport.update({
-  id: '/vistos',
-  path: '/vistos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TripRoute = TripRouteImport.update({
-  id: '/trip',
-  path: '/trip',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RoteirosRoute = RoteirosRouteImport.update({
-  id: '/roteiros',
-  path: '/roteiros',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacidadeRoute = PrivacidadeRouteImport.update({
-  id: '/privacidade',
-  path: '/privacidade',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PortalRoute = PortalRouteImport.update({
-  id: '/portal',
-  path: '/portal',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PassaporteRoute = PassaporteRouteImport.update({
-  id: '/passaporte',
-  path: '/passaporte',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OrcamentoRoute = OrcamentoRouteImport.update({
-  id: '/orcamento',
-  path: '/orcamento',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MilhasRoute = MilhasRouteImport.update({
-  id: '/milhas',
-  path: '/milhas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const McpRoute = McpRouteImport.update({
-  id: '/mcp',
-  path: '/mcp',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConsoleRoute = ConsoleRouteImport.update({
@@ -117,164 +73,71 @@ const ConsoleRoute = ConsoleRouteImport.update({
   path: '/console',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TripIndexRoute = TripIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => TripRoute,
+const MilhasRoute = MilhasRouteImport.update({
+  id: '/milhas',
+  path: '/milhas',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const PortalIndexRoute = PortalIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PortalRoute,
+const OrcamentoRoute = OrcamentoRouteImport.update({
+  id: '/orcamento',
+  path: '/orcamento',
+  getParentRoute: () => rootRouteImport,
 } as any)
+const PassaporteRoute = PassaporteRouteImport.update({
+  id: '/passaporte',
+  path: '/passaporte',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalRoute = PortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoteirosRoute = RoteirosRouteImport.update({
+  id: '/roteiros',
+  path: '/roteiros',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TripRoute = TripRouteImport.update({
+  id: '/trip',
+  path: '/trip',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VistosRoute = VistosRouteImport.update({
+  id: '/vistos',
+  path: '/vistos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ConsoleIndexRoute = ConsoleIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => ConsoleRoute,
-} as any)
-const TripRoteiroRoute = TripRoteiroRouteImport.update({
-  id: '/roteiro',
-  path: '/roteiro',
-  getParentRoute: () => TripRoute,
-} as any)
-const TripMaisRoute = TripMaisRouteImport.update({
-  id: '/mais',
-  path: '/mais',
-  getParentRoute: () => TripRoute,
-} as any)
-const TripFinanceiroRoute = TripFinanceiroRouteImport.update({
-  id: '/financeiro',
-  path: '/financeiro',
-  getParentRoute: () => TripRoute,
-} as any)
-const TripChecklistsRoute = TripChecklistsRouteImport.update({
-  id: '/checklists',
-  path: '/checklists',
-  getParentRoute: () => TripRoute,
-} as any)
-const PortalTaxasRoute = PortalTaxasRouteImport.update({
-  id: '/taxas',
-  path: '/taxas',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalRoteiroRoute = PortalRoteiroRouteImport.update({
-  id: '/roteiro',
-  path: '/roteiro',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalPropostaRoute = PortalPropostaRouteImport.update({
-  id: '/proposta',
-  path: '/proposta',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalPassaporteRoute = PortalPassaporteRouteImport.update({
-  id: '/passaporte',
-  path: '/passaporte',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalPagamentoRoute = PortalPagamentoRouteImport.update({
-  id: '/pagamento',
-  path: '/pagamento',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalMilhasRoute = PortalMilhasRouteImport.update({
-  id: '/milhas',
-  path: '/milhas',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalMensagensRoute = PortalMensagensRouteImport.update({
-  id: '/mensagens',
-  path: '/mensagens',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalLoginRoute = PortalLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalDs160Route = PortalDs160RouteImport.update({
-  id: '/ds160',
-  path: '/ds160',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalDocumentosRoute = PortalDocumentosRouteImport.update({
-  id: '/documentos',
-  path: '/documentos',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalContratoRoute = PortalContratoRouteImport.update({
-  id: '/contrato',
-  path: '/contrato',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalConclusaoRoute = PortalConclusaoRouteImport.update({
-  id: '/conclusao',
-  path: '/conclusao',
-  getParentRoute: () => PortalRoute,
-} as any)
-const PortalAgendaRoute = PortalAgendaRouteImport.update({
-  id: '/agenda',
-  path: '/agenda',
-  getParentRoute: () => PortalRoute,
-} as any)
-const OrcamentoSucessoRoute = OrcamentoSucessoRouteImport.update({
-  id: '/sucesso',
-  path: '/sucesso',
-  getParentRoute: () => OrcamentoRoute,
-} as any)
-const ConsoleTemplatesRoute = ConsoleTemplatesRouteImport.update({
-  id: '/templates',
-  path: '/templates',
-  getParentRoute: () => ConsoleRoute,
-} as any)
-const ConsoleRelatorioRoute = ConsoleRelatorioRouteImport.update({
-  id: '/relatorio',
-  path: '/relatorio',
-  getParentRoute: () => ConsoleRoute,
-} as any)
-const ConsoleProdutosRoute = ConsoleProdutosRouteImport.update({
-  id: '/produtos',
-  path: '/produtos',
-  getParentRoute: () => ConsoleRoute,
-} as any)
-const ConsoleLoginRoute = ConsoleLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => ConsoleRoute,
-} as any)
-const ConsoleJanelasRoute = ConsoleJanelasRouteImport.update({
-  id: '/janelas',
-  path: '/janelas',
-  getParentRoute: () => ConsoleRoute,
-} as any)
-const ConsoleFinanceiroRoute = ConsoleFinanceiroRouteImport.update({
-  id: '/financeiro',
-  path: '/financeiro',
-  getParentRoute: () => ConsoleRoute,
-} as any)
-const ConsoleEquipeRoute = ConsoleEquipeRouteImport.update({
-  id: '/equipe',
-  path: '/equipe',
-  getParentRoute: () => ConsoleRoute,
-} as any)
-const ConsoleConfiguracoesRoute = ConsoleConfiguracoesRouteImport.update({
-  id: '/configuracoes',
-  path: '/configuracoes',
-  getParentRoute: () => ConsoleRoute,
-} as any)
-const ConsoleAuditoriaRoute = ConsoleAuditoriaRouteImport.update({
-  id: '/auditoria',
-  path: '/auditoria',
-  getParentRoute: () => ConsoleRoute,
-} as any)
-const ConsoleAgendaRoute = ConsoleAgendaRouteImport.update({
-  id: '/agenda',
-  path: '/agenda',
   getParentRoute: () => ConsoleRoute,
 } as any)
 const ConsoleAceitarConviteRoute = ConsoleAceitarConviteRouteImport.update({
@@ -282,27 +145,165 @@ const ConsoleAceitarConviteRoute = ConsoleAceitarConviteRouteImport.update({
   path: '/aceitar-convite',
   getParentRoute: () => ConsoleRoute,
 } as any)
-const Char91DotwellKnownChar93OauthProtectedResourceRoute =
-  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
-    id: '/.well-known/oauth-protected-resource',
-    path: '/.well-known/oauth-protected-resource',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const Char91DotmcpChar93ListToolsRoute =
-  Char91DotmcpChar93ListToolsRouteImport.update({
-    id: '/.mcp/list-tools',
-    path: '/.mcp/list-tools',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ConsoleOrcamentoNovoRoute = ConsoleOrcamentoNovoRouteImport.update({
-  id: '/orcamento/novo',
-  path: '/orcamento/novo',
+const ConsoleAgendaRoute = ConsoleAgendaRouteImport.update({
+  id: '/agenda',
+  path: '/agenda',
   getParentRoute: () => ConsoleRoute,
 } as any)
-const ConsoleClienteIdRoute = ConsoleClienteIdRouteImport.update({
-  id: '/cliente/$id',
-  path: '/cliente/$id',
+const ConsoleAuditoriaRoute = ConsoleAuditoriaRouteImport.update({
+  id: '/auditoria',
+  path: '/auditoria',
   getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleConfiguracoesRoute = ConsoleConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleEquipeRoute = ConsoleEquipeRouteImport.update({
+  id: '/equipe',
+  path: '/equipe',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleFinanceiroRoute = ConsoleFinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleJanelasRoute = ConsoleJanelasRouteImport.update({
+  id: '/janelas',
+  path: '/janelas',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleLoginRoute = ConsoleLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleProdutosRoute = ConsoleProdutosRouteImport.update({
+  id: '/produtos',
+  path: '/produtos',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleRelatorioRoute = ConsoleRelatorioRouteImport.update({
+  id: '/relatorio',
+  path: '/relatorio',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleTemplatesRoute = ConsoleTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const OrcamentoSucessoRoute = OrcamentoSucessoRouteImport.update({
+  id: '/sucesso',
+  path: '/sucesso',
+  getParentRoute: () => OrcamentoRoute,
+} as any)
+const PortalIndexRoute = PortalIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalAgendaRoute = PortalAgendaRouteImport.update({
+  id: '/agenda',
+  path: '/agenda',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalConclusaoRoute = PortalConclusaoRouteImport.update({
+  id: '/conclusao',
+  path: '/conclusao',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalContratoRoute = PortalContratoRouteImport.update({
+  id: '/contrato',
+  path: '/contrato',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalDocumentosRoute = PortalDocumentosRouteImport.update({
+  id: '/documentos',
+  path: '/documentos',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalDs160Route = PortalDs160RouteImport.update({
+  id: '/ds160',
+  path: '/ds160',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalLoginRoute = PortalLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalMensagensRoute = PortalMensagensRouteImport.update({
+  id: '/mensagens',
+  path: '/mensagens',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalMilhasRoute = PortalMilhasRouteImport.update({
+  id: '/milhas',
+  path: '/milhas',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalPagamentoRoute = PortalPagamentoRouteImport.update({
+  id: '/pagamento',
+  path: '/pagamento',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalPassaporteRoute = PortalPassaporteRouteImport.update({
+  id: '/passaporte',
+  path: '/passaporte',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalPropostaRoute = PortalPropostaRouteImport.update({
+  id: '/proposta',
+  path: '/proposta',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalRoteiroRoute = PortalRoteiroRouteImport.update({
+  id: '/roteiro',
+  path: '/roteiro',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalTaxasRoute = PortalTaxasRouteImport.update({
+  id: '/taxas',
+  path: '/taxas',
+  getParentRoute: () => PortalRoute,
+} as any)
+const TripIndexRoute = TripIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => TripRoute,
+} as any)
+const TripChecklistsRoute = TripChecklistsRouteImport.update({
+  id: '/checklists',
+  path: '/checklists',
+  getParentRoute: () => TripRoute,
+} as any)
+const TripFinanceiroRoute = TripFinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
+  getParentRoute: () => TripRoute,
+} as any)
+const TripMaisRoute = TripMaisRouteImport.update({
+  id: '/mais',
+  path: '/mais',
+  getParentRoute: () => TripRoute,
+} as any)
+const TripNovoRoute = TripNovoRouteImport.update({
+  id: '/novo',
+  path: '/novo',
+  getParentRoute: () => TripRoute,
+} as any)
+const TripRoteiroRoute = TripRoteiroRouteImport.update({
+  id: '/roteiro',
+  path: '/roteiro',
+  getParentRoute: () => TripRoute,
+} as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
   Char91DotmcpChar93InvokeToolToolRouteImport.update({
@@ -310,22 +311,27 @@ const Char91DotmcpChar93InvokeToolToolRoute =
     path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
-const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
-  id: '/.lovable/oauth/consent',
-  path: '/.lovable/oauth/consent',
-  getParentRoute: () => rootRouteImport,
+const ConsoleClienteIdRoute = ConsoleClienteIdRouteImport.update({
+  id: '/cliente/$id',
+  path: '/cliente/$id',
+  getParentRoute: () => ConsoleRoute,
 } as any)
-const ConsoleOrcamentoIdEditarRoute =
-  ConsoleOrcamentoIdEditarRouteImport.update({
-    id: '/orcamento/$id/editar',
-    path: '/orcamento/$id/editar',
-    getParentRoute: () => ConsoleRoute,
-  } as any)
+const ConsoleOrcamentoNovoRoute = ConsoleOrcamentoNovoRouteImport.update({
+  id: '/orcamento/novo',
+  path: '/orcamento/novo',
+  getParentRoute: () => ConsoleRoute,
+} as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const ConsoleOrcamentoIdEditarRoute =
+  ConsoleOrcamentoIdEditarRouteImport.update({
+    id: '/orcamento/$id/editar',
+    path: '/orcamento/$id/editar',
+    getParentRoute: () => ConsoleRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -371,6 +377,7 @@ export interface FileRoutesByFullPath {
   '/trip/checklists': typeof TripChecklistsRoute
   '/trip/financeiro': typeof TripFinanceiroRoute
   '/trip/mais': typeof TripMaisRoute
+  '/trip/novo': typeof TripNovoRoute
   '/trip/roteiro': typeof TripRoteiroRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -422,6 +429,7 @@ export interface FileRoutesByTo {
   '/trip/checklists': typeof TripChecklistsRoute
   '/trip/financeiro': typeof TripFinanceiroRoute
   '/trip/mais': typeof TripMaisRoute
+  '/trip/novo': typeof TripNovoRoute
   '/trip/roteiro': typeof TripRoteiroRoute
   '/console': typeof ConsoleIndexRoute
   '/portal': typeof PortalIndexRoute
@@ -477,6 +485,7 @@ export interface FileRoutesById {
   '/trip/checklists': typeof TripChecklistsRoute
   '/trip/financeiro': typeof TripFinanceiroRoute
   '/trip/mais': typeof TripMaisRoute
+  '/trip/novo': typeof TripNovoRoute
   '/trip/roteiro': typeof TripRoteiroRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -533,6 +542,7 @@ export interface FileRouteTypes {
     | '/trip/checklists'
     | '/trip/financeiro'
     | '/trip/mais'
+    | '/trip/novo'
     | '/trip/roteiro'
     | '/console/'
     | '/portal/'
@@ -584,6 +594,7 @@ export interface FileRouteTypes {
     | '/trip/checklists'
     | '/trip/financeiro'
     | '/trip/mais'
+    | '/trip/novo'
     | '/trip/roteiro'
     | '/console'
     | '/portal'
@@ -638,6 +649,7 @@ export interface FileRouteTypes {
     | '/trip/checklists'
     | '/trip/financeiro'
     | '/trip/mais'
+    | '/trip/novo'
     | '/trip/roteiro'
     | '/console/'
     | '/portal/'
@@ -672,74 +684,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/vistos': {
-      id: '/vistos'
-      path: '/vistos'
-      fullPath: '/vistos'
-      preLoaderRoute: typeof VistosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/trip': {
-      id: '/trip'
-      path: '/trip'
-      fullPath: '/trip'
-      preLoaderRoute: typeof TripRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/roteiros': {
-      id: '/roteiros'
-      path: '/roteiros'
-      fullPath: '/roteiros'
-      preLoaderRoute: typeof RoteirosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacidade': {
-      id: '/privacidade'
-      path: '/privacidade'
-      fullPath: '/privacidade'
-      preLoaderRoute: typeof PrivacidadeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/portal': {
-      id: '/portal'
-      path: '/portal'
-      fullPath: '/portal'
-      preLoaderRoute: typeof PortalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/passaporte': {
-      id: '/passaporte'
-      path: '/passaporte'
-      fullPath: '/passaporte'
-      preLoaderRoute: typeof PassaporteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/orcamento': {
-      id: '/orcamento'
-      path: '/orcamento'
-      fullPath: '/orcamento'
-      preLoaderRoute: typeof OrcamentoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/milhas': {
-      id: '/milhas'
-      path: '/milhas'
-      fullPath: '/milhas'
-      preLoaderRoute: typeof MilhasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mcp': {
-      id: '/mcp'
-      path: '/mcp'
-      fullPath: '/mcp'
-      preLoaderRoute: typeof McpRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/console': {
@@ -749,242 +698,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/trip/': {
-      id: '/trip/'
-      path: '/'
-      fullPath: '/trip/'
-      preLoaderRoute: typeof TripIndexRouteImport
-      parentRoute: typeof TripRoute
-    }
-    '/portal/': {
-      id: '/portal/'
-      path: '/'
-      fullPath: '/portal/'
-      preLoaderRoute: typeof PortalIndexRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/console/': {
-      id: '/console/'
-      path: '/'
-      fullPath: '/console/'
-      preLoaderRoute: typeof ConsoleIndexRouteImport
-      parentRoute: typeof ConsoleRoute
-    }
-    '/trip/roteiro': {
-      id: '/trip/roteiro'
-      path: '/roteiro'
-      fullPath: '/trip/roteiro'
-      preLoaderRoute: typeof TripRoteiroRouteImport
-      parentRoute: typeof TripRoute
-    }
-    '/trip/mais': {
-      id: '/trip/mais'
-      path: '/mais'
-      fullPath: '/trip/mais'
-      preLoaderRoute: typeof TripMaisRouteImport
-      parentRoute: typeof TripRoute
-    }
-    '/trip/financeiro': {
-      id: '/trip/financeiro'
-      path: '/financeiro'
-      fullPath: '/trip/financeiro'
-      preLoaderRoute: typeof TripFinanceiroRouteImport
-      parentRoute: typeof TripRoute
-    }
-    '/trip/checklists': {
-      id: '/trip/checklists'
-      path: '/checklists'
-      fullPath: '/trip/checklists'
-      preLoaderRoute: typeof TripChecklistsRouteImport
-      parentRoute: typeof TripRoute
-    }
-    '/portal/taxas': {
-      id: '/portal/taxas'
-      path: '/taxas'
-      fullPath: '/portal/taxas'
-      preLoaderRoute: typeof PortalTaxasRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/portal/roteiro': {
-      id: '/portal/roteiro'
-      path: '/roteiro'
-      fullPath: '/portal/roteiro'
-      preLoaderRoute: typeof PortalRoteiroRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/portal/proposta': {
-      id: '/portal/proposta'
-      path: '/proposta'
-      fullPath: '/portal/proposta'
-      preLoaderRoute: typeof PortalPropostaRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/portal/passaporte': {
-      id: '/portal/passaporte'
-      path: '/passaporte'
-      fullPath: '/portal/passaporte'
-      preLoaderRoute: typeof PortalPassaporteRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/portal/pagamento': {
-      id: '/portal/pagamento'
-      path: '/pagamento'
-      fullPath: '/portal/pagamento'
-      preLoaderRoute: typeof PortalPagamentoRouteImport
-      parentRoute: typeof PortalRoute
-    }
-    '/portal/milhas': {
-      id: '/portal/milhas'
+    '/milhas': {
+      id: '/milhas'
       path: '/milhas'
-      fullPath: '/portal/milhas'
-      preLoaderRoute: typeof PortalMilhasRouteImport
-      parentRoute: typeof PortalRoute
+      fullPath: '/milhas'
+      preLoaderRoute: typeof MilhasRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/portal/mensagens': {
-      id: '/portal/mensagens'
-      path: '/mensagens'
-      fullPath: '/portal/mensagens'
-      preLoaderRoute: typeof PortalMensagensRouteImport
-      parentRoute: typeof PortalRoute
+    '/orcamento': {
+      id: '/orcamento'
+      path: '/orcamento'
+      fullPath: '/orcamento'
+      preLoaderRoute: typeof OrcamentoRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/portal/login': {
-      id: '/portal/login'
-      path: '/login'
-      fullPath: '/portal/login'
-      preLoaderRoute: typeof PortalLoginRouteImport
-      parentRoute: typeof PortalRoute
+    '/passaporte': {
+      id: '/passaporte'
+      path: '/passaporte'
+      fullPath: '/passaporte'
+      preLoaderRoute: typeof PassaporteRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/portal/ds160': {
-      id: '/portal/ds160'
-      path: '/ds160'
-      fullPath: '/portal/ds160'
-      preLoaderRoute: typeof PortalDs160RouteImport
-      parentRoute: typeof PortalRoute
+    '/portal': {
+      id: '/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/portal/documentos': {
-      id: '/portal/documentos'
-      path: '/documentos'
-      fullPath: '/portal/documentos'
-      preLoaderRoute: typeof PortalDocumentosRouteImport
-      parentRoute: typeof PortalRoute
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/portal/contrato': {
-      id: '/portal/contrato'
-      path: '/contrato'
-      fullPath: '/portal/contrato'
-      preLoaderRoute: typeof PortalContratoRouteImport
-      parentRoute: typeof PortalRoute
+    '/roteiros': {
+      id: '/roteiros'
+      path: '/roteiros'
+      fullPath: '/roteiros'
+      preLoaderRoute: typeof RoteirosRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/portal/conclusao': {
-      id: '/portal/conclusao'
-      path: '/conclusao'
-      fullPath: '/portal/conclusao'
-      preLoaderRoute: typeof PortalConclusaoRouteImport
-      parentRoute: typeof PortalRoute
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/portal/agenda': {
-      id: '/portal/agenda'
-      path: '/agenda'
-      fullPath: '/portal/agenda'
-      preLoaderRoute: typeof PortalAgendaRouteImport
-      parentRoute: typeof PortalRoute
+    '/trip': {
+      id: '/trip'
+      path: '/trip'
+      fullPath: '/trip'
+      preLoaderRoute: typeof TripRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/orcamento/sucesso': {
-      id: '/orcamento/sucesso'
-      path: '/sucesso'
-      fullPath: '/orcamento/sucesso'
-      preLoaderRoute: typeof OrcamentoSucessoRouteImport
-      parentRoute: typeof OrcamentoRoute
-    }
-    '/console/templates': {
-      id: '/console/templates'
-      path: '/templates'
-      fullPath: '/console/templates'
-      preLoaderRoute: typeof ConsoleTemplatesRouteImport
-      parentRoute: typeof ConsoleRoute
-    }
-    '/console/relatorio': {
-      id: '/console/relatorio'
-      path: '/relatorio'
-      fullPath: '/console/relatorio'
-      preLoaderRoute: typeof ConsoleRelatorioRouteImport
-      parentRoute: typeof ConsoleRoute
-    }
-    '/console/produtos': {
-      id: '/console/produtos'
-      path: '/produtos'
-      fullPath: '/console/produtos'
-      preLoaderRoute: typeof ConsoleProdutosRouteImport
-      parentRoute: typeof ConsoleRoute
-    }
-    '/console/login': {
-      id: '/console/login'
-      path: '/login'
-      fullPath: '/console/login'
-      preLoaderRoute: typeof ConsoleLoginRouteImport
-      parentRoute: typeof ConsoleRoute
-    }
-    '/console/janelas': {
-      id: '/console/janelas'
-      path: '/janelas'
-      fullPath: '/console/janelas'
-      preLoaderRoute: typeof ConsoleJanelasRouteImport
-      parentRoute: typeof ConsoleRoute
-    }
-    '/console/financeiro': {
-      id: '/console/financeiro'
-      path: '/financeiro'
-      fullPath: '/console/financeiro'
-      preLoaderRoute: typeof ConsoleFinanceiroRouteImport
-      parentRoute: typeof ConsoleRoute
-    }
-    '/console/equipe': {
-      id: '/console/equipe'
-      path: '/equipe'
-      fullPath: '/console/equipe'
-      preLoaderRoute: typeof ConsoleEquipeRouteImport
-      parentRoute: typeof ConsoleRoute
-    }
-    '/console/configuracoes': {
-      id: '/console/configuracoes'
-      path: '/configuracoes'
-      fullPath: '/console/configuracoes'
-      preLoaderRoute: typeof ConsoleConfiguracoesRouteImport
-      parentRoute: typeof ConsoleRoute
-    }
-    '/console/auditoria': {
-      id: '/console/auditoria'
-      path: '/auditoria'
-      fullPath: '/console/auditoria'
-      preLoaderRoute: typeof ConsoleAuditoriaRouteImport
-      parentRoute: typeof ConsoleRoute
-    }
-    '/console/agenda': {
-      id: '/console/agenda'
-      path: '/agenda'
-      fullPath: '/console/agenda'
-      preLoaderRoute: typeof ConsoleAgendaRouteImport
-      parentRoute: typeof ConsoleRoute
-    }
-    '/console/aceitar-convite': {
-      id: '/console/aceitar-convite'
-      path: '/aceitar-convite'
-      fullPath: '/console/aceitar-convite'
-      preLoaderRoute: typeof ConsoleAceitarConviteRouteImport
-      parentRoute: typeof ConsoleRoute
-    }
-    '/.well-known/oauth-protected-resource': {
-      id: '/.well-known/oauth-protected-resource'
-      path: '/.well-known/oauth-protected-resource'
-      fullPath: '/.well-known/oauth-protected-resource'
-      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+    '/vistos': {
+      id: '/vistos'
+      path: '/vistos'
+      fullPath: '/vistos'
+      preLoaderRoute: typeof VistosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.mcp/list-tools': {
@@ -994,26 +775,243 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/console/orcamento/novo': {
-      id: '/console/orcamento/novo'
-      path: '/orcamento/novo'
-      fullPath: '/console/orcamento/novo'
-      preLoaderRoute: typeof ConsoleOrcamentoNovoRouteImport
-      parentRoute: typeof ConsoleRoute
-    }
-    '/console/cliente/$id': {
-      id: '/console/cliente/$id'
-      path: '/cliente/$id'
-      fullPath: '/console/cliente/$id'
-      preLoaderRoute: typeof ConsoleClienteIdRouteImport
-      parentRoute: typeof ConsoleRoute
-    }
-    '/.mcp/invoke-tool/$tool': {
-      id: '/.mcp/invoke-tool/$tool'
-      path: '/.mcp/invoke-tool/$tool'
-      fullPath: '/.mcp/invoke-tool/$tool'
-      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/console/': {
+      id: '/console/'
+      path: '/'
+      fullPath: '/console/'
+      preLoaderRoute: typeof ConsoleIndexRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/aceitar-convite': {
+      id: '/console/aceitar-convite'
+      path: '/aceitar-convite'
+      fullPath: '/console/aceitar-convite'
+      preLoaderRoute: typeof ConsoleAceitarConviteRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/agenda': {
+      id: '/console/agenda'
+      path: '/agenda'
+      fullPath: '/console/agenda'
+      preLoaderRoute: typeof ConsoleAgendaRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/auditoria': {
+      id: '/console/auditoria'
+      path: '/auditoria'
+      fullPath: '/console/auditoria'
+      preLoaderRoute: typeof ConsoleAuditoriaRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/configuracoes': {
+      id: '/console/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/console/configuracoes'
+      preLoaderRoute: typeof ConsoleConfiguracoesRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/equipe': {
+      id: '/console/equipe'
+      path: '/equipe'
+      fullPath: '/console/equipe'
+      preLoaderRoute: typeof ConsoleEquipeRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/financeiro': {
+      id: '/console/financeiro'
+      path: '/financeiro'
+      fullPath: '/console/financeiro'
+      preLoaderRoute: typeof ConsoleFinanceiroRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/janelas': {
+      id: '/console/janelas'
+      path: '/janelas'
+      fullPath: '/console/janelas'
+      preLoaderRoute: typeof ConsoleJanelasRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/login': {
+      id: '/console/login'
+      path: '/login'
+      fullPath: '/console/login'
+      preLoaderRoute: typeof ConsoleLoginRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/produtos': {
+      id: '/console/produtos'
+      path: '/produtos'
+      fullPath: '/console/produtos'
+      preLoaderRoute: typeof ConsoleProdutosRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/relatorio': {
+      id: '/console/relatorio'
+      path: '/relatorio'
+      fullPath: '/console/relatorio'
+      preLoaderRoute: typeof ConsoleRelatorioRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/templates': {
+      id: '/console/templates'
+      path: '/templates'
+      fullPath: '/console/templates'
+      preLoaderRoute: typeof ConsoleTemplatesRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/orcamento/sucesso': {
+      id: '/orcamento/sucesso'
+      path: '/sucesso'
+      fullPath: '/orcamento/sucesso'
+      preLoaderRoute: typeof OrcamentoSucessoRouteImport
+      parentRoute: typeof OrcamentoRoute
+    }
+    '/portal/': {
+      id: '/portal/'
+      path: '/'
+      fullPath: '/portal/'
+      preLoaderRoute: typeof PortalIndexRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/agenda': {
+      id: '/portal/agenda'
+      path: '/agenda'
+      fullPath: '/portal/agenda'
+      preLoaderRoute: typeof PortalAgendaRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/conclusao': {
+      id: '/portal/conclusao'
+      path: '/conclusao'
+      fullPath: '/portal/conclusao'
+      preLoaderRoute: typeof PortalConclusaoRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/contrato': {
+      id: '/portal/contrato'
+      path: '/contrato'
+      fullPath: '/portal/contrato'
+      preLoaderRoute: typeof PortalContratoRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/documentos': {
+      id: '/portal/documentos'
+      path: '/documentos'
+      fullPath: '/portal/documentos'
+      preLoaderRoute: typeof PortalDocumentosRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/ds160': {
+      id: '/portal/ds160'
+      path: '/ds160'
+      fullPath: '/portal/ds160'
+      preLoaderRoute: typeof PortalDs160RouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/login': {
+      id: '/portal/login'
+      path: '/login'
+      fullPath: '/portal/login'
+      preLoaderRoute: typeof PortalLoginRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/mensagens': {
+      id: '/portal/mensagens'
+      path: '/mensagens'
+      fullPath: '/portal/mensagens'
+      preLoaderRoute: typeof PortalMensagensRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/milhas': {
+      id: '/portal/milhas'
+      path: '/milhas'
+      fullPath: '/portal/milhas'
+      preLoaderRoute: typeof PortalMilhasRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/pagamento': {
+      id: '/portal/pagamento'
+      path: '/pagamento'
+      fullPath: '/portal/pagamento'
+      preLoaderRoute: typeof PortalPagamentoRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/passaporte': {
+      id: '/portal/passaporte'
+      path: '/passaporte'
+      fullPath: '/portal/passaporte'
+      preLoaderRoute: typeof PortalPassaporteRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/proposta': {
+      id: '/portal/proposta'
+      path: '/proposta'
+      fullPath: '/portal/proposta'
+      preLoaderRoute: typeof PortalPropostaRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/roteiro': {
+      id: '/portal/roteiro'
+      path: '/roteiro'
+      fullPath: '/portal/roteiro'
+      preLoaderRoute: typeof PortalRoteiroRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/taxas': {
+      id: '/portal/taxas'
+      path: '/taxas'
+      fullPath: '/portal/taxas'
+      preLoaderRoute: typeof PortalTaxasRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/trip/': {
+      id: '/trip/'
+      path: '/'
+      fullPath: '/trip/'
+      preLoaderRoute: typeof TripIndexRouteImport
+      parentRoute: typeof TripRoute
+    }
+    '/trip/checklists': {
+      id: '/trip/checklists'
+      path: '/checklists'
+      fullPath: '/trip/checklists'
+      preLoaderRoute: typeof TripChecklistsRouteImport
+      parentRoute: typeof TripRoute
+    }
+    '/trip/financeiro': {
+      id: '/trip/financeiro'
+      path: '/financeiro'
+      fullPath: '/trip/financeiro'
+      preLoaderRoute: typeof TripFinanceiroRouteImport
+      parentRoute: typeof TripRoute
+    }
+    '/trip/mais': {
+      id: '/trip/mais'
+      path: '/mais'
+      fullPath: '/trip/mais'
+      preLoaderRoute: typeof TripMaisRouteImport
+      parentRoute: typeof TripRoute
+    }
+    '/trip/novo': {
+      id: '/trip/novo'
+      path: '/novo'
+      fullPath: '/trip/novo'
+      preLoaderRoute: typeof TripNovoRouteImport
+      parentRoute: typeof TripRoute
+    }
+    '/trip/roteiro': {
+      id: '/trip/roteiro'
+      path: '/roteiro'
+      fullPath: '/trip/roteiro'
+      preLoaderRoute: typeof TripRoteiroRouteImport
+      parentRoute: typeof TripRoute
     }
     '/.lovable/oauth/consent': {
       id: '/.lovable/oauth/consent'
@@ -1022,11 +1020,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/console/orcamento/$id/editar': {
-      id: '/console/orcamento/$id/editar'
-      path: '/orcamento/$id/editar'
-      fullPath: '/console/orcamento/$id/editar'
-      preLoaderRoute: typeof ConsoleOrcamentoIdEditarRouteImport
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console/cliente/$id': {
+      id: '/console/cliente/$id'
+      path: '/cliente/$id'
+      fullPath: '/console/cliente/$id'
+      preLoaderRoute: typeof ConsoleClienteIdRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/orcamento/novo': {
+      id: '/console/orcamento/novo'
+      path: '/orcamento/novo'
+      fullPath: '/console/orcamento/novo'
+      preLoaderRoute: typeof ConsoleOrcamentoNovoRouteImport
       parentRoute: typeof ConsoleRoute
     }
     '/api/public/payments/webhook': {
@@ -1035,6 +1047,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/public/payments/webhook'
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/console/orcamento/$id/editar': {
+      id: '/console/orcamento/$id/editar'
+      path: '/orcamento/$id/editar'
+      fullPath: '/console/orcamento/$id/editar'
+      preLoaderRoute: typeof ConsoleOrcamentoIdEditarRouteImport
+      parentRoute: typeof ConsoleRoute
     }
   }
 }
@@ -1131,6 +1150,7 @@ interface TripRouteChildren {
   TripChecklistsRoute: typeof TripChecklistsRoute
   TripFinanceiroRoute: typeof TripFinanceiroRoute
   TripMaisRoute: typeof TripMaisRoute
+  TripNovoRoute: typeof TripNovoRoute
   TripRoteiroRoute: typeof TripRoteiroRoute
   TripIndexRoute: typeof TripIndexRoute
 }
@@ -1139,6 +1159,7 @@ const TripRouteChildren: TripRouteChildren = {
   TripChecklistsRoute: TripChecklistsRoute,
   TripFinanceiroRoute: TripFinanceiroRoute,
   TripMaisRoute: TripMaisRoute,
+  TripNovoRoute: TripNovoRoute,
   TripRoteiroRoute: TripRoteiroRoute,
   TripIndexRoute: TripIndexRoute,
 }
