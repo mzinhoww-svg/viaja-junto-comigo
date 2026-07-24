@@ -17,6 +17,7 @@ import { Route as PortalRouteImport } from './routes/portal'
 import { Route as PassaporteRouteImport } from './routes/passaporte'
 import { Route as OrcamentoRouteImport } from './routes/orcamento'
 import { Route as MilhasRouteImport } from './routes/milhas'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as ConsoleRouteImport } from './routes/console'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
@@ -46,8 +47,11 @@ import { Route as ConsoleConfiguracoesRouteImport } from './routes/console.confi
 import { Route as ConsoleAuditoriaRouteImport } from './routes/console.auditoria'
 import { Route as ConsoleAgendaRouteImport } from './routes/console.agenda'
 import { Route as ConsoleAceitarConviteRouteImport } from './routes/console.aceitar-convite'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as ConsoleOrcamentoNovoRouteImport } from './routes/console.orcamento.novo'
 import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$id'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as ConsoleOrcamentoIdEditarRouteImport } from './routes/console.orcamento.$id.editar'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
@@ -89,6 +93,11 @@ const OrcamentoRoute = OrcamentoRouteImport.update({
 const MilhasRoute = MilhasRouteImport.update({
   id: '/milhas',
   path: '/milhas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConsoleRoute = ConsoleRouteImport.update({
@@ -236,6 +245,18 @@ const ConsoleAceitarConviteRoute = ConsoleAceitarConviteRouteImport.update({
   path: '/aceitar-convite',
   getParentRoute: () => ConsoleRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ConsoleOrcamentoNovoRoute = ConsoleOrcamentoNovoRouteImport.update({
   id: '/orcamento/novo',
   path: '/orcamento/novo',
@@ -246,6 +267,12 @@ const ConsoleClienteIdRoute = ConsoleClienteIdRouteImport.update({
   path: '/cliente/$id',
   getParentRoute: () => ConsoleRoute,
 } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ConsoleOrcamentoIdEditarRoute =
   ConsoleOrcamentoIdEditarRouteImport.update({
     id: '/orcamento/$id/editar',
@@ -262,6 +289,7 @@ const ApiPublicPaymentsWebhookRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/console': typeof ConsoleRouteWithChildren
+  '/mcp': typeof McpRoute
   '/milhas': typeof MilhasRoute
   '/orcamento': typeof OrcamentoRouteWithChildren
   '/passaporte': typeof PassaporteRoute
@@ -270,6 +298,8 @@ export interface FileRoutesByFullPath {
   '/roteiros': typeof RoteirosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/vistos': typeof VistosRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/console/aceitar-convite': typeof ConsoleAceitarConviteRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
@@ -297,6 +327,7 @@ export interface FileRoutesByFullPath {
   '/portal/taxas': typeof PortalTaxasRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
   '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -304,6 +335,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/mcp': typeof McpRoute
   '/milhas': typeof MilhasRoute
   '/orcamento': typeof OrcamentoRouteWithChildren
   '/passaporte': typeof PassaporteRoute
@@ -311,6 +343,8 @@ export interface FileRoutesByTo {
   '/roteiros': typeof RoteirosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/vistos': typeof VistosRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/console/aceitar-convite': typeof ConsoleAceitarConviteRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
@@ -338,6 +372,7 @@ export interface FileRoutesByTo {
   '/portal/taxas': typeof PortalTaxasRoute
   '/console': typeof ConsoleIndexRoute
   '/portal': typeof PortalIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
   '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -347,6 +382,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/console': typeof ConsoleRouteWithChildren
+  '/mcp': typeof McpRoute
   '/milhas': typeof MilhasRoute
   '/orcamento': typeof OrcamentoRouteWithChildren
   '/passaporte': typeof PassaporteRoute
@@ -355,6 +391,8 @@ export interface FileRoutesById {
   '/roteiros': typeof RoteirosRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/vistos': typeof VistosRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/console/aceitar-convite': typeof ConsoleAceitarConviteRoute
   '/console/agenda': typeof ConsoleAgendaRoute
   '/console/auditoria': typeof ConsoleAuditoriaRoute
@@ -382,6 +420,7 @@ export interface FileRoutesById {
   '/portal/taxas': typeof PortalTaxasRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/console/cliente/$id': typeof ConsoleClienteIdRoute
   '/console/orcamento/novo': typeof ConsoleOrcamentoNovoRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -392,6 +431,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/console'
+    | '/mcp'
     | '/milhas'
     | '/orcamento'
     | '/passaporte'
@@ -400,6 +440,8 @@ export interface FileRouteTypes {
     | '/roteiros'
     | '/sitemap.xml'
     | '/vistos'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/console/aceitar-convite'
     | '/console/agenda'
     | '/console/auditoria'
@@ -427,6 +469,7 @@ export interface FileRouteTypes {
     | '/portal/taxas'
     | '/console/'
     | '/portal/'
+    | '/.mcp/invoke-tool/$tool'
     | '/console/cliente/$id'
     | '/console/orcamento/novo'
     | '/api/public/payments/webhook'
@@ -434,6 +477,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/mcp'
     | '/milhas'
     | '/orcamento'
     | '/passaporte'
@@ -441,6 +485,8 @@ export interface FileRouteTypes {
     | '/roteiros'
     | '/sitemap.xml'
     | '/vistos'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/console/aceitar-convite'
     | '/console/agenda'
     | '/console/auditoria'
@@ -468,6 +514,7 @@ export interface FileRouteTypes {
     | '/portal/taxas'
     | '/console'
     | '/portal'
+    | '/.mcp/invoke-tool/$tool'
     | '/console/cliente/$id'
     | '/console/orcamento/novo'
     | '/api/public/payments/webhook'
@@ -476,6 +523,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/console'
+    | '/mcp'
     | '/milhas'
     | '/orcamento'
     | '/passaporte'
@@ -484,6 +532,8 @@ export interface FileRouteTypes {
     | '/roteiros'
     | '/sitemap.xml'
     | '/vistos'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/console/aceitar-convite'
     | '/console/agenda'
     | '/console/auditoria'
@@ -511,6 +561,7 @@ export interface FileRouteTypes {
     | '/portal/taxas'
     | '/console/'
     | '/portal/'
+    | '/.mcp/invoke-tool/$tool'
     | '/console/cliente/$id'
     | '/console/orcamento/novo'
     | '/api/public/payments/webhook'
@@ -520,6 +571,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConsoleRoute: typeof ConsoleRouteWithChildren
+  McpRoute: typeof McpRoute
   MilhasRoute: typeof MilhasRoute
   OrcamentoRoute: typeof OrcamentoRouteWithChildren
   PassaporteRoute: typeof PassaporteRoute
@@ -528,6 +580,9 @@ export interface RootRouteChildren {
   RoteirosRoute: typeof RoteirosRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   VistosRoute: typeof VistosRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
@@ -587,6 +642,13 @@ declare module '@tanstack/react-router' {
       path: '/milhas'
       fullPath: '/milhas'
       preLoaderRoute: typeof MilhasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/console': {
@@ -792,6 +854,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleAceitarConviteRouteImport
       parentRoute: typeof ConsoleRoute
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/console/orcamento/novo': {
       id: '/console/orcamento/novo'
       path: '/orcamento/novo'
@@ -805,6 +881,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/console/cliente/$id'
       preLoaderRoute: typeof ConsoleClienteIdRouteImport
       parentRoute: typeof ConsoleRoute
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/console/orcamento/$id/editar': {
       id: '/console/orcamento/$id/editar'
@@ -914,6 +997,7 @@ const PortalRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConsoleRoute: ConsoleRouteWithChildren,
+  McpRoute: McpRoute,
   MilhasRoute: MilhasRoute,
   OrcamentoRoute: OrcamentoRouteWithChildren,
   PassaporteRoute: PassaporteRoute,
@@ -922,6 +1006,10 @@ const rootRouteChildren: RootRouteChildren = {
   RoteirosRoute: RoteirosRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   VistosRoute: VistosRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
