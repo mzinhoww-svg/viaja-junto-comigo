@@ -5,7 +5,11 @@ import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-export function FeedbackForm({ requestId, initialRating, initialFeedback }: {
+export function FeedbackForm({
+  requestId,
+  initialRating,
+  initialFeedback,
+}: {
   requestId: string;
   initialRating: number | null;
   initialFeedback: string | null;
@@ -19,11 +23,16 @@ export function FeedbackForm({ requestId, initialRating, initialFeedback }: {
     mutationFn: async () => {
       if (rating < 1) throw new Error("Escolha de 1 a 5 estrelas");
       const { error } = await supabase.rpc("submit_feedback", {
-        _request_id: requestId, _rating: rating, _feedback: text,
+        _request_id: requestId,
+        _rating: rating,
+        _feedback: text,
       });
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Obrigada pelo feedback!"); qc.invalidateQueries({ queryKey: ["request", requestId] }); },
+    onSuccess: () => {
+      toast.success("Obrigada pelo feedback!");
+      qc.invalidateQueries({ queryKey: ["request", requestId] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -33,7 +42,7 @@ export function FeedbackForm({ requestId, initialRating, initialFeedback }: {
       <p className="text-xs text-ink-soft mt-1">Seu feedback fica privado e ajuda a Letícia.</p>
 
       <div className="mt-4 flex gap-2">
-        {[1,2,3,4,5].map((n) => (
+        {[1, 2, 3, 4, 5].map((n) => (
           <button
             key={n}
             disabled={sent}

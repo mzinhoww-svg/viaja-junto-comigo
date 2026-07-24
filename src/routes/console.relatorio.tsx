@@ -19,7 +19,9 @@ function Relatorio() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("requests")
-        .select("id, lead_name, visa_outcome, visa_decision_at, archived_at, client_rating, client_feedback, created_at, proposal_total_cents, payment_status, proposal_status");
+        .select(
+          "id, lead_name, visa_outcome, visa_decision_at, archived_at, client_rating, client_feedback, created_at, proposal_total_cents, payment_status, proposal_status",
+        );
       if (error) throw error;
       return data ?? [];
     },
@@ -28,7 +30,9 @@ function Relatorio() {
   const ab = useQuery({
     queryKey: ["ab-results", "lp_vistos_hero_v1"],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("ab_results", { _experiment: "lp_vistos_hero_v1" });
+      const { data, error } = await supabase.rpc("ab_results", {
+        _experiment: "lp_vistos_hero_v1",
+      });
       if (error) throw error;
       return (data ?? []) as { variant: string; views: number; converts: number }[];
     },
@@ -37,25 +41,46 @@ function Relatorio() {
   const list = q.data ?? [];
   const ativos = list.filter((r) => !r.visa_outcome && !r.archived_at).length;
   const byOutcome: Record<string, number> = {};
-  list.forEach((r) => { if (r.visa_outcome) byOutcome[r.visa_outcome] = (byOutcome[r.visa_outcome] ?? 0) + 1; });
+  list.forEach((r) => {
+    if (r.visa_outcome) byOutcome[r.visa_outcome] = (byOutcome[r.visa_outcome] ?? 0) + 1;
+  });
   const arquivados = list.filter((r) => r.archived_at).length;
 
-  const paidCents = list.filter((r) => r.payment_status === "paid").reduce((a, r) => a + (r.proposal_total_cents ?? 0), 0);
-  const openCents = list.filter((r) => r.payment_status !== "paid" && r.proposal_status === "accepted").reduce((a, r) => a + (r.proposal_total_cents ?? 0), 0);
+  const paidCents = list
+    .filter((r) => r.payment_status === "paid")
+    .reduce((a, r) => a + (r.proposal_total_cents ?? 0), 0);
+  const openCents = list
+    .filter((r) => r.payment_status !== "paid" && r.proposal_status === "accepted")
+    .reduce((a, r) => a + (r.proposal_total_cents ?? 0), 0);
   const paidCount = list.filter((r) => r.payment_status === "paid").length;
   const ticket = paidCount ? Math.round(paidCents / paidCount) : 0;
 
   const ratings = list.map((r) => r.client_rating).filter((x): x is number => !!x);
-  const nps = ratings.length ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1) : "—";
+  const nps = ratings.length
+    ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1)
+    : "—";
 
   const decididos = list.filter((r) => r.visa_decision_at);
   const tempoMedio = decididos.length
-    ? Math.round(decididos.reduce((acc, r) => acc + (new Date(r.visa_decision_at!).getTime() - new Date(r.created_at).getTime()), 0) / decididos.length / (1000 * 60 * 60 * 24))
+    ? Math.round(
+        decididos.reduce(
+          (acc, r) =>
+            acc + (new Date(r.visa_decision_at!).getTime() - new Date(r.created_at).getTime()),
+          0,
+        ) /
+          decididos.length /
+          (1000 * 60 * 60 * 24),
+      )
     : null;
 
-  const feedbacks = list.filter((r) => r.client_feedback).sort((a, b) =>
-    new Date(b.visa_decision_at ?? b.created_at).getTime() - new Date(a.visa_decision_at ?? a.created_at).getTime()
-  ).slice(0, 10);
+  const feedbacks = list
+    .filter((r) => r.client_feedback)
+    .sort(
+      (a, b) =>
+        new Date(b.visa_decision_at ?? b.created_at).getTime() -
+        new Date(a.visa_decision_at ?? a.created_at).getTime(),
+    )
+    .slice(0, 10);
 
   function exportCSV() {
     const rows = list.map((r) => ({
@@ -68,14 +93,16 @@ function Relatorio() {
       avaliacao: r.client_rating ?? "",
       feedback: r.client_feedback ?? "",
     }));
-    downloadCSV(`viajaly-relatorio-${new Date().toISOString().slice(0,10)}.csv`, toCSV(rows));
+    downloadCSV(`viajaly-relatorio-${new Date().toISOString().slice(0, 10)}.csv`, toCSV(rows));
   }
 
   return (
     <section>
       <div className="flex items-end justify-between mb-6 flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-navy mb-1">Relatório</h1>
+          <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-navy mb-1">
+            Relatório
+          </h1>
           <p className="text-sm text-ink-soft">Visão agregada dos casos da agência.</p>
         </div>
         <Button variant="outline" size="sm" onClick={exportCSV} disabled={list.length === 0}>
@@ -94,16 +121,22 @@ function Relatorio() {
         <Stat label="NPS médio" value={nps} />
       </div>
 
-      <h2 className="mt-10 mb-3 text-sm font-display font-bold text-navy uppercase tracking-wider">Financeiro (consultoria)</h2>
+      <h2 className="mt-10 mb-3 text-sm font-display font-bold text-navy uppercase tracking-wider">
+        Financeiro (consultoria)
+      </h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Stat label="Receita confirmada" value={formatBRL(paidCents)} />
         <Stat label="Em aberto (aceitos não pagos)" value={formatBRL(openCents)} />
         <Stat label="Pagamentos confirmados" value={paidCount} />
         <Stat label="Ticket médio" value={formatBRL(ticket)} />
       </div>
-      <p className="mt-2 text-xs text-ink-muted">Valores da consultoria (proposta). Taxas governamentais são pagas à parte e não entram aqui.</p>
+      <p className="mt-2 text-xs text-ink-muted">
+        Valores da consultoria (proposta). Taxas governamentais são pagas à parte e não entram aqui.
+      </p>
 
-      <h2 className="mt-10 mb-3 text-sm font-display font-bold text-navy uppercase tracking-wider">Teste A/B — landing /vistos (hero)</h2>
+      <h2 className="mt-10 mb-3 text-sm font-display font-bold text-navy uppercase tracking-wider">
+        Teste A/B — landing /vistos (hero)
+      </h2>
       <div className="bg-white rounded-2xl border border-[var(--color-border)] overflow-x-auto">
         <table className="w-full text-sm min-w-[420px]">
           <thead className="bg-[var(--color-muted)] text-ink-soft text-xs uppercase tracking-wider">
@@ -115,7 +148,13 @@ function Relatorio() {
             </tr>
           </thead>
           <tbody>
-            {(ab.data ?? []).length === 0 && <tr><td colSpan={4} className="p-6 text-center text-ink-muted">Sem dados ainda.</td></tr>}
+            {(ab.data ?? []).length === 0 && (
+              <tr>
+                <td colSpan={4} className="p-6 text-center text-ink-muted">
+                  Sem dados ainda.
+                </td>
+              </tr>
+            )}
             {(ab.data ?? []).map((r) => {
               const rate = r.views > 0 ? ((r.converts / r.views) * 100).toFixed(1) : "0.0";
               return (
@@ -131,7 +170,9 @@ function Relatorio() {
         </table>
       </div>
 
-      <h2 className="mt-10 mb-3 text-sm font-display font-bold text-navy uppercase tracking-wider">Últimos feedbacks</h2>
+      <h2 className="mt-10 mb-3 text-sm font-display font-bold text-navy uppercase tracking-wider">
+        Últimos feedbacks
+      </h2>
       <div className="space-y-2">
         {feedbacks.length === 0 && <p className="text-sm text-ink-soft">Nenhum feedback ainda.</p>}
         {feedbacks.map((r) => (
@@ -142,12 +183,20 @@ function Relatorio() {
                 <OutcomeBadge outcome={r.visa_outcome as VisaOutcome} size="sm" />
                 <div className="flex">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} size={14} className={i < (r.client_rating ?? 0) ? "fill-coral text-coral" : "text-ink-muted"} />
+                    <Star
+                      key={i}
+                      size={14}
+                      className={
+                        i < (r.client_rating ?? 0) ? "fill-coral text-coral" : "text-ink-muted"
+                      }
+                    />
                   ))}
                 </div>
               </div>
             </div>
-            {r.client_feedback && <p className="mt-2 text-sm text-ink whitespace-pre-line">{r.client_feedback}</p>}
+            {r.client_feedback && (
+              <p className="mt-2 text-sm text-ink whitespace-pre-line">{r.client_feedback}</p>
+            )}
           </div>
         ))}
       </div>

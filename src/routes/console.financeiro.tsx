@@ -25,7 +25,9 @@ function ConsoleFinanceiro() {
   const taxes = useQuery({
     queryKey: ["financeiro-taxes"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("tax_payments").select("amount_brl_cents, status");
+      const { data, error } = await supabase
+        .from("tax_payments")
+        .select("amount_brl_cents, status");
       if (error) throw error;
       return data ?? [];
     },
@@ -39,14 +41,23 @@ function ConsoleFinanceiro() {
   };
   const paid = list.filter((r) => r.payment_status === "paid");
   const paidCents = paid.reduce((a, r) => a + (r.proposal_total_cents ?? 0), 0);
-  const paidMonthCents = paid.filter((r) => inThisMonth(r.created_at)).reduce((a, r) => a + (r.proposal_total_cents ?? 0), 0);
-  const openCents = list.filter((r) => r.payment_status !== "paid" && r.proposal_status === "accepted").reduce((a, r) => a + (r.proposal_total_cents ?? 0), 0);
-  const taxesPaidCents = (taxes.data ?? []).filter((t) => t.status === "paid").reduce((a, t) => a + (t.amount_brl_cents ?? 0), 0);
+  const paidMonthCents = paid
+    .filter((r) => inThisMonth(r.created_at))
+    .reduce((a, r) => a + (r.proposal_total_cents ?? 0), 0);
+  const openCents = list
+    .filter((r) => r.payment_status !== "paid" && r.proposal_status === "accepted")
+    .reduce((a, r) => a + (r.proposal_total_cents ?? 0), 0);
+  const taxesPaidCents = (taxes.data ?? [])
+    .filter((t) => t.status === "paid")
+    .reduce((a, t) => a + (t.amount_brl_cents ?? 0), 0);
 
   return (
     <section className="anim-vfade">
       <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-navy">Financeiro</h1>
-      <p className="text-sm text-ink-soft mt-1">Receita da consultoria (proposta) e taxas recebidas. Taxas governamentais são repassadas ao governo.</p>
+      <p className="text-sm text-ink-soft mt-1">
+        Receita da consultoria (proposta) e taxas recebidas. Taxas governamentais são repassadas ao
+        governo.
+      </p>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
         <Stat label="Receita confirmada" value={formatBRL(paidCents)} />
@@ -55,7 +66,9 @@ function ConsoleFinanceiro() {
         <Stat label="Taxas recebidas (BRL)" value={formatBRL(taxesPaidCents)} />
       </div>
 
-      <h2 className="mt-10 mb-3 text-sm font-display font-bold text-navy uppercase tracking-wider">Por caso</h2>
+      <h2 className="mt-10 mb-3 text-sm font-display font-bold text-navy uppercase tracking-wider">
+        Por caso
+      </h2>
       <div className="bg-white rounded-2xl border border-[var(--color-border)] overflow-x-auto">
         <table className="w-full text-sm min-w-[560px]">
           <thead className="bg-[var(--color-muted)] text-ink-soft text-xs uppercase tracking-wider">
@@ -67,13 +80,33 @@ function ConsoleFinanceiro() {
             </tr>
           </thead>
           <tbody>
-            {reqs.isLoading && <tr><td colSpan={4} className="p-8 text-center text-ink-muted">Carregando…</td></tr>}
+            {reqs.isLoading && (
+              <tr>
+                <td colSpan={4} className="p-8 text-center text-ink-muted">
+                  Carregando…
+                </td>
+              </tr>
+            )}
             {list.map((r) => (
               <tr key={r.id} className="border-t border-[var(--color-border)]">
                 <td className="px-4 py-3 font-semibold text-navy">{r.lead_name}</td>
                 <td className="px-4 py-3 font-mono">{formatBRL(r.proposal_total_cents ?? 0)}</td>
-                <td className="px-4 py-3"><StatusPill variant={r.payment_status === "paid" ? "done" : r.payment_status === "declined" ? "danger" : "warn"}>{r.payment_status}</StatusPill></td>
-                <td className="px-4 py-3 text-ink-soft">{new Date(r.created_at).toLocaleDateString("pt-BR")}</td>
+                <td className="px-4 py-3">
+                  <StatusPill
+                    variant={
+                      r.payment_status === "paid"
+                        ? "done"
+                        : r.payment_status === "declined"
+                          ? "danger"
+                          : "warn"
+                    }
+                  >
+                    {r.payment_status}
+                  </StatusPill>
+                </td>
+                <td className="px-4 py-3 text-ink-soft">
+                  {new Date(r.created_at).toLocaleDateString("pt-BR")}
+                </td>
               </tr>
             ))}
           </tbody>

@@ -5,7 +5,10 @@ import { cn } from "@/lib/utils";
 export type StepStatus = "done" | "active" | "locked";
 
 export function StepCard({
-  idx, label, status, onClick,
+  idx,
+  label,
+  status,
+  onClick,
 }: {
   idx: number;
   label: string;
@@ -28,7 +31,7 @@ export function StepCard({
       <span
         className={cn(
           "shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold font-display",
-          status === "done"   && "bg-[var(--color-success-bg)] text-[var(--color-success-fg)]",
+          status === "done" && "bg-[var(--color-success-bg)] text-[var(--color-success-fg)]",
           status === "active" && "bg-coral text-cream",
           status === "locked" && "bg-[var(--color-locked-bg)] text-[var(--color-locked-fg)]",
         )}
@@ -38,7 +41,7 @@ export function StepCard({
       <span className="flex-1">
         <span className="block font-display font-semibold text-navy leading-tight">{label}</span>
       </span>
-      {status === "done"   && <StatusPill variant="done">Concluído</StatusPill>}
+      {status === "done" && <StatusPill variant="done">Concluído</StatusPill>}
       {status === "active" && <StatusPill variant="active">Agora</StatusPill>}
       {status === "locked" && <StatusPill variant="locked">Em breve</StatusPill>}
     </button>

@@ -35,10 +35,13 @@ export const submitLead = createServerFn({ method: "POST" })
       { auth: { persistSession: false, autoRefreshToken: false } },
     );
 
-    const { data: res, error } = await supabase.rpc("submit_lead" as never, {
-      _payload: data as never,
-      _client_ip: ip,
-    } as never);
+    const { data: res, error } = await supabase.rpc(
+      "submit_lead" as never,
+      {
+        _payload: data as never,
+        _client_ip: ip,
+      } as never,
+    );
     if (error) throw new Error(error.message);
     return res as { ok: boolean; request_id?: string };
   });

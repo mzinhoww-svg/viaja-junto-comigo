@@ -4,7 +4,8 @@ export function PaymentTestModeBanner() {
   if (!clientToken) {
     return (
       <div className="w-full bg-[var(--color-danger-bg)] border-b border-[var(--color-danger-fg)]/30 px-4 py-2 text-center text-xs text-[var(--color-danger-fg)]">
-        Pagamentos em produção não estão configurados. Conclua a publicação do Stripe para aceitar pagamentos reais.
+        Pagamentos em produção não estão configurados. Conclua a publicação do Stripe para aceitar
+        pagamentos reais.
       </div>
     );
   }

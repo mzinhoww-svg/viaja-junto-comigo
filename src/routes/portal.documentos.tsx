@@ -30,18 +30,26 @@ function PortalDocuments() {
     <PhoneFrame>
       <div className="px-5 pt-8 pb-24 anim-vfade">
         <div className="flex items-center justify-between">
-          <button onClick={() => nav({ to: "/portal" })} className="flex items-center gap-1 text-ink-soft text-sm hover:text-coral">
+          <button
+            onClick={() => nav({ to: "/portal" })}
+            className="flex items-center gap-1 text-ink-soft text-sm hover:text-coral"
+          >
             <ChevronLeft size={16} /> Jornada
           </button>
           <Logo size={28} />
-          <button onClick={signOut} className="text-ink-muted hover:text-coral p-2" aria-label="Sair">
+          <button
+            onClick={signOut}
+            className="text-ink-muted hover:text-coral p-2"
+            aria-label="Sair"
+          >
             <LogOut size={18} />
           </button>
         </div>
 
         <h1 className="mt-6 text-2xl font-display font-extrabold text-navy">Documentos</h1>
         <p className="mt-1 text-ink-soft text-sm">
-          Envie uma foto ou PDF de cada item para que possamos preparar seu visto. Aceitamos arquivos de até 8 MB.
+          Envie uma foto ou PDF de cada item para que possamos preparar seu visto. Aceitamos
+          arquivos de até 8 MB.
         </p>
 
         <div className="mt-6">

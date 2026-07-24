@@ -11,9 +11,17 @@ type AuthorizationDetails = {
 } | null;
 
 type OAuthAuth = {
-  getAuthorizationDetails: (id: string) => Promise<{ data: AuthorizationDetails; error: { message: string } | null }>;
-  approveAuthorization: (id: string) => Promise<{ data: { redirect_url?: string; redirect_to?: string } | null; error: { message: string } | null }>;
-  denyAuthorization: (id: string) => Promise<{ data: { redirect_url?: string; redirect_to?: string } | null; error: { message: string } | null }>;
+  getAuthorizationDetails: (
+    id: string,
+  ) => Promise<{ data: AuthorizationDetails; error: { message: string } | null }>;
+  approveAuthorization: (id: string) => Promise<{
+    data: { redirect_url?: string; redirect_to?: string } | null;
+    error: { message: string } | null;
+  }>;
+  denyAuthorization: (id: string) => Promise<{
+    data: { redirect_url?: string; redirect_to?: string } | null;
+    error: { message: string } | null;
+  }>;
 };
 
 function oauth(): OAuthAuth {
@@ -89,13 +97,15 @@ function Consent() {
           Conectar {clientName} à sua conta Viajaly
         </h1>
         <p className="mt-2 text-sm text-ink-soft">
-          Isso permite que {clientName} use a Viajaly em seu nome, com as mesmas permissões
-          e políticas de acesso da sua conta.
+          Isso permite que {clientName} use a Viajaly em seu nome, com as mesmas permissões e
+          políticas de acesso da sua conta.
         </p>
 
         <ul className="mt-4 text-sm text-ink-soft space-y-1 list-disc pl-5">
           <li>Compartilhar seu perfil básico e e-mail</li>
-          <li>Chamar as ferramentas habilitadas neste aplicativo enquanto você estiver conectado</li>
+          <li>
+            Chamar as ferramentas habilitadas neste aplicativo enquanto você estiver conectado
+          </li>
         </ul>
 
         <p className="mt-3 text-[11px] text-ink-muted uppercase tracking-wider">
@@ -127,8 +137,8 @@ function Consent() {
         </div>
 
         <p className="mt-6 text-xs text-ink-muted">
-          Isto não substitui as regras de acesso do banco (RLS) — as ferramentas só verão o que
-          você já pode ver.
+          Isto não substitui as regras de acesso do banco (RLS) — as ferramentas só verão o que você
+          já pode ver.
         </p>
       </div>
     </main>

@@ -63,7 +63,9 @@ export function DocumentList({
       if (ids.length === 0) return { travelers: [] as Traveler[], docs: [] as DocRow[] };
       const { data: docs, error: dErr } = await supabase
         .from("documents")
-        .select("id, traveler_id, kind, name, status, file_url, reject_reason, version, uploaded_at")
+        .select(
+          "id, traveler_id, kind, name, status, file_url, reject_reason, version, uploaded_at",
+        )
         .in("traveler_id", ids)
         .order("kind");
       if (dErr) throw dErr;
@@ -95,17 +97,25 @@ export function DocumentList({
   });
 
   if (q.isLoading) return <p className="text-ink-muted text-sm">Carregando documentos…</p>;
-  if (!q.data || q.data.travelers.length === 0) return <p className="text-ink-muted text-sm">Sem viajantes cadastrados.</p>;
+  if (!q.data || q.data.travelers.length === 0)
+    return <p className="text-ink-muted text-sm">Sem viajantes cadastrados.</p>;
 
   return (
     <div className="space-y-6">
       {q.data.travelers.map((t) => {
         const docs = q.data.docs.filter((d) => d.traveler_id === t.id);
         return (
-          <div key={t.id} className="bg-white rounded-2xl border border-[var(--color-border)] p-4 md:p-5">
+          <div
+            key={t.id}
+            className="bg-white rounded-2xl border border-[var(--color-border)] p-4 md:p-5"
+          >
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-display font-bold text-navy">{t.name}</h3>
-              {t.is_lead && <span className="text-[11px] uppercase tracking-wider text-teal font-bold">Titular</span>}
+              {t.is_lead && (
+                <span className="text-[11px] uppercase tracking-wider text-teal font-bold">
+                  Titular
+                </span>
+              )}
             </div>
             <ul className="space-y-2">
               {docs.map((d) => (
@@ -116,7 +126,9 @@ export function DocumentList({
                   travelerId={t.id}
                   variant={variant}
                   onUploaded={(url) => submitMut.mutate({ doc_id: d.id, file_url: url })}
-                  onReview={(approve, reason) => reviewMut.mutate({ doc_id: d.id, approve, reason })}
+                  onReview={(approve, reason) =>
+                    reviewMut.mutate({ doc_id: d.id, approve, reason })
+                  }
                 />
               ))}
             </ul>
@@ -150,8 +162,11 @@ function DocRowItem({
   const finalReason = choice === REJECT_REASON_OTHER ? reasonText.trim() : choice;
 
   async function handleFile(file: File) {
-    if (file.size > 8 * 1024 * 1024) { toast.error("Arquivo maior que 8 MB"); return; }
-    const safeName = file.name.replace(/[^\w.\-]+/g, "_");
+    if (file.size > 8 * 1024 * 1024) {
+      toast.error("Arquivo maior que 8 MB");
+      return;
+    }
+    const safeName = file.name.replace(/[^\w.-]+/g, "_");
     const path = `${requestId}/${travelerId}/${doc.id}-v${doc.version + 1}-${safeName}`;
     setUploading(true);
     try {
@@ -180,15 +195,15 @@ function DocRowItem({
           </div>
           <div className="min-w-0">
             <p className="font-semibold text-navy text-sm truncate">{doc.name}</p>
-            <span className={`inline-block mt-1 text-[11px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full ${STATUS_COLOR[doc.status]}`}>
+            <span
+              className={`inline-block mt-1 text-[11px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full ${STATUS_COLOR[doc.status]}`}
+            >
               {STATUS_LABEL[doc.status]}
             </span>
           </div>
         </div>
         <div className="flex items-center gap-2 ml-auto">
-          {doc.file_url && variant === "console" && (
-            <ViewFileButton path={doc.file_url} />
-          )}
+          {doc.file_url && variant === "console" && <ViewFileButton path={doc.file_url} />}
           {canUpload && (
             <>
               <input
@@ -209,17 +224,33 @@ function DocRowItem({
                 disabled={uploading}
                 className="rounded-full"
               >
-                {uploading ? <Loader2 size={14} className="animate-spin" /> : doc.file_url ? <RefreshCcw size={14} /> : <Upload size={14} />}
+                {uploading ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : doc.file_url ? (
+                  <RefreshCcw size={14} />
+                ) : (
+                  <Upload size={14} />
+                )}
                 <span className="ml-1.5">{doc.file_url ? "Trocar" : "Enviar"}</span>
               </Button>
             </>
           )}
           {variant === "console" && doc.status === "received" && (
             <>
-              <Button size="sm" variant="outline" className="rounded-full text-vgreen border-vgreen/40" onClick={() => onReview(true)}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="rounded-full text-vgreen border-vgreen/40"
+                onClick={() => onReview(true)}
+              >
                 <Check size={14} className="mr-1" /> Aprovar
               </Button>
-              <Button size="sm" variant="outline" className="rounded-full text-coral border-coral/40" onClick={() => setRejecting((v) => !v)}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="rounded-full text-coral border-coral/40"
+                onClick={() => setRejecting((v) => !v)}
+              >
                 <X size={14} className="mr-1" /> Recusar
               </Button>
             </>
@@ -238,7 +269,11 @@ function DocRowItem({
             aria-label="Motivo da recusa"
           >
             <option value="">Selecione o motivo…</option>
-            {REJECT_REASONS.map((r) => <option key={r} value={r}>{r}</option>)}
+            {REJECT_REASONS.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
             <option value={REJECT_REASON_OTHER}>{REJECT_REASON_OTHER}</option>
           </select>
           {choice === REJECT_REASON_OTHER && (
@@ -251,12 +286,27 @@ function DocRowItem({
             />
           )}
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => { setRejecting(false); setChoice(""); setReasonText(""); }}>Cancelar</Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                setRejecting(false);
+                setChoice("");
+                setReasonText("");
+              }}
+            >
+              Cancelar
+            </Button>
             <Button
               size="sm"
               className="bg-coral text-cream hover:bg-[var(--color-coral-hover)]"
               disabled={!finalReason}
-              onClick={() => { onReview(false, finalReason); setRejecting(false); setChoice(""); setReasonText(""); }}
+              onClick={() => {
+                onReview(false, finalReason);
+                setRejecting(false);
+                setChoice("");
+                setReasonText("");
+              }}
             >
               Confirmar recusa
             </Button>
@@ -277,9 +327,14 @@ function ViewFileButton({ path }: { path: string }) {
       disabled={loading}
       onClick={async () => {
         setLoading(true);
-        const { data, error } = await supabase.storage.from("documents").createSignedUrl(path, 60 * 5);
+        const { data, error } = await supabase.storage
+          .from("documents")
+          .createSignedUrl(path, 60 * 5);
         setLoading(false);
-        if (error || !data?.signedUrl) { toast.error("Não foi possível abrir"); return; }
+        if (error || !data?.signedUrl) {
+          toast.error("Não foi possível abrir");
+          return;
+        }
         window.open(data.signedUrl, "_blank", "noopener");
       }}
     >

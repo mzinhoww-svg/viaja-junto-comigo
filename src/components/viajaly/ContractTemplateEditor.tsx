@@ -22,7 +22,9 @@ export function ContractTemplateEditor() {
   const all = useQuery({
     queryKey: ["contract-templates-admin"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("contract_templates").select("scope, title, body_html");
+      const { data, error } = await supabase
+        .from("contract_templates")
+        .select("scope, title, body_html");
       if (error) throw error;
       return data ?? [];
     },
@@ -31,16 +33,28 @@ export function ContractTemplateEditor() {
   const current = (all.data ?? []).find((t) => t.scope === scope);
   const defaultBody = (all.data ?? []).find((t) => t.scope === "default")?.body_html ?? "";
   const [body, setBody] = useState("");
-  useEffect(() => { setBody(current?.body_html ?? ""); }, [scope, all.data]);
+  useEffect(() => {
+    setBody(current?.body_html ?? "");
+  }, [scope, all.data]);
   const dirty = body !== (current?.body_html ?? "");
 
   const save = useMutation({
     mutationFn: async () => {
-      const { data: prof, error: pErr } = await supabase.from("profiles").select("agency_id").eq("id", (await supabase.auth.getUser()).data.user?.id ?? "").maybeSingle();
+      const { data: prof, error: pErr } = await supabase
+        .from("profiles")
+        .select("agency_id")
+        .eq("id", (await supabase.auth.getUser()).data.user?.id ?? "")
+        .maybeSingle();
       if (pErr) throw pErr;
       if (!prof?.agency_id) throw new Error("Agência não encontrada para o usuário.");
       const { error } = await supabase.from("contract_templates").upsert(
-        { agency_id: prof.agency_id, scope, title: current?.title ?? `Contrato ${scope}`, body_html: body, updated_at: new Date().toISOString() },
+        {
+          agency_id: prof.agency_id,
+          scope,
+          title: current?.title ?? `Contrato ${scope}`,
+          body_html: body,
+          updated_at: new Date().toISOString(),
+        },
         { onConflict: "agency_id,scope" },
       );
       if (error) throw error;
@@ -59,26 +73,46 @@ export function ContractTemplateEditor() {
         {SCOPES.map((s) => {
           const exists = (all.data ?? []).some((t) => t.scope === s.key);
           return (
-            <button key={s.key} onClick={() => setScope(s.key)}
-              className={`text-xs px-3 py-1.5 rounded-full border ${scope === s.key ? "border-coral bg-coral/10 text-coral" : "border-[var(--color-border)] text-ink-soft hover:border-navy"}`}>
-              {s.label}{!exists && s.key !== "default" ? " ·novo" : ""}
+            <button
+              key={s.key}
+              onClick={() => setScope(s.key)}
+              className={`text-xs px-3 py-1.5 rounded-full border ${scope === s.key ? "border-coral bg-coral/10 text-coral" : "border-[var(--color-border)] text-ink-soft hover:border-navy"}`}
+            >
+              {s.label}
+              {!exists && s.key !== "default" ? " ·novo" : ""}
             </button>
           );
         })}
       </div>
       <p className="text-sm text-ink-soft">
-        Editando: <b>{SCOPES.find((s) => s.key === scope)?.label}</b>. Placeholders preenchidos automaticamente:{" "}
-        <code className="text-[11px] bg-[var(--color-muted)] px-1 rounded">{"{{AGENCY}} {{CLIENT}} {{TRAVELERS}} {{ITEMS}} {{TOTAL}} {{DATE}}"}</code>.
-        Produto sem template próprio cai no <b>Padrão</b> (mantenha os placeholders).
+        Editando: <b>{SCOPES.find((s) => s.key === scope)?.label}</b>. Placeholders preenchidos
+        automaticamente:{" "}
+        <code className="text-[11px] bg-[var(--color-muted)] px-1 rounded">
+          {"{{AGENCY}} {{CLIENT}} {{TRAVELERS}} {{ITEMS}} {{TOTAL}} {{DATE}}"}
+        </code>
+        . Produto sem template próprio cai no <b>Padrão</b> (mantenha os placeholders).
       </p>
-      <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={16} className="font-mono text-xs" placeholder="HTML do contrato com placeholders" />
+      <Textarea
+        value={body}
+        onChange={(e) => setBody(e.target.value)}
+        rows={16}
+        className="font-mono text-xs"
+        placeholder="HTML do contrato com placeholders"
+      />
       <div className="flex gap-2">
-        <Button size="sm" variant={dirty ? "default" : "outline"} className={dirty ? "bg-navy text-cream" : ""}
-          disabled={!dirty || save.isPending} onClick={() => save.mutate()}>
+        <Button
+          size="sm"
+          variant={dirty ? "default" : "outline"}
+          className={dirty ? "bg-navy text-cream" : ""}
+          disabled={!dirty || save.isPending}
+          onClick={() => save.mutate()}
+        >
           {save.isPending ? "Salvando…" : "Salvar template"}
         </Button>
         {scope !== "default" && !current && (
-          <Button size="sm" variant="ghost" onClick={() => setBody(defaultBody)}>Copiar do padrão</Button>
+          <Button size="sm" variant="ghost" onClick={() => setBody(defaultBody)}>
+            Copiar do padrão
+          </Button>
         )}
       </div>
     </div>

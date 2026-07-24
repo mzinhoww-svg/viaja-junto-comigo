@@ -88,15 +88,13 @@ export function OTPInput({
   }
 
   return (
-    <div
-      className="flex gap-2 justify-between"
-      role="group"
-      aria-label="Código de acesso"
-    >
+    <div className="flex gap-2 justify-between" role="group" aria-label="Código de acesso">
       {Array.from({ length }).map((_, i) => (
         <input
           key={i}
-          ref={(el) => { refs.current[i] = el; }}
+          ref={(el) => {
+            refs.current[i] = el;
+          }}
           type="text"
           inputMode="numeric"
           autoComplete={i === 0 ? "one-time-code" : "off"}

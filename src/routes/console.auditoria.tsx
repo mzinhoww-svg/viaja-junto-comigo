@@ -36,7 +36,9 @@ function AuditPage() {
     queryFn: async () => {
       let query = supabase
         .from("access_code_attempts")
-        .select("id, at, ip, email, success, attempted_code, request_id, requests(lead_name, lead_email)")
+        .select(
+          "id, at, ip, email, success, attempted_code, request_id, requests(lead_name, lead_email)",
+        )
         .order("at", { ascending: false })
         .limit(200);
       if (onlyFailed) query = query.eq("success", false);
@@ -45,11 +47,12 @@ function AuditPage() {
       const rows = (data ?? []) as Row[];
       if (!filter.trim()) return rows;
       const f = filter.toLowerCase().trim();
-      return rows.filter((r) =>
-        (r.email ?? "").toLowerCase().includes(f) ||
-        (r.requests?.lead_name ?? "").toLowerCase().includes(f) ||
-        (r.requests?.lead_email ?? "").toLowerCase().includes(f) ||
-        (r.ip ?? "").includes(f),
+      return rows.filter(
+        (r) =>
+          (r.email ?? "").toLowerCase().includes(f) ||
+          (r.requests?.lead_name ?? "").toLowerCase().includes(f) ||
+          (r.requests?.lead_email ?? "").toLowerCase().includes(f) ||
+          (r.ip ?? "").includes(f),
       );
     },
   });
@@ -105,14 +108,30 @@ function AuditPage() {
             </tr>
           </thead>
           <tbody>
-            {q.isLoading && <tr><td colSpan={6} className="p-8 text-center text-ink-muted">Carregando…</td></tr>}
+            {q.isLoading && (
+              <tr>
+                <td colSpan={6} className="p-8 text-center text-ink-muted">
+                  Carregando…
+                </td>
+              </tr>
+            )}
             {q.data?.length === 0 && (
-              <tr><td colSpan={6} className="p-8 text-center text-ink-muted">Nenhum registro com esse filtro.</td></tr>
+              <tr>
+                <td colSpan={6} className="p-8 text-center text-ink-muted">
+                  Nenhum registro com esse filtro.
+                </td>
+              </tr>
             )}
             {q.data?.map((r) => (
-              <tr key={r.id} className="border-t border-[var(--color-border)] hover:bg-[var(--color-muted)]/40">
+              <tr
+                key={r.id}
+                className="border-t border-[var(--color-border)] hover:bg-[var(--color-muted)]/40"
+              >
                 <td className="px-4 py-3 text-ink-soft whitespace-nowrap">
-                  {new Date(r.at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}
+                  {new Date(r.at).toLocaleString("pt-BR", {
+                    dateStyle: "short",
+                    timeStyle: "short",
+                  })}
                 </td>
                 <td className="px-4 py-3">
                   {r.requests?.lead_name ?? <span className="text-ink-muted">— sem match —</span>}

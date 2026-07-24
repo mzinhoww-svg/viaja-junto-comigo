@@ -16,8 +16,14 @@ export function WaQuickActions({
   const items: Array<{ label: string; msg: string }> = [
     { label: "Proposta aceita", msg: waTemplates.proposalAccepted(clientName) },
     { label: "Pagamento confirmado", msg: waTemplates.paymentConfirmed(clientName) },
-    { label: "Documento aprovado", msg: waTemplates.documentApproved(clientName, "(nome do documento)") },
-    { label: "Documento reprovado", msg: waTemplates.documentRejected(clientName, "(nome do documento)") },
+    {
+      label: "Documento aprovado",
+      msg: waTemplates.documentApproved(clientName, "(nome do documento)"),
+    },
+    {
+      label: "Documento reprovado",
+      msg: waTemplates.documentRejected(clientName, "(nome do documento)"),
+    },
     {
       label: "Agendamento confirmado",
       msg: waTemplates.scheduleConfirmed(clientName, new Date().toISOString()),

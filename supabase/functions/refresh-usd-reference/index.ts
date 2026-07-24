@@ -25,8 +25,9 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: CORS });
 
   // Require CRON_SECRET via x-cron-secret header (or Authorization: Bearer ...)
-  const provided = req.headers.get("x-cron-secret")
-    ?? (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
+  const provided =
+    req.headers.get("x-cron-secret") ??
+    (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
   if (!CRON_SECRET || provided !== CRON_SECRET) {
     return json({ ok: false, error: "unauthorized" }, 401);
   }

@@ -24,10 +24,13 @@ export function AssigneeSelect({ requestId, value }: { requestId: string; value:
   const staff = useStaffMembers();
   const mut = useMutation({
     mutationFn: async (assignee: string | null) => {
-      const { error } = await supabase.rpc("assign_request" as never, {
-        _request_id: requestId,
-        _assignee: assignee,
-      } as never);
+      const { error } = await supabase.rpc(
+        "assign_request" as never,
+        {
+          _request_id: requestId,
+          _assignee: assignee,
+        } as never,
+      );
       if (error) throw error;
     },
     onSuccess: () => {

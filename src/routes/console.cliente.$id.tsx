@@ -8,19 +8,49 @@ import { HandoffCard } from "@/components/viajaly/HandoffCard";
 
 // Componentes pesados por aba: code-splitting — carregam só quando a aba abre,
 // e os exclusivos do console saem do bundle inicial do app.
-const DocumentList = lazy(() => import("@/components/viajaly/DocumentList").then((m) => ({ default: m.DocumentList })));
-const DS160Form = lazy(() => import("@/components/viajaly/DS160Form").then((m) => ({ default: m.DS160Form })));
-const TaxList = lazy(() => import("@/components/viajaly/TaxList").then((m) => ({ default: m.TaxList })));
-const ScheduleList = lazy(() => import("@/components/viajaly/ScheduleList").then((m) => ({ default: m.ScheduleList })));
-const AccessAuditCard = lazy(() => import("@/components/viajaly/AccessAuditCard").then((m) => ({ default: m.AccessAuditCard })));
-const ConclusionPanel = lazy(() => import("@/components/viajaly/ConclusionPanel").then((m) => ({ default: m.ConclusionPanel })));
-const RoteiroCardConsole = lazy(() => import("@/components/viajaly/RoteiroCard").then((m) => ({ default: m.RoteiroCardConsole })));
-const MilhasCardConsole = lazy(() => import("@/components/viajaly/MilhasCard").then((m) => ({ default: m.MilhasCardConsole })));
-const PassportStatusEditor = lazy(() => import("@/components/viajaly/PassportStatusEditor").then((m) => ({ default: m.PassportStatusEditor })));
-const EmergencyContactsEditor = lazy(() => import("@/components/viajaly/EmergencyContactsEditor").then((m) => ({ default: m.EmergencyContactsEditor })));
-const BriefingReadOnly = lazy(() => import("@/components/viajaly/BriefingForm").then((m) => ({ default: m.BriefingReadOnly })));
-const MessageThread = lazy(() => import("@/components/viajaly/MessageThread").then((m) => ({ default: m.MessageThread })));
-const ContractPanel = lazy(() => import("@/components/viajaly/ContractPanel").then((m) => ({ default: m.ContractPanel })));
+const DocumentList = lazy(() =>
+  import("@/components/viajaly/DocumentList").then((m) => ({ default: m.DocumentList })),
+);
+const DS160Form = lazy(() =>
+  import("@/components/viajaly/DS160Form").then((m) => ({ default: m.DS160Form })),
+);
+const TaxList = lazy(() =>
+  import("@/components/viajaly/TaxList").then((m) => ({ default: m.TaxList })),
+);
+const ScheduleList = lazy(() =>
+  import("@/components/viajaly/ScheduleList").then((m) => ({ default: m.ScheduleList })),
+);
+const AccessAuditCard = lazy(() =>
+  import("@/components/viajaly/AccessAuditCard").then((m) => ({ default: m.AccessAuditCard })),
+);
+const ConclusionPanel = lazy(() =>
+  import("@/components/viajaly/ConclusionPanel").then((m) => ({ default: m.ConclusionPanel })),
+);
+const RoteiroCardConsole = lazy(() =>
+  import("@/components/viajaly/RoteiroCard").then((m) => ({ default: m.RoteiroCardConsole })),
+);
+const MilhasCardConsole = lazy(() =>
+  import("@/components/viajaly/MilhasCard").then((m) => ({ default: m.MilhasCardConsole })),
+);
+const PassportStatusEditor = lazy(() =>
+  import("@/components/viajaly/PassportStatusEditor").then((m) => ({
+    default: m.PassportStatusEditor,
+  })),
+);
+const EmergencyContactsEditor = lazy(() =>
+  import("@/components/viajaly/EmergencyContactsEditor").then((m) => ({
+    default: m.EmergencyContactsEditor,
+  })),
+);
+const BriefingReadOnly = lazy(() =>
+  import("@/components/viajaly/BriefingForm").then((m) => ({ default: m.BriefingReadOnly })),
+);
+const MessageThread = lazy(() =>
+  import("@/components/viajaly/MessageThread").then((m) => ({ default: m.MessageThread })),
+);
+const ContractPanel = lazy(() =>
+  import("@/components/viajaly/ContractPanel").then((m) => ({ default: m.ContractPanel })),
+);
 import { WaQuickActions } from "@/components/viajaly/WaQuickActions";
 import { OutcomeBadge, type VisaOutcome } from "@/components/viajaly/OutcomeBadge";
 import { StatusPill } from "@/components/viajaly/StatusPill";
@@ -35,7 +65,21 @@ export const Route = createFileRoute("/console/cliente/$id")({
   component: ConsoleClient,
 });
 
-type Tab = "jornada" | "pagamentos" | "contrato" | "documentos" | "ds160" | "taxas" | "agenda" | "passaporte" | "roteiro" | "milhas" | "mensagens" | "historico" | "conclusao" | "acesso";
+type Tab =
+  | "jornada"
+  | "pagamentos"
+  | "contrato"
+  | "documentos"
+  | "ds160"
+  | "taxas"
+  | "agenda"
+  | "passaporte"
+  | "roteiro"
+  | "milhas"
+  | "mensagens"
+  | "historico"
+  | "conclusao"
+  | "acesso";
 
 function ConsoleClient() {
   const { id } = Route.useParams();
@@ -63,7 +107,10 @@ function ConsoleClient() {
   const ds160Review = useQuery({
     queryKey: ["ds160-review", id],
     queryFn: async () => {
-      const { data: travelers } = await supabase.from("travelers").select("id").eq("request_id", id);
+      const { data: travelers } = await supabase
+        .from("travelers")
+        .select("id")
+        .eq("request_id", id);
       const ids = (travelers ?? []).map((t) => t.id);
       if (ids.length === 0) return 0;
       const { count } = await supabase
@@ -77,19 +124,31 @@ function ConsoleClient() {
 
   const flipProposal = useMutation({
     mutationFn: async (status: "accepted" | "sent") => {
-      const { error } = await supabase.from("requests").update({ proposal_status: status }).eq("id", id);
+      const { error } = await supabase
+        .from("requests")
+        .update({ proposal_status: status })
+        .eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["request", id] }); toast.success("Atualizado"); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["request", id] });
+      toast.success("Atualizado");
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const flipSigned = useMutation({
     mutationFn: async (signed: boolean) => {
-      const { error } = await supabase.from("requests").update({ contract_signed: signed, signed_at: signed ? new Date().toISOString() : null }).eq("id", id);
+      const { error } = await supabase
+        .from("requests")
+        .update({ contract_signed: signed, signed_at: signed ? new Date().toISOString() : null })
+        .eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["request", id] }); toast.success("Atualizado"); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["request", id] });
+      toast.success("Atualizado");
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -98,7 +157,10 @@ function ConsoleClient() {
       const { error } = await supabase.rpc("confirm_payment", { _request_id: id, _paid: paid });
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["request", id] }); toast.success("Pagamento atualizado"); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["request", id] });
+      toast.success("Pagamento atualizado");
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -123,7 +185,10 @@ function ConsoleClient() {
 
   return (
     <section>
-      <Link to="/console" className="inline-flex items-center gap-1 text-ink-soft text-sm hover:text-coral">
+      <Link
+        to="/console"
+        className="inline-flex items-center gap-1 text-ink-soft text-sm hover:text-coral"
+      >
         <ChevronLeft size={16} /> Pipeline
       </Link>
       <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
@@ -131,9 +196,16 @@ function ConsoleClient() {
           <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-3xl font-display font-extrabold text-navy">{req.data.lead_name}</h1>
             <OutcomeBadge outcome={req.data.visa_outcome as VisaOutcome} size="sm" />
-            {req.data.archived_at && <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">Arquivado</span>}
+            {req.data.archived_at && (
+              <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">
+                Arquivado
+              </span>
+            )}
             {(ds160Review.data ?? 0) > 0 && (
-              <button onClick={() => setTab("ds160")} className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 hover:bg-amber-200">
+              <button
+                onClick={() => setTab("ds160")}
+                className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 hover:bg-amber-200"
+              >
                 DS-160 aguardando revisão
               </button>
             )}
@@ -143,11 +215,20 @@ function ConsoleClient() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="min-h-10" onClick={() => setShowShare((v) => !v)}>
-            <Share2 size={14} className="mr-1.5" /> {showShare ? "Ocultar acesso" : "Compartilhar acesso"}
+          <Button
+            variant="outline"
+            size="sm"
+            className="min-h-10"
+            onClick={() => setShowShare((v) => !v)}
+          >
+            <Share2 size={14} className="mr-1.5" />{" "}
+            {showShare ? "Ocultar acesso" : "Compartilhar acesso"}
           </Button>
           <Link to="/console/orcamento/$id/editar" params={{ id }}>
-            <Button size="sm" className="bg-navy hover:bg-[var(--color-navy-light)] text-cream min-h-10">
+            <Button
+              size="sm"
+              className="bg-navy hover:bg-[var(--color-navy-light)] text-cream min-h-10"
+            >
               <Pencil size={14} className="mr-1.5" /> Editar orçamento
             </Button>
           </Link>
@@ -171,9 +252,6 @@ function ConsoleClient() {
         clientName={req.data.lead_name}
       />
 
-
-
-
       <div className="mt-6 border-b border-[var(--color-border)] flex gap-1">
         {tabs.map((t) => (
           <button
@@ -191,127 +269,156 @@ function ConsoleClient() {
       </div>
 
       <Suspense fallback={<p className="mt-6 text-sm text-ink-muted">Carregando…</p>}>
-      {tab === "jornada" && (
-        <div className="grid md:grid-cols-2 gap-6 mt-6">
-          <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5">
-            <h2 className="font-display font-bold text-navy mb-4">Etapas</h2>
-            <div className="space-y-2">
-              {journey.data?.map((s) => <StepCard key={s.key} idx={s.idx} label={s.label} status={s.status} />)}
+        {tab === "jornada" && (
+          <div className="grid md:grid-cols-2 gap-6 mt-6">
+            <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5">
+              <h2 className="font-display font-bold text-navy mb-4">Etapas</h2>
+              <div className="space-y-2">
+                {journey.data?.map((s) => (
+                  <StepCard key={s.key} idx={s.idx} label={s.label} status={s.status} />
+                ))}
+              </div>
+            </div>
+            <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5 space-y-4">
+              <h2 className="font-display font-bold text-navy">Controles rápidos</h2>
+              <p className="text-xs text-ink-soft">
+                Atalhos manuais — portal reflete em &lt;2s via realtime.
+              </p>
+              <div className="space-y-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="min-h-10"
+                  onClick={() =>
+                    flipProposal.mutate(
+                      req.data!.proposal_status === "accepted" ? "sent" : "accepted",
+                    )
+                  }
+                >
+                  {req.data.proposal_status === "accepted"
+                    ? "Marcar proposta como enviada"
+                    : "Aceitar proposta"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="min-h-10"
+                  onClick={() => flipSigned.mutate(!req.data!.contract_signed)}
+                >
+                  {req.data.contract_signed ? "Desassinar contrato" : "Assinar contrato"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="min-h-10"
+                  onClick={() => flipPayment.mutate(req.data!.payment_status !== "paid")}
+                >
+                  {req.data.payment_status === "paid" ? "Reverter pagamento" : "Marcar pago"}
+                </Button>
+              </div>
             </div>
           </div>
-          <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5 space-y-4">
-            <h2 className="font-display font-bold text-navy">Controles rápidos</h2>
-            <p className="text-xs text-ink-soft">Atalhos manuais — portal reflete em &lt;2s via realtime.</p>
-            <div className="space-y-2">
-              <Button size="sm" variant="outline" className="min-h-10" onClick={() => flipProposal.mutate(req.data!.proposal_status === "accepted" ? "sent" : "accepted")}>
-                {req.data.proposal_status === "accepted" ? "Marcar proposta como enviada" : "Aceitar proposta"}
-              </Button>
-              <Button size="sm" variant="outline" className="min-h-10" onClick={() => flipSigned.mutate(!req.data!.contract_signed)}>
-                {req.data.contract_signed ? "Desassinar contrato" : "Assinar contrato"}
-              </Button>
-              <Button size="sm" variant="outline" className="min-h-10" onClick={() => flipPayment.mutate(req.data!.payment_status !== "paid")}>
-                {req.data.payment_status === "paid" ? "Reverter pagamento" : "Marcar pago"}
-              </Button>
-            </div>
+        )}
+
+        {tab === "pagamentos" && (
+          <div className="mt-6 max-w-2xl">
+            <PaymentsPanel
+              request={req.data}
+              pending={flipPayment.isPending}
+              onToggle={() => flipPayment.mutate(req.data!.payment_status !== "paid")}
+            />
           </div>
-        </div>
-      )}
+        )}
 
-      {tab === "pagamentos" && (
-        <div className="mt-6 max-w-2xl">
-          <PaymentsPanel
-            request={req.data}
-            pending={flipPayment.isPending}
-            onToggle={() => flipPayment.mutate(req.data!.payment_status !== "paid")}
-          />
-        </div>
-      )}
+        {tab === "contrato" && (
+          <div className="mt-6 max-w-3xl">
+            <ContractPanel requestId={id} request={req.data} />
+          </div>
+        )}
 
-      {tab === "contrato" && (
-        <div className="mt-6 max-w-3xl">
-          <ContractPanel requestId={id} request={req.data} />
-        </div>
-      )}
+        {tab === "documentos" && (
+          <div className="mt-6">
+            <DocumentList requestId={id} variant="console" />
+          </div>
+        )}
 
-      {tab === "documentos" && (
-        <div className="mt-6">
-          <DocumentList requestId={id} variant="console" />
-        </div>
-      )}
+        {tab === "ds160" && (
+          <div className="mt-6 max-w-3xl">
+            <DS160Form requestId={id} variant="console" />
+          </div>
+        )}
 
-      {tab === "ds160" && (
-        <div className="mt-6 max-w-3xl">
-          <DS160Form requestId={id} variant="console" />
-        </div>
-      )}
+        {tab === "taxas" && (
+          <div className="mt-6 max-w-3xl">
+            <TaxList requestId={id} variant="console" />
+          </div>
+        )}
 
-      {tab === "taxas" && (
-        <div className="mt-6 max-w-3xl">
-          <TaxList requestId={id} variant="console" />
-        </div>
-      )}
+        {tab === "agenda" && (
+          <div className="mt-6 max-w-3xl">
+            <ScheduleList requestId={id} variant="console" />
+          </div>
+        )}
 
-      {tab === "agenda" && (
-        <div className="mt-6 max-w-3xl">
-          <ScheduleList requestId={id} variant="console" />
-        </div>
-      )}
+        {tab === "passaporte" && (
+          <div className="mt-6 max-w-2xl space-y-4">
+            <PassportStatusEditor
+              requestId={id}
+              status={req.data.passport_status ?? "coletando"}
+              notes={req.data.passport_notes ?? null}
+            />
+            <BriefingReadOnly requestId={id} productKey="passaporte" />
+          </div>
+        )}
 
+        {tab === "roteiro" && (
+          <div className="mt-6 max-w-3xl space-y-4">
+            <RoteiroCardConsole requestId={id} />
+            <BriefingReadOnly requestId={id} productKey="roteiro" />
+          </div>
+        )}
 
+        {tab === "milhas" && (
+          <div className="mt-6 max-w-3xl space-y-4">
+            <MilhasCardConsole requestId={id} />
+            <BriefingReadOnly requestId={id} productKey="milhas" />
+          </div>
+        )}
 
-      {tab === "passaporte" && (
-        <div className="mt-6 max-w-2xl space-y-4">
-          <PassportStatusEditor requestId={id} status={req.data.passport_status ?? "coletando"} notes={req.data.passport_notes ?? null} />
-          <BriefingReadOnly requestId={id} productKey="passaporte" />
-        </div>
-      )}
+        {tab === "mensagens" && (
+          <div className="mt-6 max-w-3xl">
+            <MessageThread requestId={id} isAdmin={true} />
+          </div>
+        )}
 
-      {tab === "roteiro" && (
-        <div className="mt-6 max-w-3xl space-y-4">
-          <RoteiroCardConsole requestId={id} />
-          <BriefingReadOnly requestId={id} productKey="roteiro" />
-        </div>
-      )}
+        {tab === "historico" && (
+          <div className="mt-6 max-w-3xl">
+            <HistoryTimeline requestId={id} />
+          </div>
+        )}
 
-      {tab === "milhas" && (
-        <div className="mt-6 max-w-3xl space-y-4">
-          <MilhasCardConsole requestId={id} />
-          <BriefingReadOnly requestId={id} productKey="milhas" />
-        </div>
-      )}
+        {tab === "conclusao" && (
+          <div className="mt-6 max-w-3xl space-y-6">
+            <ConclusionPanel
+              request={{
+                id,
+                visa_outcome: req.data.visa_outcome as VisaOutcome,
+                visa_decision_at: req.data.visa_decision_at ?? null,
+                visa_validity_until: req.data.visa_validity_until ?? null,
+                archived_at: req.data.archived_at ?? null,
+                client_rating: req.data.client_rating ?? null,
+                client_feedback: req.data.client_feedback ?? null,
+              }}
+            />
+            <EmergencyContactsEditor />
+          </div>
+        )}
 
-      {tab === "mensagens" && (
-        <div className="mt-6 max-w-3xl">
-          <MessageThread requestId={id} isAdmin={true} />
-        </div>
-      )}
-
-      {tab === "historico" && (
-        <div className="mt-6 max-w-3xl">
-          <HistoryTimeline requestId={id} />
-        </div>
-      )}
-
-      {tab === "conclusao" && (
-        <div className="mt-6 max-w-3xl space-y-6">
-          <ConclusionPanel request={{
-            id,
-            visa_outcome: req.data.visa_outcome as VisaOutcome,
-            visa_decision_at: req.data.visa_decision_at ?? null,
-            visa_validity_until: req.data.visa_validity_until ?? null,
-            archived_at: req.data.archived_at ?? null,
-            client_rating: req.data.client_rating ?? null,
-            client_feedback: req.data.client_feedback ?? null,
-          }} />
-          <EmergencyContactsEditor />
-        </div>
-      )}
-
-      {tab === "acesso" && (
-        <div className="mt-6 max-w-2xl">
-          <AccessAuditCard requestId={id} />
-        </div>
-      )}
+        {tab === "acesso" && (
+          <div className="mt-6 max-w-2xl">
+            <AccessAuditCard requestId={id} />
+          </div>
+        )}
       </Suspense>
     </section>
   );
@@ -322,24 +429,51 @@ function PaymentsPanel({
   pending,
   onToggle,
 }: {
-  request: { payment_status: string; payment_method?: string | null; payment_installments?: number | null; payment_card_last4?: string | null; payment_attempts?: number | null; proposal_total_cents?: number | null };
+  request: {
+    payment_status: string;
+    payment_method?: string | null;
+    payment_installments?: number | null;
+    payment_card_last4?: string | null;
+    payment_attempts?: number | null;
+    proposal_total_cents?: number | null;
+  };
   pending: boolean;
   onToggle: () => void;
 }) {
   const paid = request.payment_status === "paid";
-  const method = request.payment_method === "card" ? "Cartão" : request.payment_method === "pix" ? "Pix" : "—";
+  const method =
+    request.payment_method === "card" ? "Cartão" : request.payment_method === "pix" ? "Pix" : "—";
   return (
     <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5 space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="font-display font-bold text-navy">Pagamento da consultoria</h2>
-        <StatusPill variant={paid ? "done" : request.payment_status === "declined" ? "danger" : "warn"}>{request.payment_status}</StatusPill>
+        <StatusPill
+          variant={paid ? "done" : request.payment_status === "declined" ? "danger" : "warn"}
+        >
+          {request.payment_status}
+        </StatusPill>
       </div>
       <dl className="grid grid-cols-2 gap-y-3 text-sm">
-        <dt className="text-ink-soft">Valor</dt><dd className="text-navy font-semibold font-mono">{formatBRL(request.proposal_total_cents ?? 0)}</dd>
-        <dt className="text-ink-soft">Método</dt><dd className="text-ink">{method}</dd>
-        {request.payment_installments ? (<><dt className="text-ink-soft">Parcelas</dt><dd className="text-ink">{request.payment_installments}x</dd></>) : null}
-        {request.payment_card_last4 ? (<><dt className="text-ink-soft">Final do cartão</dt><dd className="text-ink font-mono">•••• {request.payment_card_last4}</dd></>) : null}
-        <dt className="text-ink-soft">Tentativas</dt><dd className="text-ink">{request.payment_attempts ?? 0}</dd>
+        <dt className="text-ink-soft">Valor</dt>
+        <dd className="text-navy font-semibold font-mono">
+          {formatBRL(request.proposal_total_cents ?? 0)}
+        </dd>
+        <dt className="text-ink-soft">Método</dt>
+        <dd className="text-ink">{method}</dd>
+        {request.payment_installments ? (
+          <>
+            <dt className="text-ink-soft">Parcelas</dt>
+            <dd className="text-ink">{request.payment_installments}x</dd>
+          </>
+        ) : null}
+        {request.payment_card_last4 ? (
+          <>
+            <dt className="text-ink-soft">Final do cartão</dt>
+            <dd className="text-ink font-mono">•••• {request.payment_card_last4}</dd>
+          </>
+        ) : null}
+        <dt className="text-ink-soft">Tentativas</dt>
+        <dd className="text-ink">{request.payment_attempts ?? 0}</dd>
       </dl>
       <Button size="sm" variant="outline" disabled={pending} onClick={onToggle}>
         {paid ? "Reverter pagamento" : "Marcar como pago"}
@@ -363,7 +497,8 @@ function HistoryTimeline({ requestId }: { requestId: string }) {
     },
   });
   if (q.isLoading) return <p className="text-ink-muted text-sm">Carregando histórico…</p>;
-  if (!q.data || q.data.length === 0) return <p className="text-ink-muted text-sm">Sem eventos registrados ainda.</p>;
+  if (!q.data || q.data.length === 0)
+    return <p className="text-ink-muted text-sm">Sem eventos registrados ainda.</p>;
   return (
     <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5">
       <h2 className="font-display font-bold text-navy mb-4">Histórico do caso</h2>
@@ -373,7 +508,9 @@ function HistoryTimeline({ requestId }: { requestId: string }) {
             <span className="absolute -left-[5px] mt-1.5 w-2.5 h-2.5 rounded-full bg-coral" />
             <p className="text-sm font-semibold text-navy">{n.title}</p>
             {n.body && <p className="text-xs text-ink-soft">{n.body}</p>}
-            <p className="text-[11px] text-ink-muted mt-0.5">{new Date(n.created_at).toLocaleString("pt-BR")} · {n.audience}</p>
+            <p className="text-[11px] text-ink-muted mt-0.5">
+              {new Date(n.created_at).toLocaleString("pt-BR")} · {n.audience}
+            </p>
           </li>
         ))}
       </ol>

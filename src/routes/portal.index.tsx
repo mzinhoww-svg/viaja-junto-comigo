@@ -11,7 +11,20 @@ import { NotificationBell } from "@/components/viajaly/NotificationBell";
 import { useSignOut } from "./portal";
 import { LogOut, MessageSquare, ChevronDown } from "lucide-react";
 
-const STEP_TO_ROUTE: Record<string, "/portal/proposta" | "/portal/contrato" | "/portal/pagamento" | "/portal/documentos" | "/portal/ds160" | "/portal/taxas" | "/portal/agenda" | "/portal/conclusao" | "/portal/passaporte" | "/portal/roteiro" | "/portal/milhas"> = {
+const STEP_TO_ROUTE: Record<
+  string,
+  | "/portal/proposta"
+  | "/portal/contrato"
+  | "/portal/pagamento"
+  | "/portal/documentos"
+  | "/portal/ds160"
+  | "/portal/taxas"
+  | "/portal/agenda"
+  | "/portal/conclusao"
+  | "/portal/passaporte"
+  | "/portal/roteiro"
+  | "/portal/milhas"
+> = {
   proposta: "/portal/proposta",
   contrato: "/portal/contrato",
   pagamento: "/portal/pagamento",
@@ -32,10 +45,17 @@ export const Route = createFileRoute("/portal/")({
   head: () => ({
     meta: [
       { title: "Sua jornada — Viajaly" },
-      { name: "description", content: "Acompanhe sua jornada Viajaly: proposta, contrato, documentos, taxas e agendamento — tudo num portal só, em português." },
+      {
+        name: "description",
+        content:
+          "Acompanhe sua jornada Viajaly: proposta, contrato, documentos, taxas e agendamento — tudo num portal só, em português.",
+      },
       { name: "robots", content: "noindex,follow" },
       { property: "og:title", content: "Sua jornada — Viajaly" },
-      { property: "og:description", content: "Portal do cliente Viajaly: acompanhe cada etapa da sua viagem em um só lugar." },
+      {
+        property: "og:description",
+        content: "Portal do cliente Viajaly: acompanhe cada etapa da sua viagem em um só lugar.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://viajaly.com/portal" },
     ],
@@ -57,11 +77,20 @@ function PortalHome() {
     const has = (k: string) => journey.data!.some((s) => s.key === k);
     const s = r.proposal_status;
     // 'draft' fica no hub mostrando "aguardando orçamento" — não força navegação
-    if (s === "sent" || s === "viewed") { nav({ to: "/portal/proposta" }); return; }
+    if (s === "sent" || s === "viewed") {
+      nav({ to: "/portal/proposta" });
+      return;
+    }
     if (s === "accepted") {
       // Pagar primeiro, depois contrato
-      if (r.payment_status !== "paid") { nav({ to: "/portal/pagamento" }); return; }
-      if (has("contrato") && !r.contract_signed) { nav({ to: "/portal/contrato" }); return; }
+      if (r.payment_status !== "paid") {
+        nav({ to: "/portal/pagamento" });
+        return;
+      }
+      if (has("contrato") && !r.contract_signed) {
+        nav({ to: "/portal/contrato" });
+        return;
+      }
     }
   }, [req.data, journey.data, nav]);
 
@@ -76,11 +105,19 @@ function PortalHome() {
         <div className="flex items-center justify-between">
           <Logo size={32} />
           <div className="flex items-center">
-            <button onClick={() => nav({ to: "/portal/mensagens" })} className="text-ink-muted hover:text-coral p-2" aria-label="Mensagens">
+            <button
+              onClick={() => nav({ to: "/portal/mensagens" })}
+              className="text-ink-muted hover:text-coral p-2"
+              aria-label="Mensagens"
+            >
               <MessageSquare size={18} />
             </button>
             <NotificationBell />
-            <button onClick={signOut} className="text-ink-muted hover:text-coral p-2" aria-label="Sair">
+            <button
+              onClick={signOut}
+              className="text-ink-muted hover:text-coral p-2"
+              aria-label="Sair"
+            >
               <LogOut size={18} />
             </button>
           </div>
@@ -89,7 +126,8 @@ function PortalHome() {
         {!req.data ? (
           <div className="mt-8 p-6 rounded-2xl bg-white border border-[var(--color-border)]">
             <p className="text-ink-soft text-sm">
-              Você ainda não tem uma proposta ativa. Entre em contato com a Letícia para receber seu orçamento.
+              Você ainda não tem uma proposta ativa. Entre em contato com a Letícia para receber seu
+              orçamento.
             </p>
           </div>
         ) : req.data.proposal_status === "draft" ? (
@@ -97,11 +135,17 @@ function PortalHome() {
         ) : (
           <>
             <div className="mt-6 p-5 rounded-3xl bg-navy text-cream">
-              <p className="text-xs uppercase tracking-wider opacity-70">Olá, {req.data.lead_name?.split(" ")[0]}</p>
+              <p className="text-xs uppercase tracking-wider opacity-70">
+                Olá, {req.data.lead_name?.split(" ")[0]}
+              </p>
               <h1 className="mt-1 text-2xl font-display font-extrabold text-cream">Sua jornada</h1>
               <div className="mt-4 flex items-end justify-between">
                 <span className="text-4xl font-display font-extrabold text-cream">{pct}%</span>
-                {next && <span className="text-sm opacity-80">Agora: <b>{next}</b></span>}
+                {next && (
+                  <span className="text-sm opacity-80">
+                    Agora: <b>{next}</b>
+                  </span>
+                )}
               </div>
               <div className="mt-3 h-2 rounded-full bg-white/15 overflow-hidden">
                 <div className="h-full bg-coral transition-all" style={{ width: `${pct}%` }} />
@@ -114,21 +158,27 @@ function PortalHome() {
                   onClick={() => nav({ to: "/portal/ds160" })}
                   className="rounded-2xl border border-[var(--color-border)] bg-white p-3 text-left hover:border-coral transition"
                 >
-                  <p className="text-[10px] uppercase tracking-wider text-ink-muted font-bold">Formulário</p>
+                  <p className="text-[10px] uppercase tracking-wider text-ink-muted font-bold">
+                    Formulário
+                  </p>
                   <p className="mt-1 font-display font-bold text-navy text-sm">DS-160</p>
                 </button>
                 <button
                   onClick={() => nav({ to: "/portal/taxas" })}
                   className="rounded-2xl border border-[var(--color-border)] bg-white p-3 text-left hover:border-coral transition"
                 >
-                  <p className="text-[10px] uppercase tracking-wider text-ink-muted font-bold">Pagamento</p>
+                  <p className="text-[10px] uppercase tracking-wider text-ink-muted font-bold">
+                    Pagamento
+                  </p>
                   <p className="mt-1 font-display font-bold text-navy text-sm">Taxa MRV</p>
                 </button>
                 <button
                   onClick={() => nav({ to: "/portal/agenda" })}
                   className="rounded-2xl border border-[var(--color-border)] bg-white p-3 text-left hover:border-coral transition"
                 >
-                  <p className="text-[10px] uppercase tracking-wider text-ink-muted font-bold">Datas</p>
+                  <p className="text-[10px] uppercase tracking-wider text-ink-muted font-bold">
+                    Datas
+                  </p>
                   <p className="mt-1 font-display font-bold text-navy text-sm">Agendamentos</p>
                 </button>
               </div>
@@ -144,13 +194,24 @@ function PortalHome() {
             >
               <span>
                 Etapas{" "}
-                {total > 0 && <span className="text-ink-muted normal-case font-semibold">· {done}/{total}</span>}
+                {total > 0 && (
+                  <span className="text-ink-muted normal-case font-semibold">
+                    · {done}/{total}
+                  </span>
+                )}
               </span>
-              <ChevronDown size={18} className={`text-ink-muted transition-transform ${stepsOpen ? "rotate-180" : ""}`} />
+              <ChevronDown
+                size={18}
+                className={`text-ink-muted transition-transform ${stepsOpen ? "rotate-180" : ""}`}
+              />
             </button>
             {stepsOpen &&
               (journey.isLoading ? (
-                <div className="space-y-2">{Array.from({ length: 7 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-2xl" />)}</div>
+                <div className="space-y-2">
+                  {Array.from({ length: 7 }).map((_, i) => (
+                    <Skeleton key={i} className="h-16 rounded-2xl" />
+                  ))}
+                </div>
               ) : (
                 <div className="space-y-2">
                   {journey.data?.map((s) => {

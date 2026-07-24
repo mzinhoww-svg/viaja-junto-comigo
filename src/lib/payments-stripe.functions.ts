@@ -8,17 +8,19 @@ type CheckoutResult = { clientSecret: string } | { error: string };
 
 export const createConsultancyCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: {
-    requestId: string;
-    method: PaymentMethod;
-    returnUrl: string;
-    environment: StripeEnv;
-  }) => {
-    if (!/^[0-9a-f-]{36}$/i.test(data.requestId)) throw new Error("Invalid requestId");
-    if (data.method !== "card" && data.method !== "pix") throw new Error("Invalid method");
-    if (!data.returnUrl.startsWith("http")) throw new Error("Invalid returnUrl");
-    return data;
-  })
+  .inputValidator(
+    (data: {
+      requestId: string;
+      method: PaymentMethod;
+      returnUrl: string;
+      environment: StripeEnv;
+    }) => {
+      if (!/^[0-9a-f-]{36}$/i.test(data.requestId)) throw new Error("Invalid requestId");
+      if (data.method !== "card" && data.method !== "pix") throw new Error("Invalid method");
+      if (!data.returnUrl.startsWith("http")) throw new Error("Invalid returnUrl");
+      return data;
+    },
+  )
   .handler(async ({ data, context }): Promise<CheckoutResult> => {
     try {
       const { supabase } = context;
@@ -43,17 +45,19 @@ export const createConsultancyCheckout = createServerFn({ method: "POST" })
         ui_mode: "embedded_page",
         return_url: `${data.returnUrl}?session_id={CHECKOUT_SESSION_ID}`,
         payment_method_types: [data.method],
-        line_items: [{
-          quantity: 1,
-          price_data: {
-            currency: "brl",
-            product_data: {
-              name: `Consultoria Viajaly · #${data.requestId.slice(0, 8)}`,
-              description: `Pacote de serviços de assessoria — ${req.lead_name ?? "Cliente"}`,
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: "brl",
+              product_data: {
+                name: `Consultoria Viajaly · #${data.requestId.slice(0, 8)}`,
+                description: `Pacote de serviços de assessoria — ${req.lead_name ?? "Cliente"}`,
+              },
+              unit_amount: amount,
             },
-            unit_amount: amount,
           },
-        }],
+        ],
         ...(req.lead_email && { customer_email: req.lead_email }),
         payment_intent_data: {
           description: `Consultoria Viajaly #${data.requestId.slice(0, 8)}`,
@@ -85,17 +89,19 @@ export const createConsultancyCheckout = createServerFn({ method: "POST" })
  */
 export const createTaxesCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: {
-    requestId: string;
-    method: PaymentMethod;
-    returnUrl: string;
-    environment: StripeEnv;
-  }) => {
-    if (!/^[0-9a-f-]{36}$/i.test(data.requestId)) throw new Error("Invalid requestId");
-    if (data.method !== "card" && data.method !== "pix") throw new Error("Invalid method");
-    if (!data.returnUrl.startsWith("http")) throw new Error("Invalid returnUrl");
-    return data;
-  })
+  .inputValidator(
+    (data: {
+      requestId: string;
+      method: PaymentMethod;
+      returnUrl: string;
+      environment: StripeEnv;
+    }) => {
+      if (!/^[0-9a-f-]{36}$/i.test(data.requestId)) throw new Error("Invalid requestId");
+      if (data.method !== "card" && data.method !== "pix") throw new Error("Invalid method");
+      if (!data.returnUrl.startsWith("http")) throw new Error("Invalid returnUrl");
+      return data;
+    },
+  )
   .handler(async ({ data, context }): Promise<CheckoutResult> => {
     try {
       const { supabase } = context;

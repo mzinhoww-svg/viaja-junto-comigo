@@ -48,15 +48,24 @@ export function MessageThread({ requestId, isAdmin }: { requestId: string; isAdm
   useEffect(() => {
     const ch = supabase
       .channel(`messages:${requestId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "messages", filter: `request_id=eq.${requestId}` },
-        () => qc.invalidateQueries({ queryKey: ["messages", requestId] }))
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "messages", filter: `request_id=eq.${requestId}` },
+        () => qc.invalidateQueries({ queryKey: ["messages", requestId] }),
+      )
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    return () => {
+      supabase.removeChannel(ch);
+    };
   }, [qc, requestId]);
 
   useEffect(() => {
     (async () => {
-      try { await supabase.rpc("mark_messages_read" as never, { _request_id: requestId } as never); } catch { /* noop */ }
+      try {
+        await supabase.rpc("mark_messages_read" as never, { _request_id: requestId } as never);
+      } catch {
+        /* noop */
+      }
     })();
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [q.data?.length, requestId]);
@@ -65,15 +74,22 @@ export function MessageThread({ requestId, isAdmin }: { requestId: string; isAdm
     mutationFn: async () => {
       const t = body.trim();
       if (!t && files.length === 0) throw new Error("Mensagem vazia");
-      const { error } = await supabase.rpc("send_message" as never, {
-        _request_id: requestId,
-        _body: t,
-        _attachments: files,
-        _internal: isAdmin && internal,
-      } as never);
+      const { error } = await supabase.rpc(
+        "send_message" as never,
+        {
+          _request_id: requestId,
+          _body: t,
+          _attachments: files,
+          _internal: isAdmin && internal,
+        } as never,
+      );
       if (error) throw error;
     },
-    onSuccess: () => { setBody(""); setFiles([]); qc.invalidateQueries({ queryKey: ["messages", requestId] }); },
+    onSuccess: () => {
+      setBody("");
+      setFiles([]);
+      qc.invalidateQueries({ queryKey: ["messages", requestId] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -96,7 +112,10 @@ export function MessageThread({ requestId, isAdmin }: { requestId: string; isAdm
 
   async function openAttachment(path: string) {
     const { data, error } = await supabase.storage.from("documents").createSignedUrl(path, 60 * 5);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     window.open(data.signedUrl, "_blank", "noopener");
   }
 
@@ -113,7 +132,9 @@ export function MessageThread({ requestId, isAdmin }: { requestId: string; isAdm
           const align = mine ? "items-end" : "items-start";
           const bubble = m.internal
             ? "bg-amber-100 text-amber-900 border border-amber-200"
-            : mine ? "bg-coral text-cream" : "bg-slate-100 text-ink";
+            : mine
+              ? "bg-coral text-cream"
+              : "bg-slate-100 text-ink";
           return (
             <div key={m.id} className={`flex flex-col ${align}`}>
               <div className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${bubble}`}>
@@ -126,7 +147,11 @@ export function MessageThread({ requestId, isAdmin }: { requestId: string; isAdm
                 {m.attachments && m.attachments.length > 0 && (
                   <div className="mt-1.5 space-y-1">
                     {m.attachments.map((a, i) => (
-                      <button key={i} onClick={() => openAttachment(a.path)} className="flex items-center gap-1 text-xs underline opacity-90 hover:opacity-100">
+                      <button
+                        key={i}
+                        onClick={() => openAttachment(a.path)}
+                        className="flex items-center gap-1 text-xs underline opacity-90 hover:opacity-100"
+                      >
                         <Paperclip size={11} /> {a.name}
                       </button>
                     ))}
@@ -148,22 +173,41 @@ export function MessageThread({ requestId, isAdmin }: { requestId: string; isAdm
             {files.map((f, i) => (
               <span key={i} className="text-[11px] bg-slate-100 px-2 py-1 rounded-full">
                 {f.name}
-                <button onClick={() => setFiles((s) => s.filter((_, j) => j !== i))} className="ml-1 text-ink-muted hover:text-coral">×</button>
+                <button
+                  onClick={() => setFiles((s) => s.filter((_, j) => j !== i))}
+                  className="ml-1 text-ink-muted hover:text-coral"
+                >
+                  ×
+                </button>
               </span>
             ))}
           </div>
         )}
         <div className="flex gap-2 items-end">
-          <textarea value={body} onChange={(e) => setBody(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) send.mutate(); }}
-            placeholder="Escreva uma mensagem… (Ctrl+Enter envia)" rows={2}
-            className="flex-1 rounded-xl border border-[var(--color-border)] px-3 py-2 text-sm resize-none" />
+          <textarea
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) send.mutate();
+            }}
+            placeholder="Escreva uma mensagem… (Ctrl+Enter envia)"
+            rows={2}
+            className="flex-1 rounded-xl border border-[var(--color-border)] px-3 py-2 text-sm resize-none"
+          />
           <div className="flex flex-col gap-1">
-            <label className="cursor-pointer p-2 rounded-lg border border-[var(--color-border)] hover:border-coral text-ink-soft" title="Anexar">
+            <label
+              className="cursor-pointer p-2 rounded-lg border border-[var(--color-border)] hover:border-coral text-ink-soft"
+              title="Anexar"
+            >
               <Paperclip size={16} />
               <input type="file" hidden onChange={onFile} disabled={uploading} />
             </label>
-            <Button size="sm" className="bg-coral hover:bg-coral-dark text-cream" onClick={() => send.mutate()} disabled={send.isPending}>
+            <Button
+              size="sm"
+              className="bg-coral hover:bg-coral-dark text-cream"
+              onClick={() => send.mutate()}
+              disabled={send.isPending}
+            >
               <Send size={14} />
             </Button>
           </div>
@@ -171,10 +215,17 @@ export function MessageThread({ requestId, isAdmin }: { requestId: string; isAdm
         {isAdmin && (
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <label className="inline-flex items-center gap-2 text-xs text-ink-soft">
-              <input type="checkbox" checked={internal} onChange={(e) => setInternal(e.target.checked)} />
+              <input
+                type="checkbox"
+                checked={internal}
+                onChange={(e) => setInternal(e.target.checked)}
+              />
               <Lock size={12} /> Nota interna (cliente não vê)
             </label>
-            <TemplatesPicker requestId={requestId} onPick={(rendered) => setBody((b) => (b ? b + "\n\n" : "") + rendered)} />
+            <TemplatesPicker
+              requestId={requestId}
+              onPick={(rendered) => setBody((b) => (b ? b + "\n\n" : "") + rendered)}
+            />
           </div>
         )}
       </div>

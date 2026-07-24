@@ -11,20 +11,28 @@ export function EmergencyContactsEditor() {
   const q = useQuery({
     queryKey: ["agency_emergency"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("agencies").select("emergency_contacts").maybeSingle();
+      const { data, error } = await supabase
+        .from("agencies")
+        .select("emergency_contacts")
+        .maybeSingle();
       if (error) throw error;
       return ((data?.emergency_contacts as { items?: Contact[] } | null)?.items ?? []) as Contact[];
     },
   });
   const [items, setItems] = useState<Contact[]>([]);
-  useEffect(() => { if (q.data) setItems(q.data); }, [q.data]);
+  useEffect(() => {
+    if (q.data) setItems(q.data);
+  }, [q.data]);
 
   const save = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.rpc("upsert_emergency_contacts", { _contacts: { items } });
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Contatos salvos"); qc.invalidateQueries({ queryKey: ["agency_emergency"] }); },
+    onSuccess: () => {
+      toast.success("Contatos salvos");
+      qc.invalidateQueries({ queryKey: ["agency_emergency"] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -35,18 +43,52 @@ export function EmergencyContactsEditor() {
       <div className="space-y-2">
         {items.map((c, i) => (
           <div key={i} className="grid grid-cols-[1fr,1fr,auto] gap-2">
-            <input value={c.label} onChange={(e) => setItems((arr) => arr.map((x, j) => j === i ? { ...x, label: e.target.value } : x))}
-              placeholder="Rótulo (ex: Letícia)" className="rounded-lg border border-[var(--color-border)] px-3 h-9 text-sm" />
-            <input value={c.value} onChange={(e) => setItems((arr) => arr.map((x, j) => j === i ? { ...x, value: e.target.value } : x))}
-              placeholder="Telefone / e-mail" className="rounded-lg border border-[var(--color-border)] px-3 h-9 text-sm" />
-            <Button size="sm" variant="outline" onClick={() => setItems((arr) => arr.filter((_, j) => j !== i))}>Remover</Button>
+            <input
+              value={c.label}
+              onChange={(e) =>
+                setItems((arr) =>
+                  arr.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)),
+                )
+              }
+              placeholder="Rótulo (ex: Letícia)"
+              className="rounded-lg border border-[var(--color-border)] px-3 h-9 text-sm"
+            />
+            <input
+              value={c.value}
+              onChange={(e) =>
+                setItems((arr) =>
+                  arr.map((x, j) => (j === i ? { ...x, value: e.target.value } : x)),
+                )
+              }
+              placeholder="Telefone / e-mail"
+              className="rounded-lg border border-[var(--color-border)] px-3 h-9 text-sm"
+            />
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setItems((arr) => arr.filter((_, j) => j !== i))}
+            >
+              Remover
+            </Button>
           </div>
         ))}
       </div>
       <div className="flex gap-2">
-        <Button size="sm" variant="outline" onClick={() => setItems((a) => [...a, { label: "", value: "" }])}>+ Contato</Button>
-        <Button size="sm" onClick={() => save.mutate()} disabled={save.isPending}
-          className="bg-navy text-cream hover:bg-[var(--color-navy-light)]">Salvar</Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setItems((a) => [...a, { label: "", value: "" }])}
+        >
+          + Contato
+        </Button>
+        <Button
+          size="sm"
+          onClick={() => save.mutate()}
+          disabled={save.isPending}
+          className="bg-navy text-cream hover:bg-[var(--color-navy-light)]"
+        >
+          Salvar
+        </Button>
       </div>
     </div>
   );

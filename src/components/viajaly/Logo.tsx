@@ -1,6 +1,14 @@
 import { cn } from "@/lib/utils";
 
-export function Logo({ size = 32, withText = true, className }: { size?: number; withText?: boolean; className?: string }) {
+export function Logo({
+  size = 32,
+  withText = true,
+  className,
+}: {
+  size?: number;
+  withText?: boolean;
+  className?: string;
+}) {
   return (
     <span className={cn("inline-flex items-center gap-2", className)}>
       <svg viewBox="0 0 120 120" width={size} height={size} aria-hidden>

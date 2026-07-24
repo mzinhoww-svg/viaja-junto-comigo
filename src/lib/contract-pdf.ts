@@ -3,7 +3,7 @@ import { jsPDF } from "jspdf";
 export type ContractAuditTrail = {
   signerName: string;
   signerCpf?: string | null;
-  signedAtISO: string;       // ISO UTC
+  signedAtISO: string; // ISO UTC
   ip: string;
   userAgent: string;
   bodySha256: string;
@@ -64,13 +64,7 @@ export function buildContractPdf(opts: {
   return new Blob([buf], { type: "application/pdf" });
 }
 
-function drawFooter(
-  doc: jsPDF,
-  a: ContractAuditTrail,
-  W: number,
-  H: number,
-  MARGIN: number,
-) {
+function drawFooter(doc: jsPDF, a: ContractAuditTrail, W: number, H: number, MARGIN: number) {
   const y0 = H - 96;
   doc.setDrawColor(200, 200, 200);
   doc.line(MARGIN, y0, W - MARGIN, y0);
@@ -121,5 +115,7 @@ export async function sha256HexBrowser(text: string): Promise<string> {
   const enc = new TextEncoder().encode(text);
   const buf = await crypto.subtle.digest("SHA-256", enc);
   const bytes = new Uint8Array(buf);
-  return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }

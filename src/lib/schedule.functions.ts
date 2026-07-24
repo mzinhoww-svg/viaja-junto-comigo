@@ -7,13 +7,15 @@ const dateStr = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 export const saveIntentWish = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({
-      intent_id: z.string().uuid(),
-      wish_dates: z.array(dateStr).max(10).default([]),
-      wish_period: z.enum(["morning", "afternoon", "any"]).optional(),
-      consulate: z.string().max(20).optional(),
-      notes: z.string().max(500).optional(),
-    }).parse(input),
+    z
+      .object({
+        intent_id: z.string().uuid(),
+        wish_dates: z.array(dateStr).max(10).default([]),
+        wish_period: z.enum(["morning", "afternoon", "any"]).optional(),
+        consulate: z.string().max(20).optional(),
+        notes: z.string().max(500).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("save_intent_wish", {
@@ -30,11 +32,13 @@ export const saveIntentWish = createServerFn({ method: "POST" })
 export const confirmIntent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({
-      intent_id: z.string().uuid(),
-      confirmed_date: dateStr,
-      consulate: z.string().max(20).optional(),
-    }).parse(input),
+    z
+      .object({
+        intent_id: z.string().uuid(),
+        confirmed_date: dateStr,
+        consulate: z.string().max(20).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("confirm_intent", {
@@ -58,10 +62,12 @@ export const reopenIntent = createServerFn({ method: "POST" })
 export const upsertScheduleWindow = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({
-      slots: z.record(z.string(), z.record(z.string(), z.array(dateStr))).optional(),
-      released_quinzenas: z.array(z.string()).optional(),
-    }).parse(input),
+    z
+      .object({
+        slots: z.record(z.string(), z.record(z.string(), z.array(dateStr))).optional(),
+        released_quinzenas: z.array(z.string()).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.rpc("upsert_schedule_window", {

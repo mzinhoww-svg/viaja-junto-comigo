@@ -29,7 +29,10 @@ const decode = (s) =>
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&nbsp;/g, " ");
-const stripTags = (s) => decode(s.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
+const stripTags = (s) =>
+  decode(s.replace(/<[^>]+>/g, " "))
+    .replace(/\s+/g, " ")
+    .trim();
 
 function parseFaq(body) {
   const re =
@@ -41,10 +44,12 @@ function parseFaq(body) {
 }
 
 function parseSteps(body) {
-  const re = /<div class="step[^"]*"[^>]*>\s*<div class="step-n">(\d+)<\/div>\s*<h4>(.*?)<\/h4>\s*<p>(.*?)<\/p>/gs;
+  const re =
+    /<div class="step[^"]*"[^>]*>\s*<div class="step-n">(\d+)<\/div>\s*<h4>(.*?)<\/h4>\s*<p>(.*?)<\/p>/gs;
   const out = [];
   let m;
-  while ((m = re.exec(body))) out.push({ n: Number(m[1]), name: stripTags(m[2]), text: stripTags(m[3]) });
+  while ((m = re.exec(body)))
+    out.push({ n: Number(m[1]), name: stripTags(m[2]), text: stripTags(m[3]) });
   return out;
 }
 

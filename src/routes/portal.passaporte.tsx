@@ -6,10 +6,26 @@ import { useMyRequest, useRequestRealtime } from "@/hooks/useJourney";
 import { ChevronLeft, Plane } from "lucide-react";
 
 const LABELS: Record<string, { label: string; sub: string; cls: string }> = {
-  coletando:  { label: "Coletando dados",       sub: "Estamos reunindo o que precisamos.",       cls: "bg-slate-100 text-slate-800" },
-  em_emissao: { label: "Em emissão",            sub: "Processo na Polícia Federal em curso.",    cls: "bg-amber-100 text-amber-800" },
-  pronto:     { label: "Pronto para retirada",  sub: "Combine a retirada com a Letícia.",        cls: "bg-emerald-100 text-emerald-800" },
-  entregue:   { label: "Entregue",              sub: "Passaporte já está com você.",             cls: "bg-emerald-50 text-emerald-700" },
+  coletando: {
+    label: "Coletando dados",
+    sub: "Estamos reunindo o que precisamos.",
+    cls: "bg-slate-100 text-slate-800",
+  },
+  em_emissao: {
+    label: "Em emissão",
+    sub: "Processo na Polícia Federal em curso.",
+    cls: "bg-amber-100 text-amber-800",
+  },
+  pronto: {
+    label: "Pronto para retirada",
+    sub: "Combine a retirada com a Letícia.",
+    cls: "bg-emerald-100 text-emerald-800",
+  },
+  entregue: {
+    label: "Entregue",
+    sub: "Passaporte já está com você.",
+    cls: "bg-emerald-50 text-emerald-700",
+  },
 };
 
 export const Route = createFileRoute("/portal/passaporte")({
@@ -29,7 +45,10 @@ function PortalPassaporte() {
   return (
     <PhoneFrame>
       <div className="px-5 pt-8 pb-24 anim-vfade">
-        <button onClick={() => nav({ to: "/portal" })} className="inline-flex items-center gap-1 text-ink-soft text-sm hover:text-coral mb-4">
+        <button
+          onClick={() => nav({ to: "/portal" })}
+          className="inline-flex items-center gap-1 text-ink-soft text-sm hover:text-coral mb-4"
+        >
           <ChevronLeft size={16} /> Hub
         </button>
         <h1 className="text-2xl font-display font-extrabold text-navy mb-1">Passaporte</h1>
@@ -39,9 +58,12 @@ function PortalPassaporte() {
         </div>
 
         <div className="flex gap-1 border-b border-[var(--color-border)] mb-4">
-          {(["briefing","entrega"] as const).map((t) => (
-            <button key={t} onClick={() => setTab(t)}
-              className={`px-4 py-2 text-sm font-semibold border-b-2 -mb-px ${tab===t ? "border-coral text-coral" : "border-transparent text-ink-soft"}`}>
+          {(["briefing", "entrega"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`px-4 py-2 text-sm font-semibold border-b-2 -mb-px ${tab === t ? "border-coral text-coral" : "border-transparent text-ink-soft"}`}
+            >
               {t === "briefing" ? "Briefing" : "Entrega"}
             </button>
           ))}
@@ -53,7 +75,11 @@ function PortalPassaporte() {
           <>
             <div className="rounded-3xl bg-white border border-[var(--color-border)] p-6 text-center">
               <Plane size={32} className="mx-auto text-coral" />
-              <span className={`inline-block mt-3 px-3 py-1 rounded-full text-xs font-bold ${meta.cls}`}>{meta.label}</span>
+              <span
+                className={`inline-block mt-3 px-3 py-1 rounded-full text-xs font-bold ${meta.cls}`}
+              >
+                {meta.label}
+              </span>
               <p className="mt-3 text-sm text-ink-soft">{meta.sub}</p>
             </div>
             {r.passport_notes && (

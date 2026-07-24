@@ -46,9 +46,13 @@ export function HandoffCard({
   async function copy(text: string, kind: "link" | "code" | "msg") {
     try {
       await navigator.clipboard.writeText(text);
-      if (kind === "link") { setCopiedLink(true); setTimeout(() => setCopiedLink(false), 1500); }
-      else if (kind === "code") { setCopiedCode(true); setTimeout(() => setCopiedCode(false), 1500); }
-      else toast.success("Mensagem copiada");
+      if (kind === "link") {
+        setCopiedLink(true);
+        setTimeout(() => setCopiedLink(false), 1500);
+      } else if (kind === "code") {
+        setCopiedCode(true);
+        setTimeout(() => setCopiedCode(false), 1500);
+      } else toast.success("Mensagem copiada");
     } catch {
       toast.error("Não foi possível copiar");
     }
@@ -89,16 +93,22 @@ export function HandoffCard({
             <ExternalLink size={14} />
           </a>
         </div>
-        <p className="font-mono text-xs sm:text-sm break-all leading-relaxed">
-          {link || "—"}
-        </p>
+        <p className="font-mono text-xs sm:text-sm break-all leading-relaxed">{link || "—"}</p>
         <Button
           onClick={() => copy(link, "link")}
           variant="outline"
           size="sm"
           className="mt-3 w-full bg-cream/5 border-cream/20 text-cream hover:bg-cream/10 hover:text-cream rounded-full"
         >
-          {copiedLink ? <><Check size={14} className="mr-1.5" /> Link copiado</> : <><Copy size={14} className="mr-1.5" /> Copiar link</>}
+          {copiedLink ? (
+            <>
+              <Check size={14} className="mr-1.5" /> Link copiado
+            </>
+          ) : (
+            <>
+              <Copy size={14} className="mr-1.5" /> Copiar link
+            </>
+          )}
         </Button>
       </div>
 
@@ -112,7 +122,12 @@ export function HandoffCard({
             {accessCode}
           </div>
         </div>
-        <Button onClick={() => copy(accessCode, "code")} size="icon" variant="outline" aria-label="Copiar código">
+        <Button
+          onClick={() => copy(accessCode, "code")}
+          size="icon"
+          variant="outline"
+          aria-label="Copiar código"
+        >
           {copiedCode ? <Check size={16} /> : <Copy size={16} />}
         </Button>
       </div>

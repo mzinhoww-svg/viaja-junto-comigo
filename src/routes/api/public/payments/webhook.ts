@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- Stripe webhook payloads are signature-verified upstream and read dynamically */
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { type StripeEnv, verifyWebhook } from "@/lib/stripe.server";
@@ -50,12 +51,9 @@ async function handleConsultancyCheckout(session: any) {
 
 async function notifyPaymentConfirmed(session: any) {
   const email: string | undefined =
-    session?.customer_details?.email ??
-    session?.customer_email ??
-    session?.metadata?.lead_email;
+    session?.customer_details?.email ?? session?.customer_email ?? session?.metadata?.lead_email;
   if (!email) return;
-  const name: string | undefined =
-    session?.customer_details?.name ?? session?.metadata?.lead_name;
+  const name: string | undefined = session?.customer_details?.name ?? session?.metadata?.lead_name;
   const { sendTransactionalEmail } = await import("@/lib/email.server");
   await sendTransactionalEmail({
     template: "payment_confirmed",
@@ -146,7 +144,10 @@ async function handleEvent(event: { id: string; type: string; data: { object: an
   const supabase = getSupabase();
 
   const { data: existing } = await supabase
-    .from("stripe_webhook_events").select("id").eq("id", event.id).maybeSingle();
+    .from("stripe_webhook_events")
+    .select("id")
+    .eq("id", event.id)
+    .maybeSingle();
   if (existing) return { skipped: true };
 
   switch (event.type) {

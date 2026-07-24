@@ -6,7 +6,13 @@ import { useMyRequest, useRequestRealtime } from "@/hooks/useJourney";
 import { PhoneFrame } from "@/components/viajaly/PhoneFrame";
 import { Logo } from "@/components/viajaly/Logo";
 import { Button } from "@/components/ui/button";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from "@/components/ui/drawer";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerFooter,
+} from "@/components/ui/drawer";
 import { Textarea } from "@/components/ui/textarea";
 import { Check, X } from "lucide-react";
 import { toast } from "sonner";
@@ -21,10 +27,14 @@ function productMeta(key: string | null | undefined, label: string): ProductMeta
   const isPass = k === "pass" || k === "passaporte" || lbl.includes("passaporte");
   const isRot = k === "rot" || k === "roteiro" || lbl.includes("roteiro");
   const isMil = k === "mil" || k === "milhas" || lbl.includes("milha");
-  if (isVistos) return { color: "#FF5A5F", tint: "rgba(255,90,95,0.12)", dark: "#B23036", perGroup: false };
-  if (isPass)   return { color: "#2DB7C9", tint: "rgba(45,183,201,0.14)", dark: "#0F6A78", perGroup: false };
-  if (isRot)    return { color: "#E8A33D", tint: "rgba(232,163,61,0.18)", dark: "#8A5A12", perGroup: true };
-  if (isMil)    return { color: "#1F8A5B", tint: "rgba(31,138,91,0.14)", dark: "#0F5436", perGroup: true };
+  if (isVistos)
+    return { color: "#FF5A5F", tint: "rgba(255,90,95,0.12)", dark: "#B23036", perGroup: false };
+  if (isPass)
+    return { color: "#2DB7C9", tint: "rgba(45,183,201,0.14)", dark: "#0F6A78", perGroup: false };
+  if (isRot)
+    return { color: "#E8A33D", tint: "rgba(232,163,61,0.18)", dark: "#8A5A12", perGroup: true };
+  if (isMil)
+    return { color: "#1F8A5B", tint: "rgba(31,138,91,0.14)", dark: "#0F5436", perGroup: true };
   return { color: "#94A3B8", tint: "rgba(148,163,184,0.18)", dark: "#334155", perGroup: false };
 }
 import { useSignOut } from "./portal";
@@ -47,7 +57,11 @@ function PropostaPage() {
   // mark as viewed once
   useEffect(() => {
     if (req.data?.id && req.data.proposal_status === "sent") {
-      supabase.rpc("client_set_proposal_status", { _request_id: req.data.id, _status: "viewed", _reason: undefined });
+      supabase.rpc("client_set_proposal_status", {
+        _request_id: req.data.id,
+        _status: "viewed",
+        _reason: undefined,
+      });
     }
   }, [req.data?.id, req.data?.proposal_status]);
 
@@ -56,8 +70,10 @@ function PropostaPage() {
     enabled: !!req.data?.id,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("proposal_items").select("*")
-        .eq("request_id", req.data!.id).order("sort");
+        .from("proposal_items")
+        .select("*")
+        .eq("request_id", req.data!.id)
+        .order("sort");
       if (error) throw error;
       return data;
     },
@@ -66,22 +82,34 @@ function PropostaPage() {
   const accept = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.rpc("client_set_proposal_status", {
-        _request_id: req.data!.id, _status: "accepted", _reason: undefined,
+        _request_id: req.data!.id,
+        _status: "accepted",
+        _reason: undefined,
       });
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Proposta aceita! Vamos ao pagamento 🎉"); qc.invalidateQueries({ queryKey: ["my-request"] }); nav({ to: "/portal/pagamento" }); },
+    onSuccess: () => {
+      toast.success("Proposta aceita! Vamos ao pagamento 🎉");
+      qc.invalidateQueries({ queryKey: ["my-request"] });
+      nav({ to: "/portal/pagamento" });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const decline = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.rpc("client_set_proposal_status", {
-        _request_id: req.data!.id, _status: "declined", _reason: reason,
+        _request_id: req.data!.id,
+        _status: "declined",
+        _reason: reason,
       });
       if (error) throw error;
     },
-    onSuccess: () => { setDeclineOpen(false); toast("Recebemos seu retorno."); qc.invalidateQueries({ queryKey: ["my-request"] }); },
+    onSuccess: () => {
+      setDeclineOpen(false);
+      toast("Recebemos seu retorno.");
+      qc.invalidateQueries({ queryKey: ["my-request"] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -94,14 +122,19 @@ function PropostaPage() {
       <div className="px-5 pt-8 pb-32">
         <div className="flex items-center justify-between">
           <Logo size={32} />
-          <button onClick={signOut} className="text-xs text-ink-muted hover:text-coral">Sair</button>
+          <button onClick={signOut} className="text-xs text-ink-muted hover:text-coral">
+            Sair
+          </button>
         </div>
 
         <div className="mt-6">
           <p className="text-xs uppercase tracking-wider text-coral font-bold">Etapa 1 de 7</p>
-          <h1 className="mt-1 text-3xl font-display font-extrabold text-navy leading-tight">Sua proposta</h1>
+          <h1 className="mt-1 text-3xl font-display font-extrabold text-navy leading-tight">
+            Sua proposta
+          </h1>
           <p className="mt-2 text-sm text-ink-soft">
-            Olá{r?.lead_name ? `, ${r.lead_name.split(" ")[0]}` : ""}! Confira o que preparamos pra você.
+            Olá{r?.lead_name ? `, ${r.lead_name.split(" ")[0]}` : ""}! Confira o que preparamos pra
+            você.
           </p>
         </div>
 
@@ -110,7 +143,7 @@ function PropostaPage() {
             {items.data?.map((it) => {
               const meta = productMeta(it.product_key, it.label);
               const leadFirst = r?.lead_name?.trim().split(/\s+/)[0] ?? "";
-              const scopeLabel = meta.perGroup ? "grupo" : (leadFirst || "titular");
+              const scopeLabel = meta.perGroup ? "grupo" : leadFirst || "titular";
               return (
                 <li key={it.id} className="py-3 flex justify-between items-start gap-3">
                   <div className="flex min-w-0 items-start gap-2.5">
@@ -135,45 +168,57 @@ function PropostaPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="font-mono text-ink shrink-0">{formatBRL(it.qty * it.unit_price_cents - it.discount_cents)}</div>
+                  <div className="font-mono text-ink shrink-0">
+                    {formatBRL(it.qty * it.unit_price_cents - it.discount_cents)}
+                  </div>
                 </li>
               );
             })}
           </ul>
 
           <div className="mt-4 pt-4 border-t border-[var(--color-border)] space-y-1 text-sm">
-            <div className="flex justify-between text-ink-soft"><span>Subtotal</span><span className="font-mono">{formatBRL(r?.proposal_subtotal_cents ?? 0)}</span></div>
+            <div className="flex justify-between text-ink-soft">
+              <span>Subtotal</span>
+              <span className="font-mono">{formatBRL(r?.proposal_subtotal_cents ?? 0)}</span>
+            </div>
             {(r?.proposal_discount_cents ?? 0) > 0 && (
-              <div className="flex justify-between text-ink-soft"><span>Descontos por item</span><span className="font-mono">- {formatBRL(r!.proposal_discount_cents)}</span></div>
+              <div className="flex justify-between text-ink-soft">
+                <span>Descontos por item</span>
+                <span className="font-mono">- {formatBRL(r!.proposal_discount_cents)}</span>
+              </div>
             )}
             {(r?.combo_discount_cents ?? 0) > 0 && (
-              <div className="flex justify-between text-[var(--color-success-fg)]"><span>Desconto combo ({r?.combo_pct ?? 10}%)</span><span className="font-mono">- {formatBRL(r!.combo_discount_cents)}</span></div>
+              <div className="flex justify-between text-[var(--color-success-fg)]">
+                <span>Desconto combo ({r?.combo_pct ?? 10}%)</span>
+                <span className="font-mono">- {formatBRL(r!.combo_discount_cents)}</span>
+              </div>
             )}
             {(r?.manual_discount_cents ?? 0) > 0 && (
-              <div className="flex justify-between text-ink-soft"><span>Desconto adicional</span><span className="font-mono">- {formatBRL(r!.manual_discount_cents)}</span></div>
+              <div className="flex justify-between text-ink-soft">
+                <span>Desconto adicional</span>
+                <span className="font-mono">- {formatBRL(r!.manual_discount_cents)}</span>
+              </div>
             )}
             <div className="flex justify-between text-navy font-display font-extrabold text-xl pt-1">
-              <span>Total</span><span className="font-mono">{formatBRL(r?.proposal_total_cents ?? 0)}</span>
+              <span>Total</span>
+              <span className="font-mono">{formatBRL(r?.proposal_total_cents ?? 0)}</span>
             </div>
           </div>
         </div>
 
         <div className="mt-6 rounded-2xl bg-cream border border-coral/30 p-4 text-sm text-ink">
-          <b className="text-navy">Como funciona:</b> ao aceitar, você faz o pagamento da consultoria
-          (Pix ou cartão em até 12x) e em seguida assina o contrato digital. Depois cuidamos do DS-160,
-          documentos e agendamento. <b>As taxas governamentais são cobradas à parte.</b>
+          <b className="text-navy">Como funciona:</b> ao aceitar, você faz o pagamento da
+          consultoria (Pix ou cartão em até 12x) e em seguida assina o contrato digital. Depois
+          cuidamos do DS-160, documentos e agendamento.{" "}
+          <b>As taxas governamentais são cobradas à parte.</b>
         </div>
 
         <div className="mt-4">
           <LegalDisclaimer taxes />
         </div>
 
-        {accepted && (
-          <Banner ok>Proposta aceita. Próxima etapa em breve no seu portal.</Banner>
-        )}
-        {declined && (
-          <Banner>Recebemos seu retorno. A Letícia entrará em contato.</Banner>
-        )}
+        {accepted && <Banner ok>Proposta aceita. Próxima etapa em breve no seu portal.</Banner>}
+        {declined && <Banner>Recebemos seu retorno. A Letícia entrará em contato.</Banner>}
 
         {!accepted && !declined && (
           <div className="mt-6 space-y-2">
@@ -200,11 +245,24 @@ function PropostaPage() {
             <DrawerTitle>Por que está recusando?</DrawerTitle>
           </DrawerHeader>
           <div className="px-4">
-            <Textarea rows={4} placeholder="Conta pra gente — ajuda a melhorar." value={reason} onChange={(e) => setReason(e.target.value)} />
+            <Textarea
+              rows={4}
+              placeholder="Conta pra gente — ajuda a melhorar."
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+            />
           </div>
           <DrawerFooter>
-            <Button onClick={() => decline.mutate()} disabled={decline.isPending} className="bg-navy text-cream">Enviar</Button>
-            <Button variant="ghost" onClick={() => setDeclineOpen(false)}>Cancelar</Button>
+            <Button
+              onClick={() => decline.mutate()}
+              disabled={decline.isPending}
+              className="bg-navy text-cream"
+            >
+              Enviar
+            </Button>
+            <Button variant="ghost" onClick={() => setDeclineOpen(false)}>
+              Cancelar
+            </Button>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
@@ -214,7 +272,9 @@ function PropostaPage() {
 
 function Banner({ children, ok }: { children: React.ReactNode; ok?: boolean }) {
   return (
-    <div className={`mt-6 rounded-2xl p-4 text-sm font-semibold ${ok ? "bg-[var(--color-success-bg)] text-[var(--color-success-fg)]" : "bg-[var(--color-muted)] text-ink"}`}>
+    <div
+      className={`mt-6 rounded-2xl p-4 text-sm font-semibold ${ok ? "bg-[var(--color-success-bg)] text-[var(--color-success-fg)]" : "bg-[var(--color-muted)] text-ink"}`}
+    >
       {children}
     </div>
   );

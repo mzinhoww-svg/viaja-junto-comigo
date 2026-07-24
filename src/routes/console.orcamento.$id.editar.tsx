@@ -87,7 +87,10 @@ function EditarOrcamento() {
   const plans = useQuery({
     queryKey: ["visto_plans"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("visto_plans").select("key, label, price").order("price");
+      const { data, error } = await supabase
+        .from("visto_plans")
+        .select("key, label, price")
+        .order("price");
       if (error) throw error;
       return data;
     },
@@ -103,8 +106,12 @@ function EditarOrcamento() {
       });
     }
   }, [reqQ.data]);
-  useEffect(() => { if (travQ.data) setTravelers(travQ.data.map((t) => ({ id: t.id, name: t.name }))); }, [travQ.data]);
-  useEffect(() => { if (itemQ.data) setItems(itemQ.data as ItemRow[]); }, [itemQ.data]);
+  useEffect(() => {
+    if (travQ.data) setTravelers(travQ.data.map((t) => ({ id: t.id, name: t.name })));
+  }, [travQ.data]);
+  useEffect(() => {
+    if (itemQ.data) setItems(itemQ.data as ItemRow[]);
+  }, [itemQ.data]);
 
   const totals = useMemo(() => {
     const sub = items.reduce((s, i) => s + i.qty * i.unit_price_cents, 0);
@@ -156,7 +163,9 @@ function EditarOrcamento() {
           <div className="w-14 h-14 mx-auto rounded-full bg-[var(--color-success-bg)] grid place-items-center text-[var(--color-success-fg)]">
             <Check size={28} />
           </div>
-          <h1 className="mt-4 text-2xl font-display font-extrabold text-navy">Orçamento atualizado</h1>
+          <h1 className="mt-4 text-2xl font-display font-extrabold text-navy">
+            Orçamento atualizado
+          </h1>
           <p className="mt-1 text-ink-soft text-sm">
             Reenvie o link personalizado para {lead.name.split(" ")[0]} ver as mudanças.
           </p>
@@ -178,10 +187,7 @@ function EditarOrcamento() {
             Abrir ficha →
           </Link>
           <span className="text-ink-muted">·</span>
-          <button
-            onClick={() => setSaved(false)}
-            className="text-ink-soft hover:text-navy"
-          >
+          <button onClick={() => setSaved(false)} className="text-ink-soft hover:text-navy">
             Voltar a editar
           </button>
         </div>
@@ -191,7 +197,11 @@ function EditarOrcamento() {
 
   return (
     <section className="max-w-3xl mx-auto">
-      <Link to="/console/cliente/$id" params={{ id }} className="inline-flex items-center gap-1 text-ink-soft text-sm hover:text-coral">
+      <Link
+        to="/console/cliente/$id"
+        params={{ id }}
+        className="inline-flex items-center gap-1 text-ink-soft text-sm hover:text-coral"
+      >
         <ChevronLeft size={16} /> Ficha do cliente
       </Link>
       <div className="flex items-end justify-between mt-2">
@@ -208,31 +218,63 @@ function EditarOrcamento() {
         <div className="grid sm:grid-cols-2 gap-4 mt-4">
           <div>
             <Label>Nome completo</Label>
-            <Input value={lead.name} onChange={(e) => setLead({ ...lead, name: e.target.value })} className="mt-1" />
+            <Input
+              value={lead.name}
+              onChange={(e) => setLead({ ...lead, name: e.target.value })}
+              className="mt-1"
+            />
           </div>
           <div>
             <Label>E-mail</Label>
-            <Input type="email" value={lead.email} onChange={(e) => setLead({ ...lead, email: e.target.value })} className="mt-1" />
+            <Input
+              type="email"
+              value={lead.email}
+              onChange={(e) => setLead({ ...lead, email: e.target.value })}
+              className="mt-1"
+            />
           </div>
           <div className="sm:col-span-2">
             <Label>WhatsApp</Label>
-            <Input value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })} className="mt-1" />
+            <Input
+              value={lead.phone}
+              onChange={(e) => setLead({ ...lead, phone: e.target.value })}
+              className="mt-1"
+            />
           </div>
         </div>
 
         <div className="mt-6">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="font-display font-semibold text-navy text-sm uppercase tracking-wider">Viajantes</h3>
-            <Button size="sm" variant="outline" onClick={() => setTravelers([...travelers, { name: "" }])}>
+            <h3 className="font-display font-semibold text-navy text-sm uppercase tracking-wider">
+              Viajantes
+            </h3>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setTravelers([...travelers, { name: "" }])}
+            >
               <Plus size={14} className="mr-1" /> Adicionar
             </Button>
           </div>
           <div className="space-y-2">
             {travelers.map((t, i) => (
               <div key={t.id ?? `new-${i}`} className="grid grid-cols-[1fr_40px] gap-2">
-                <Input placeholder="Nome" value={t.name} onChange={(e) => { const c = [...travelers]; c[i] = { ...t, name: e.target.value }; setTravelers(c); }} />
-                <Button size="icon" variant="ghost" aria-label="Remover" disabled={travelers.length === 1}
-                  onClick={() => setTravelers(travelers.filter((_, j) => j !== i))}>
+                <Input
+                  placeholder="Nome"
+                  value={t.name}
+                  onChange={(e) => {
+                    const c = [...travelers];
+                    c[i] = { ...t, name: e.target.value };
+                    setTravelers(c);
+                  }}
+                />
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  aria-label="Remover"
+                  disabled={travelers.length === 1}
+                  onClick={() => setTravelers(travelers.filter((_, j) => j !== i))}
+                >
                   <Trash2 size={16} />
                 </Button>
               </div>
@@ -247,58 +289,142 @@ function EditarOrcamento() {
       <div className="bg-white rounded-2xl border border-[var(--color-border)] p-6 mt-6">
         <h2 className="font-display font-bold text-navy">Itens da proposta</h2>
         <div className="mt-4">
-          <p className="text-xs uppercase tracking-wider text-ink-muted font-bold mb-1.5">Vistos — escolha o plano</p>
+          <p className="text-xs uppercase tracking-wider text-ink-muted font-bold mb-1.5">
+            Vistos — escolha o plano
+          </p>
           <div className="flex flex-wrap gap-2">
             {plans.data?.map((pl) => {
               const cents = Math.round(Number(pl.price) * 100);
-              const active = items.some((i) => i.product_key === "vistos" && i.unit_price_cents === cents);
+              const active = items.some(
+                (i) => i.product_key === "vistos" && i.unit_price_cents === cents,
+              );
               return (
-                <button key={pl.key} type="button"
-                  onClick={() => setItems((cur) => {
-                    const existing = cur.find((i) => i.product_key === "vistos");
-                    const rest = cur.filter((i) => i.product_key !== "vistos");
-                    return [...rest, { product_key: "vistos", kind: "visto", label: `Viajaly Vistos · ${pl.label}`, qty: existing?.qty ?? 1, unit_price_cents: cents, discount_cents: existing?.discount_cents ?? 0 }];
-                  })}
-                  className={`text-xs px-3 py-1.5 rounded-full border ${active ? "border-coral bg-coral/10 text-coral" : "border-[var(--color-border)] hover:border-teal hover:text-teal"}`}>
+                <button
+                  key={pl.key}
+                  type="button"
+                  onClick={() =>
+                    setItems((cur) => {
+                      const existing = cur.find((i) => i.product_key === "vistos");
+                      const rest = cur.filter((i) => i.product_key !== "vistos");
+                      return [
+                        ...rest,
+                        {
+                          product_key: "vistos",
+                          kind: "visto",
+                          label: `Viajaly Vistos · ${pl.label}`,
+                          qty: existing?.qty ?? 1,
+                          unit_price_cents: cents,
+                          discount_cents: existing?.discount_cents ?? 0,
+                        },
+                      ];
+                    })
+                  }
+                  className={`text-xs px-3 py-1.5 rounded-full border ${active ? "border-coral bg-coral/10 text-coral" : "border-[var(--color-border)] hover:border-teal hover:text-teal"}`}
+                >
                   {pl.label} · {formatBRL(cents)}
                 </button>
               );
             })}
           </div>
         </div>
-        <p className="mt-4 text-xs uppercase tracking-wider text-ink-muted font-bold mb-1.5">Outros produtos</p>
+        <p className="mt-4 text-xs uppercase tracking-wider text-ink-muted font-bold mb-1.5">
+          Outros produtos
+        </p>
         <div className="flex flex-wrap gap-2">
-          {catalog.data?.filter((p) => p.key !== "vistos").map((p) => (
-            <button key={p.key} type="button"
-              onClick={() => setItems([...items, {
-                product_key: p.key,
-                kind: "consultoria",
-                label: p.name, qty: 1,
-                unit_price_cents: Math.round(Number(p.price) * 100),
-                discount_cents: 0,
-              }])}
-              className="text-xs px-3 py-1.5 rounded-full border border-[var(--color-border)] hover:border-teal hover:text-teal">
-              + {p.name} · {formatBRL(Math.round(Number(p.price) * 100))}
-            </button>
-          ))}
-          <button type="button"
-            onClick={() => setItems([...items, { product_key: null, kind: "extra", label: "", qty: 1, unit_price_cents: 0, discount_cents: 0 }])}
-            className="text-xs px-3 py-1.5 rounded-full border border-dashed border-coral text-coral hover:bg-coral/5">
+          {catalog.data
+            ?.filter((p) => p.key !== "vistos")
+            .map((p) => (
+              <button
+                key={p.key}
+                type="button"
+                onClick={() =>
+                  setItems([
+                    ...items,
+                    {
+                      product_key: p.key,
+                      kind: "consultoria",
+                      label: p.name,
+                      qty: 1,
+                      unit_price_cents: Math.round(Number(p.price) * 100),
+                      discount_cents: 0,
+                    },
+                  ])
+                }
+                className="text-xs px-3 py-1.5 rounded-full border border-[var(--color-border)] hover:border-teal hover:text-teal"
+              >
+                + {p.name} · {formatBRL(Math.round(Number(p.price) * 100))}
+              </button>
+            ))}
+          <button
+            type="button"
+            onClick={() =>
+              setItems([
+                ...items,
+                {
+                  product_key: null,
+                  kind: "extra",
+                  label: "",
+                  qty: 1,
+                  unit_price_cents: 0,
+                  discount_cents: 0,
+                },
+              ])
+            }
+            className="text-xs px-3 py-1.5 rounded-full border border-dashed border-coral text-coral hover:bg-coral/5"
+          >
             + Item manual
           </button>
         </div>
 
         <div className="mt-5 space-y-2">
-          {items.length === 0 && <p className="text-sm text-ink-muted">Adicione ao menos um item.</p>}
+          {items.length === 0 && (
+            <p className="text-sm text-ink-muted">Adicione ao menos um item.</p>
+          )}
           {items.map((it, i) => (
             <div key={i} className="grid grid-cols-[1fr_70px_120px_120px_40px] gap-2 items-center">
-              <Input placeholder="Descrição" value={it.label} onChange={(e) => { const c = [...items]; c[i] = { ...it, label: e.target.value }; setItems(c); }} />
-              <Input type="number" min={1} value={it.qty} onChange={(e) => { const c = [...items]; c[i] = { ...it, qty: Math.max(1, Number(e.target.value) || 1) }; setItems(c); }} />
-              <Input placeholder="Preço" value={(it.unit_price_cents / 100).toFixed(2).replace(".", ",")}
-                onChange={(e) => { const c = [...items]; c[i] = { ...it, unit_price_cents: brlToCents(e.target.value) }; setItems(c); }} />
-              <Input placeholder="Desc." value={(it.discount_cents / 100).toFixed(2).replace(".", ",")}
-                onChange={(e) => { const c = [...items]; c[i] = { ...it, discount_cents: brlToCents(e.target.value) }; setItems(c); }} />
-              <Button size="icon" variant="ghost" aria-label="Remover" onClick={() => setItems(items.filter((_, j) => j !== i))}>
+              <Input
+                placeholder="Descrição"
+                value={it.label}
+                onChange={(e) => {
+                  const c = [...items];
+                  c[i] = { ...it, label: e.target.value };
+                  setItems(c);
+                }}
+              />
+              <Input
+                type="number"
+                min={1}
+                value={it.qty}
+                onChange={(e) => {
+                  const c = [...items];
+                  c[i] = { ...it, qty: Math.max(1, Number(e.target.value) || 1) };
+                  setItems(c);
+                }}
+              />
+              <Input
+                placeholder="Preço"
+                value={(it.unit_price_cents / 100).toFixed(2).replace(".", ",")}
+                onChange={(e) => {
+                  const c = [...items];
+                  c[i] = { ...it, unit_price_cents: brlToCents(e.target.value) };
+                  setItems(c);
+                }}
+              />
+              <Input
+                placeholder="Desc."
+                value={(it.discount_cents / 100).toFixed(2).replace(".", ",")}
+                onChange={(e) => {
+                  const c = [...items];
+                  c[i] = { ...it, discount_cents: brlToCents(e.target.value) };
+                  setItems(c);
+                }}
+              />
+              <Button
+                size="icon"
+                variant="ghost"
+                aria-label="Remover"
+                onClick={() => setItems(items.filter((_, j) => j !== i))}
+              >
                 <Trash2 size={16} />
               </Button>
             </div>
@@ -306,14 +432,28 @@ function EditarOrcamento() {
         </div>
 
         <div className="mt-6 border-t border-[var(--color-border)] pt-4 space-y-1 text-sm">
-          <div className="flex justify-between text-ink-soft"><span>Subtotal</span><span className="font-mono">{formatBRL(totals.sub)}</span></div>
-          <div className="flex justify-between text-ink-soft"><span>Descontos</span><span className="font-mono">- {formatBRL(totals.disc)}</span></div>
-          <div className="flex justify-between text-navy font-display font-extrabold text-lg"><span>Total</span><span className="font-mono">{formatBRL(totals.total)}</span></div>
+          <div className="flex justify-between text-ink-soft">
+            <span>Subtotal</span>
+            <span className="font-mono">{formatBRL(totals.sub)}</span>
+          </div>
+          <div className="flex justify-between text-ink-soft">
+            <span>Descontos</span>
+            <span className="font-mono">- {formatBRL(totals.disc)}</span>
+          </div>
+          <div className="flex justify-between text-navy font-display font-extrabold text-lg">
+            <span>Total</span>
+            <span className="font-mono">{formatBRL(totals.total)}</span>
+          </div>
         </div>
       </div>
 
       <div className="mt-6 flex justify-end gap-2">
-        <Button variant="outline" onClick={() => nav({ to: "/console/cliente/$id", params: { id } })}>Cancelar</Button>
+        <Button
+          variant="outline"
+          onClick={() => nav({ to: "/console/cliente/$id", params: { id } })}
+        >
+          Cancelar
+        </Button>
         <Button
           disabled={!canSave || saveMut.isPending}
           onClick={() => saveMut.mutate()}
