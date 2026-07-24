@@ -1,7 +1,12 @@
 import { CheckCircle2, XCircle, Clock, Ban } from "lucide-react";
 
 export type VisaOutcome =
-  "aprovado" | "recusado" | "admin_processing" | "cancelado" | null | undefined;
+  | "aprovado"
+  | "recusado"
+  | "admin_processing"
+  | "cancelado"
+  | null
+  | undefined;
 
 const MAP = {
   aprovado: {

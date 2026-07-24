@@ -124,7 +124,8 @@ export function ProductsHub({ requestId }: { requestId: string }) {
         .in("traveler_id", ids);
       const flagged = (subs ?? []).find((s) => {
         const exp = (s.form as Record<string, unknown> | null)?.passport_expiry_date as
-          string | undefined;
+          | string
+          | undefined;
         if (!exp) return false;
         const d = new Date(exp);
         if (isNaN(d.getTime())) return false;
