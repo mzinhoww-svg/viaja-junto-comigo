@@ -4,11 +4,11 @@
 ## 0. STATUS ATUAL — leia isto primeiro, sempre
 | Campo | Valor |
 |---|---|
-| Onda atual | 0 — nada iniciado |
+| Onda atual | 1 — Fundação |
 | Último ticket concluído (mergeado) | — |
-| Ticket em aberto aguardando review | — |
-| Migration aplicada no Supabase | Não |
-| Última atualização desta seção | — |
+| Ticket em aberto aguardando review | VJT-001 (PR [#11](https://github.com/mzinhoww-svg/viaja-junto-comigo/pull/11), issue [#10](https://github.com/mzinhoww-svg/viaja-junto-comigo/issues/10)) |
+| Migration aplicada no Supabase | **Não — bloqueada**: o conector Supabase desta conta não acessa o projeto `urrlqljlibpzaqnemlwf` (Lovable Cloud). Migration versionada no repo; aplicar via Lovable ou SQL Editor do dashboard |
+| Última atualização desta seção | 2026-07-24 |
 **Protocolo de toda sessão, sem exceção:**
 1. Leia esta seção 0 e a seção 8 (Log). Se este arquivo e o estado real do repositório divergirem (ex.: PR já mergeado mas não registrado aqui), reconcilie a seção 0 e o log ANTES de fazer qualquer coisa nova
 2. Determine o próximo ticket executável: primeiro ticket da seção 7 cujo "Bloqueado por" já está com status Mergeado no log, e que ainda não tem entrada de conclusão
@@ -377,4 +377,10 @@ Formato: **VJT-XXX Título** — Problema · Escopo IN/OUT · Aceite · Bloquead
 ---
 ## 8. Log de execução
 > Toda tarefa concluída gera uma entrada aqui, no topo (mais recente primeiro). Sem entrada = tarefa não existe.
-*(nenhuma entrada ainda — o primeiro ticket a executar é VJT-001)*
+
+### 2026-07-24 — VJT-001 Fundação do repositório — **Aguardando review** (PR [#11](https://github.com/mzinhoww-svg/viaja-junto-comigo/pull/11))
+- **O que foi feito**: schema completo do Trip versionado em migration; rotas `/trip/*` autenticadas (sessão compartilhada com o portal; sem login → redirect `/portal/login`) com bottom nav de 5 itens e placeholders; CI GitHub Actions (lint+typecheck+vitest+build via bun); Sentry no client gated por `VITE_SENTRY_DSN`; vitest com primeira suíte (`money.test.ts`). Commits de suporte: formatação prettier/eslint em 117 arquivos pré-existentes + correção de types Supabase desatualizados (`ab_events`/`ab_results`) — sem isso o CI nasceria vermelho.
+- **Arquivos novos**: `supabase/migrations/20260723120000_viajaly_trip_initial_schema.sql`, `src/routes/trip.{tsx,index,financeiro,checklists,roteiro,mais}.tsx`, `src/components/trip/{BottomNav,SectionPlaceholder}.tsx`, `src/lib/sentry.ts`, `src/lib/money.test.ts`, `vitest.config.ts`, `.github/workflows/ci.yml`. Tocados: `package.json` (deps `@sentry/react`, `vitest`; scripts `typecheck`/`test`), `bun.lock`, `src/router.tsx`, `src/routeTree.gen.ts`, `src/integrations/supabase/types.ts`.
+- **Tabelas/RLS**: 16 tabelas novas com RLS via `is_trip_member`/`is_trip_owner`, RPC `accept_trip_invite`, seeds `paises_visto` (14) e `checklist_templates` (15). **Migration ainda NÃO aplicada no projeto remoto** (bloqueio de acesso do conector — ver seção 0); aplicar manualmente antes de validar o aceite.
+- **Como testar no celular**: preview Vercel do PR em 375px → `/trip` sem login redireciona; logado, bottom nav navega entre as 5 abas, cada uma com empty state + CTA.
+- **Pendências deixadas para tickets futuros**: `VITE_SENTRY_DSN` manual no painel Vercel; aplicação da migration; telas internas (VJT-002+).
