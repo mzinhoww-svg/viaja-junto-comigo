@@ -12,15 +12,16 @@ export default defineTool({
       return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
     }
     const supabase = supabaseForUser(ctx);
+    const userId = ctx.getUserId() ?? "";
     const { data, error } = await supabase
       .from("profiles")
       .select("id, name, email, role, agency_id")
-      .eq("id", ctx.getUserId())
+      .eq("id", userId)
       .maybeSingle();
     if (error) {
       return { content: [{ type: "text", text: error.message }], isError: true };
     }
-    const profile = data ?? { id: ctx.getUserId(), email: ctx.getUserEmail() ?? null, role: null };
+    const profile = data ?? { id: userId, email: ctx.getUserEmail() ?? null, role: null };
     return {
       content: [{ type: "text", text: JSON.stringify(profile) }],
       structuredContent: { profile },
