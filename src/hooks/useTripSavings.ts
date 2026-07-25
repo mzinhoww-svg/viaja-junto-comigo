@@ -7,6 +7,8 @@ import {
 } from "@/lib/trip-savings";
 import { calcularTripMath, type TripMathResult } from "@/lib/trip-math";
 import { tripDashboardQueryKey, tripSavingsQueryKey } from "@/lib/trip-query-keys";
+import { capture } from "@/lib/posthog";
+import { TRIP_EVENTS } from "@/lib/trip-analytics";
 
 export type SavingsEntry = {
   id: string;
@@ -126,7 +128,16 @@ export function useAddSavingsEntry(tripId: string) {
         throw error;
       }
     },
-    onSuccess: () => invalidateSavings(qc, tripId),
+    // `savings_entry_created` (VJT-015): só a criação. Editar ou apagar um
+    // registro existente não é entrada nova de economia.
+    onSuccess: (_data, input) => {
+      capture(TRIP_EVENTS.savingsEntryCreated, {
+        trip_id: tripId,
+        mes_ano: input.mesAno,
+        valor_brl_cents: input.valorBrlCents,
+      });
+      invalidateSavings(qc, tripId);
+    },
   });
 }
 

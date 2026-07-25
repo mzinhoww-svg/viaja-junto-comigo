@@ -6,6 +6,8 @@
  * normalizado — não há FK entre as duas tabelas.
  */
 import { waLink, type WaTracking } from "./whatsapp.ts";
+import { capture } from "./posthog.ts";
+import { TRIP_EVENTS } from "./trip-analytics.ts";
 
 export type PaisVistoRow = {
   paisIso: string;
@@ -89,16 +91,29 @@ export function buildVisaConsultoriaLink(pais: PaisVistoRow, tracking: VisaTrack
  * Rastreia clique no CTA do card de visto (evento `visa_cta_click`, Seção 7).
  * Mesmo padrão de `trackWhatsAppClick` (dataLayer/gtag), evento distinto para
  * o funil visto→lead mapeado no VJT-015. Seguro para SSR (no-op fora do browser).
+ *
+ * O VJT-015 acrescenta a perna PostHog **dentro desta mesma função**, em vez
+ * de um segundo `onClick` no `VisaContextualCard`: o ponto de disparo já
+ * existia desde o VJT-009 e continua único, então dataLayer/gtag e PostHog
+ * veem exatamente o mesmo clique, uma vez cada.
  */
 export function trackVisaCtaClick(tracking: VisaTracking) {
   if (typeof window === "undefined") return;
   const payload = {
-    event: "visa_cta_click",
+    event: TRIP_EVENTS.visaCtaClick,
     visa_source: tracking.source,
     visa_campaign: tracking.campaign,
     visa_content: tracking.content,
     visa_page: typeof location !== "undefined" ? location.pathname : "",
   };
+
+  capture(TRIP_EVENTS.visaCtaClick, {
+    visa_source: payload.visa_source,
+    visa_campaign: payload.visa_campaign,
+    visa_content: payload.visa_content,
+    visa_page: payload.visa_page,
+  });
+
   try {
     const w = window as unknown as {
       dataLayer?: Record<string, unknown>[];
@@ -107,7 +122,7 @@ export function trackVisaCtaClick(tracking: VisaTracking) {
     w.dataLayer = w.dataLayer || [];
     w.dataLayer.push(payload);
     if (typeof w.gtag === "function") {
-      w.gtag("event", "visa_cta_click", payload);
+      w.gtag("event", TRIP_EVENTS.visaCtaClick, payload);
     }
   } catch {
     /* analytics nunca deve quebrar a UX */

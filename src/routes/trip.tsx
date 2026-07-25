@@ -4,6 +4,7 @@ import { TripBottomNav } from "@/components/trip/BottomNav";
 import { LgpdConsentGate } from "@/components/trip/lgpd/LgpdConsentGate";
 import { PaywallModal } from "@/components/trip/paywall/PaywallModal";
 import { PaywallProvider } from "@/hooks/usePaywall";
+import { useAnalyticsIdentity } from "@/hooks/useAnalyticsIdentity";
 import { TRIP_PWA_THEME_COLOR, buildTripPwaLinks } from "@/lib/trip-pwa";
 
 /**
@@ -45,6 +46,8 @@ export const Route = createFileRoute("/trip")({
 });
 
 function TripLayout() {
+  useAnalyticsIdentity();
+
   return (
     <PaywallProvider>
       <LgpdConsentGate>

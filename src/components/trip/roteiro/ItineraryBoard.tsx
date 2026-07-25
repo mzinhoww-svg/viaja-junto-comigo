@@ -18,6 +18,8 @@ import {
 } from "@/hooks/useItinerary";
 import { canExportItineraryPdf, isDayLimitReached } from "@/lib/itinerary";
 import { exportItineraryPdf } from "@/lib/itinerary-pdf";
+import { capture } from "@/lib/posthog";
+import { TRIP_EVENTS } from "@/lib/trip-analytics";
 
 export function ItineraryBoard() {
   const trip = useCurrentTrip();
@@ -99,6 +101,10 @@ function TripItineraryBoard({ trip }: { trip: CurrentTrip }) {
         },
         days,
       );
+      // `pdf_exported` (VJT-015) só depois do PDF gerado: o clique de um free
+      // abre o paywall e sai acima (vira `upgrade_view`, não exportação), e
+      // uma falha na geração cai no catch sem contar exportação.
+      capture(TRIP_EVENTS.pdfExported, { trip_id: tripId, dias: days.length });
     } catch {
       toast.error("Não foi possível gerar o PDF. Tente novamente.");
     }

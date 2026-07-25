@@ -3,6 +3,8 @@ import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { aiUsageQueryKey } from "@/hooks/useAiUsage";
 import { mesAnoAtual } from "@/lib/trip-savings";
+import { capture } from "@/lib/posthog";
+import { TRIP_EVENTS } from "@/lib/trip-analytics";
 
 export type AiChatResponse = {
   conversation_id: string;
@@ -53,6 +55,16 @@ export function useAiChat(tripId: string | undefined) {
     },
     onSuccess: (data) => {
       conversationIdRef.current = data.conversation_id;
+      // `ai_message_sent` (VJT-015): só envio respondido. Mensagem barrada por
+      // cota/kill switch cai no `onError` e não conta. `redirecionou_visto`
+      // liga o assistente ao funil visto→lead (VJT-014 responde pergunta de
+      // visto direto com o link da consultoria, sem chamar o modelo).
+      capture(TRIP_EVENTS.aiMessageSent, {
+        trip_id: tripId as string,
+        msgs_usadas: data.usage.used,
+        msgs_limite: data.usage.limit,
+        redirecionou_visto: !!data.redirect,
+      });
       qc.invalidateQueries({ queryKey: aiUsageQueryKey(mesAnoAtual()) });
     },
   });

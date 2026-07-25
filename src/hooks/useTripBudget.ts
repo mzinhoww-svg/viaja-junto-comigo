@@ -11,6 +11,8 @@ import {
   type BudgetItemRow,
 } from "@/lib/trip-budget";
 import { invalidateFinanceiro, tripBudgetQueryKey } from "@/lib/trip-query-keys";
+import { capture } from "@/lib/posthog";
+import { TRIP_EVENTS } from "@/lib/trip-analytics";
 
 export type TripBudgetData = {
   moedaDestino: string | null;
@@ -175,7 +177,17 @@ export function useAddBudgetItem(tripId: string) {
       });
       if (error) throw error;
     },
-    onSuccess: () => invalidateFinanceiro(qc, tripId),
+    // `budget_item_created` (VJT-015). `tem_valor_destino` separa quem usa
+    // moeda dual de quem só orça em BRL — sem mandar o valor em si, que já
+    // vive agregado no `trip_created`/dashboard.
+    onSuccess: (_data, input) => {
+      capture(TRIP_EVENTS.budgetItemCreated, {
+        trip_id: tripId,
+        category_id: input.categoryId,
+        tem_valor_destino: input.estimadoDestinoCents > 0,
+      });
+      invalidateFinanceiro(qc, tripId);
+    },
   });
 }
 
