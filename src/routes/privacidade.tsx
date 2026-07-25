@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Logo } from "@/components/viajaly/Logo";
+import { LGPD_SUBPROCESSADORES } from "@/lib/lgpd-consent";
 
 export const Route = createFileRoute("/privacidade")({
   ssr: false,
@@ -27,7 +28,7 @@ function PagePrivacidade() {
 
       <main className="max-w-3xl mx-auto px-5 py-10 prose prose-sm sm:prose-base">
         <h1 className="text-3xl font-display font-extrabold text-navy">Política de Privacidade</h1>
-        <p className="text-ink-soft">Última atualização: junho de 2026.</p>
+        <p className="text-ink-soft">Última atualização: julho de 2026.</p>
 
         <section className="mt-6 space-y-4 text-ink">
           <p>
@@ -57,8 +58,38 @@ function PagePrivacidade() {
 
           <h2 className="text-lg font-display font-bold text-navy mt-6">Compartilhamento</h2>
           <p>
-            Não vendemos seus dados. Compartilhamos apenas com fornecedores essenciais (hospedagem,
-            mensageria), sempre limitados ao necessário para prestar o serviço.
+            Não vendemos seus dados. Compartilhamos com os fornecedores essenciais abaixo
+            (subprocessadores), sempre limitados ao necessário para prestar o serviço:
+          </p>
+          <ul className="list-disc pl-6">
+            {LGPD_SUBPROCESSADORES.map((sub) => (
+              <li key={sub.nome}>
+                <b>{sub.nome}</b> — {sub.papel} ({sub.pais}).
+              </li>
+            ))}
+          </ul>
+
+          <h2 className="text-lg font-display font-bold text-navy mt-6">
+            Tratamento por inteligência artificial
+          </h2>
+          <p>
+            No assistente de IA da <b>Viajaly Trip</b>, os dados da sua viagem — destino, cidade,
+            data, número de viajantes, progresso do planejamento e o texto que você escreve no chat
+            — são enviados para <b>OpenRouter</b> (Estados Unidos), que roteia a mensagem, e
+            processados por <b>DeepSeek</b> (China), que gera a resposta. Esse tratamento acontece
+            apenas quando você usa o assistente, com base no seu <b>consentimento</b>, e você pode
+            revogá-lo a qualquer momento — nesse caso, deixamos de oferecer o assistente, e o resto
+            do produto continua funcionando.
+          </p>
+
+          <h2 className="text-lg font-display font-bold text-navy mt-6">
+            Transferência internacional de dados
+          </h2>
+          <p>
+            Os fornecedores listados acima processam dados <b>fora do Brasil</b> (Estados Unidos e
+            China), o que caracteriza transferência internacional de dados pessoais nos termos do
+            Capítulo V da LGPD. Ao aceitar o consentimento na Viajaly Trip, você é informado dessa
+            transferência de forma específica e destacada.
           </p>
 
           <h2 className="text-lg font-display font-bold text-navy mt-6">Seus direitos</h2>
