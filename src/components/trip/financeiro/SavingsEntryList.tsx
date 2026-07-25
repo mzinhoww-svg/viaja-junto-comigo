@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import type { SavingsEntry } from "@/hooks/useTripSavings";
 import { brlToCents, formatBRL } from "@/lib/money";
-import { formatMesAnoLabel } from "@/lib/trip-savings";
+import { entryAutorLabel, formatMesAnoLabel } from "@/lib/trip-savings";
 
 type Props = {
   entries: SavingsEntry[];
@@ -97,6 +97,11 @@ export function SavingsEntryList({
               </p>
               {editingId !== entry.id && (
                 <p className="text-sm text-muted-foreground">{formatBRL(entry.valorBrlCents)}</p>
+              )}
+              {entryAutorLabel(entry.createdBy) && (
+                <p className="text-xs text-muted-foreground/70">
+                  {entryAutorLabel(entry.createdBy)}
+                </p>
               )}
             </div>
             {editingId === entry.id ? (

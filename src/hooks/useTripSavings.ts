@@ -12,7 +12,12 @@ export type SavingsEntry = {
   id: string;
   mesAno: string;
   valorBrlCents: number;
-  createdBy: string;
+  /**
+   * `null` quando o autor excluiu a conta (VJT-017) — `created_by` vira NULL
+   * via ON DELETE SET NULL em vez de apagar a linha, para não tirar o
+   * valor do acumulado coletivo da trip. Ver `entryAutorLabel` (trip-savings.ts).
+   */
+  createdBy: string | null;
   createdAt: string;
 };
 

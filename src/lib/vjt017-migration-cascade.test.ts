@@ -4,9 +4,17 @@
  * um Postgres real do projeto (mesma limitação documentada em
  * VIAJALY-TRIP.md Seção 3 para as migrations anteriores), então o único
  * jeito honesto de testar o cascade sem um banco de verdade é verificar,
- * por contrato, que a migration declara `on delete cascade` exatamente
- * onde `supabase.auth.admin.deleteUser()` precisa dele para não falhar por
- * violação de FK — para qualquer membro (não só o owner da trip).
+ * por contrato, que a migration declara a ação de FK certa em cada coluna
+ * — para qualquer membro (não só o owner da trip):
+ * - CASCADE (apaga a linha) para dado genuinamente pessoal e sem agregado
+ *   compartilhado: `ai_conversations`, `trip_invites`, `trip_nps_responses`.
+ * - SET NULL (anonimiza, preserva a linha) só para `savings_entries.created_by`
+ *   — o valor consolida na economia coletiva da trip (`calcularAcumulado`,
+ *   somado de todos os membros sem filtro por autor); apagar a linha
+ *   distorceria o total que os outros membros veem. Uma vez `created_by`
+ *   nulo, a linha deixa de identificar alguém (LGPD Art. 12) — o
+ *   apagamento do dado pessoal (Art. 18) já está satisfeito sem destruir o
+ *   valor financeiro que passou a ser coletivo.
  */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -27,19 +35,52 @@ function tableBody(nomeTabela: string): string {
   return sql.slice(inicio, fim);
 }
 
-describe("VJT-017 migration — FKs para auth.users(id) precisam de ON DELETE CASCADE", () => {
-  it("corrige as 4 colunas que faltavam cascade desde o schema inicial (VJT-001)", () => {
-    expect(sql).toMatch(
-      /alter table public\.savings_entries[\s\S]*?foreign key \(created_by\) references auth\.users\(id\) on delete cascade/,
+/**
+ * Extrai UM statement `alter table public.<tabela> ...;` a partir da
+ * ocorrência de `marcador` dentro dele (ex.: o nome da constraint), até o
+ * `;` que o fecha — sem isso, um regex não-guloso (`[\s\S]*?`) atravessa
+ * para o próximo `alter table`/`create table` do arquivo e pode casar com
+ * uma FK de OUTRA tabela mais adiante (bug já pego neste arquivo: a regex
+ * de "não ficou como CASCADE" para savings_entries batia com o cascade de
+ * ai_conversations/trip_invites, que vem depois no arquivo).
+ */
+function alterStatement(nomeTabela: string, marcador: string): string {
+  const marcadorPos = sql.indexOf(marcador);
+  if (marcadorPos === -1) throw new Error(`marcador "${marcador}" não encontrado na migration`);
+  const inicio = sql.lastIndexOf(`alter table public.${nomeTabela}`, marcadorPos);
+  if (inicio === -1)
+    throw new Error(`alter table de ${nomeTabela} não encontrado antes do marcador`);
+  const fim = sql.indexOf(";", marcadorPos);
+  return sql.slice(inicio, fim + 1);
+}
+
+describe("VJT-017 migration — FKs para auth.users(id) corrigidas com a ação certa", () => {
+  it("savings_entries.created_by usa SET NULL (anonimiza, preserva o valor coletivo) e a coluna aceita NULL", () => {
+    const stmt = alterStatement("savings_entries", "savings_entries_created_by_fkey");
+    expect(stmt).toMatch(/alter column created_by drop not null/);
+    expect(stmt).toMatch(
+      /foreign key \(created_by\) references auth\.users\(id\) on delete set null/,
     );
-    expect(sql).toMatch(
-      /alter table public\.ai_conversations[\s\S]*?foreign key \(created_by\) references auth\.users\(id\) on delete cascade/,
+    // Regressão: não pode ter regredido para cascade (nem sobrado sem ação).
+    expect(stmt).not.toMatch(/on delete cascade/);
+    expect(stmt).not.toMatch(/references auth\.users\(id\);/);
+  });
+
+  it("ai_conversations.created_by usa CASCADE (dado pessoal sem agregado compartilhado)", () => {
+    const stmt = alterStatement("ai_conversations", "ai_conversations_created_by_fkey");
+    expect(stmt).toMatch(
+      /foreign key \(created_by\) references auth\.users\(id\) on delete cascade/,
     );
-    expect(sql).toMatch(
-      /alter table public\.trip_invites[\s\S]*?foreign key \(created_by\) references auth\.users\(id\) on delete cascade/,
+  });
+
+  it("trip_invites.created_by e accepted_by usam CASCADE (dado pessoal sem agregado compartilhado)", () => {
+    const created = alterStatement("trip_invites", "trip_invites_created_by_fkey");
+    expect(created).toMatch(
+      /foreign key \(created_by\) references auth\.users\(id\) on delete cascade/,
     );
-    expect(sql).toMatch(
-      /alter table public\.trip_invites[\s\S]*?foreign key \(accepted_by\) references auth\.users\(id\) on delete cascade/,
+    const accepted = alterStatement("trip_invites", "trip_invites_accepted_by_fkey");
+    expect(accepted).toMatch(
+      /foreign key \(accepted_by\) references auth\.users\(id\) on delete cascade/,
     );
   });
 
@@ -54,17 +95,17 @@ describe("VJT-017 migration — FKs para auth.users(id) precisam de ON DELETE CA
     expect(body).toMatch(/user_id uuid primary key references auth\.users\(id\) on delete cascade/);
   });
 
-  it("as 4 colunas corrigidas não têm mais uma FK sem cascade sobrando na migration", () => {
+  it("as 4 colunas corrigidas não têm mais uma FK sem ação sobrando na migration", () => {
     // Regressão: garante que a correção não deixou uma segunda declaração
-    // da mesma FK sem "on delete cascade" (ex.: copiar/colar incompleto).
-    const dropsSemCascade = [
+    // da mesma FK sem ação explícita (ex.: copiar/colar incompleto).
+    const semAcao = [
       /add constraint savings_entries_created_by_fkey\s+foreign key \(created_by\) references auth\.users\(id\);/,
       /add constraint ai_conversations_created_by_fkey\s+foreign key \(created_by\) references auth\.users\(id\);/,
       /add constraint trip_invites_created_by_fkey\s+foreign key \(created_by\) references auth\.users\(id\);/,
       /add constraint trip_invites_accepted_by_fkey\s+foreign key \(accepted_by\) references auth\.users\(id\);/,
     ];
-    for (const semCascade of dropsSemCascade) {
-      expect(sql).not.toMatch(semCascade);
+    for (const s of semAcao) {
+      expect(sql).not.toMatch(s);
     }
   });
 });

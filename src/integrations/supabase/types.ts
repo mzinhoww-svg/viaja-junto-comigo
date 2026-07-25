@@ -1592,7 +1592,7 @@ export type Database = {
       savings_entries: {
         Row: {
           created_at: string;
-          created_by: string;
+          created_by: string | null;
           id: string;
           mes_ano: string;
           trip_id: string;
@@ -1608,7 +1608,7 @@ export type Database = {
         };
         Update: {
           created_at?: string;
-          created_by?: string;
+          created_by?: string | null;
           id?: string;
           mes_ano?: string;
           trip_id?: string;

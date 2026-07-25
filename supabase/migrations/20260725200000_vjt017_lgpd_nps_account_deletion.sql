@@ -3,17 +3,38 @@
 -- viagem concluída (VIAJALY-TRIP.md Seção 7).
 -- =============================================================
 
--- 1) Fecha o gap de ON DELETE CASCADE em referências a auth.users(id) que
---    faltava em 4 colunas desde o schema inicial (VJT-001). Sem isso,
+-- 1) Fecha o gap de FK sem ação em referências a auth.users(id) que faltava
+--    em 4 colunas desde o schema inicial (VJT-001). Sem isso,
 --    supabase.auth.admin.deleteUser() falha com violação de FK sempre que o
 --    usuário excluído não é o owner da trip (ex.: um membro convidado que
 --    registrou uma economia ou uma conversa de IA em viagem de outra
 --    pessoa) — a exclusão de conta precisa funcionar para qualquer membro,
 --    não só para o owner.
+--
+--    `savings_entries.created_by` é o único caso onde CASCADE (apagar a
+--    linha) e SET NULL (anonimizar, manter a linha) não são equivalentes:
+--    o valor de cada registro entra direto em `calcularAcumulado`
+--    (trip-math.ts), somado de TODOS os membros da trip, sem filtro por
+--    autor. Se um membro convidado excluir a conta e a linha for apagada
+--    (CASCADE), o valor que ele guardou junto com o grupo desaparece do
+--    total que o owner e os outros membros veem — sem aviso, sem registro
+--    de que algo mudou. Isso não é o que a LGPD pede: o Art. 18 garante o
+--    apagamento dos DADOS PESSOAIS do titular (aqui, a atribuição — "quem
+--    registrou isso"), não a destruição de um valor financeiro que passou a
+--    ser coletivo no momento em que entrou na economia compartilhada da
+--    trip. Uma vez que `created_by` vira NULL, a linha deixa de identificar
+--    alguém (deixa de ser dado pessoal, Art. 12) — o direito ao
+--    esquecimento já está satisfeito sem precisar apagar o valor em si.
+--    Por isso `created_by` usa SET NULL (e a coluna passa a aceitar NULL),
+--    enquanto as demais colunas desta seção seguem CASCADE: `ai_conversations`
+--    e `trip_nps_responses` (mais abaixo) são dado genuinamente pessoal, sem
+--    nenhum agregado compartilhado dependendo deles — cascatear é a leitura
+--    correta da LGPD nesses dois casos.
 alter table public.savings_entries
+  alter column created_by drop not null,
   drop constraint savings_entries_created_by_fkey,
   add constraint savings_entries_created_by_fkey
-    foreign key (created_by) references auth.users(id) on delete cascade;
+    foreign key (created_by) references auth.users(id) on delete set null;
 
 alter table public.ai_conversations
   drop constraint ai_conversations_created_by_fkey,
