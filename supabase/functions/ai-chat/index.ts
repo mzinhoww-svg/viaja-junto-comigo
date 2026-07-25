@@ -3,10 +3,20 @@
 //   POST { trip_id: uuid, message: string, conversation_id?: uuid }
 //   -> { conversation_id, message, usage: { used, limit }, redirect?: { whatsapp_url } }
 //
-// Segredos exigidos (Supabase → Project Settings → Edge Functions → Secrets):
-//   ANTHROPIC_API_KEY   — nunca exposta ao client/Vercel (Seção 3)
-//   AI_ENABLED          — kill switch ("false" desativa o assistente inteiro)
-//   AI_DAILY_MSG_CAP     — teto diário global de mensagens (proteção de custo), default 300
+// Provider: OpenRouter (API compatível com OpenAI), modelo DeepSeek por
+// custo — ver `AI_MODEL` em src/lib/ai-assistant.ts.
+//
+// Cadastre estes como secrets de Edge Function do projeto Supabase (a
+// interface exata depende de como o projeto é administrado — este repo usa
+// Lovable Cloud e não há evidência aqui de qual painel/CLI está em uso, então
+// não afirmamos um caminho de menu):
+//   OPENROUTER_API_KEY  — obrigatória; nunca exposta ao client/Vercel (Seção 3)
+//   AI_ENABLED          — opcional; kill switch, ver `isAiEnabled` (fail-safe:
+//                         valor não reconhecido DESLIGA; ausente = ligado)
+//   AI_DAILY_MSG_CAP    — opcional; teto diário global de mensagens, default 300
+//   AI_MODEL            — opcional; troca o modelo sem novo deploy (default: DeepSeek)
+//   OPENROUTER_REFERER  — opcional; atribuição no ranking do OpenRouter
+// SUPABASE_URL e SUPABASE_ANON_KEY são injetadas pelo runtime — não cadastrar.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import {
   resolveEntitlement,
@@ -26,6 +36,7 @@ import {
   AI_MODEL,
   AI_MAX_TOKENS,
   AI_HISTORY_LIMIT,
+  isAiEnabled,
   isMessageValid,
   isVisaQuestion,
   buildSystemPrompt,
@@ -40,9 +51,17 @@ const CORS = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
-const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY") ?? "";
-const AI_ENABLED = (Deno.env.get("AI_ENABLED") ?? "true") !== "false";
+const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY") ?? "";
+// Kill switch com fail-safe: valor não reconhecido desliga. Ver `isAiEnabled`.
+const AI_ENABLED = isAiEnabled(Deno.env.get("AI_ENABLED"));
 const AI_DAILY_MSG_CAP = Number(Deno.env.get("AI_DAILY_MSG_CAP") ?? "300");
+// Permite trocar de modelo pelo painel de secrets, sem novo deploy da função.
+const AI_MODEL_ID = Deno.env.get("AI_MODEL") ?? AI_MODEL;
+// Atribuição pública no ranking do OpenRouter — cosmético, não afeta a
+// resposta. Usa o domínio institucional (`viajaly.com`, o `url` da
+// Organization no schema.org das landings) e não o `viajaly.app`, que no repo
+// aparece para portal/e-mail transacional. Sobrescrevível pelo secret.
+const OPENROUTER_REFERER = Deno.env.get("OPENROUTER_REFERER") ?? "https://viajaly.com";
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -55,37 +74,48 @@ type RequestBody = { trip_id?: string; message?: string; conversation_id?: strin
 
 const UUID_RE = /^[0-9a-f-]{36}$/i;
 
-type AnthropicMessage = { role: "user" | "assistant"; content: string };
+type ChatMessage = { role: "user" | "assistant"; content: string };
 
-async function callAnthropic(
+/**
+ * Chama o modelo via OpenRouter. O formato é o do OpenAI Chat Completions
+ * (não o da Anthropic): o prompt de sistema entra como a primeira mensagem
+ * com `role: "system"`, e a resposta sai em `choices[0].message.content` —
+ * por isso trocar de provider não é só trocar a URL e a chave.
+ */
+async function callLlm(
   systemPrompt: string,
-  history: AnthropicMessage[],
+  history: ChatMessage[],
   message: string,
 ): Promise<string> {
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
+  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      "x-api-key": ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
+      Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+      // Atribuição no ranking do OpenRouter — opcional, não afeta a resposta.
+      "HTTP-Referer": OPENROUTER_REFERER,
+      "X-Title": "Viajaly Trip",
     },
     body: JSON.stringify({
-      model: AI_MODEL,
+      model: AI_MODEL_ID,
       max_tokens: AI_MAX_TOKENS,
-      system: systemPrompt,
-      messages: [...history, { role: "user", content: message }],
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...history,
+        { role: "user", content: message },
+      ],
     }),
   });
   if (!res.ok) {
-    throw new Error(`anthropic_${res.status}`);
+    throw new Error(`openrouter_${res.status}`);
   }
   const data = await res.json();
-  const text = (data?.content ?? [])
-    .filter((block: { type: string }) => block.type === "text")
-    .map((block: { text: string }) => block.text)
-    .join("\n")
-    .trim();
-  if (!text) throw new Error("anthropic_empty_response");
+  // OpenRouter pode devolver erro de upstream com HTTP 200 no corpo.
+  if (data?.error) {
+    throw new Error("openrouter_upstream_error");
+  }
+  const text = (data?.choices?.[0]?.message?.content ?? "").trim();
+  if (!text) throw new Error("openrouter_empty_response");
   return text;
 }
 
@@ -178,7 +208,7 @@ Deno.serve(async (req) => {
 
   // Escopo fechado (Seção 7): pergunta sobre visto num destino que exige
   // visto redireciona direto ao WhatsApp da consultoria, sem gastar chamada
-  // à Anthropic — mesma infraestrutura do VJT-009 (trip-visa.ts/whatsapp.ts).
+  // ao modelo — mesma infraestrutura do VJT-009 (trip-visa.ts/whatsapp.ts).
   let redirect: { whatsapp_url: string } | undefined;
   let responseText: string;
 
@@ -252,13 +282,13 @@ Deno.serve(async (req) => {
       .order("created_at", { ascending: true })
       .limit(AI_HISTORY_LIMIT);
     if (historyRes.error) return json({ error: historyRes.error.message }, 500);
-    const history: AnthropicMessage[] = (historyRes.data ?? []).map((m) => ({
+    const history: ChatMessage[] = (historyRes.data ?? []).map((m) => ({
       role: m.role === "assistant" ? "assistant" : "user",
       content: m.content,
     }));
 
     try {
-      responseText = await callAnthropic(buildSystemPrompt(context), history, message);
+      responseText = await callLlm(buildSystemPrompt(context), history, message);
     } catch {
       return json({ error: "ai_upstream_error" }, 502);
     }
