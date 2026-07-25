@@ -7,14 +7,21 @@ import { PaywallProvider } from "@/hooks/usePaywall";
 /**
  * Pathless layout that gates everything under /trip/*.
  * Auth is shared with the visa app (same Supabase project); unauthenticated
- * users are sent to the existing portal login.
+ * users are sent to the existing portal login. `next` preserves the
+ * destination (e.g. /trip/aceitar-convite?token=...) so an invited person
+ * without an active session yet lands back on the invite after logging in.
  */
 export const Route = createFileRoute("/trip")({
   ssr: false,
 
-  beforeLoad: async () => {
+  beforeLoad: async ({ location }) => {
     const { data } = await supabase.auth.getSession();
-    if (!data.session) throw redirect({ to: "/portal/login" });
+    if (!data.session) {
+      throw redirect({
+        to: "/portal/login",
+        search: { next: location.pathname + location.searchStr },
+      });
+    }
   },
   component: TripLayout,
 });

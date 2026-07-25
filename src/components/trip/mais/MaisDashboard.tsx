@@ -3,6 +3,7 @@ import { TripSectionPlaceholder } from "@/components/trip/SectionPlaceholder";
 import { AiAssistantCard } from "@/components/trip/mais/AiAssistantCard";
 import { InviteMemberCard } from "@/components/trip/mais/InviteMemberCard";
 import { PlanStatusCard } from "@/components/trip/mais/PlanStatusCard";
+import { TripMembersList } from "@/components/trip/mais/TripMembersList";
 import { useCurrentTrip } from "@/hooks/useItinerary";
 
 function MaisLoading() {
@@ -40,6 +41,7 @@ export function MaisDashboard() {
       </div>
       <PlanStatusCard />
       <InviteMemberCard tripId={trip.data.id} />
+      <TripMembersList tripId={trip.data.id} />
       <AiAssistantCard />
     </div>
   );
