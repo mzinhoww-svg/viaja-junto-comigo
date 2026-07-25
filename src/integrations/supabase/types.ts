@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      ab_events: {
+        Row: {
+          created_at: string
+          event: string
+          experiment: string
+          id: string
+          session_id: string | null
+          variant: string
+        }
+        Insert: {
+          created_at?: string
+          event: string
+          experiment: string
+          id?: string
+          session_id?: string | null
+          variant: string
+        }
+        Update: {
+          created_at?: string
+          event?: string
+          experiment?: string
+          id?: string
+          session_id?: string | null
+          variant?: string
+        }
+        Relationships: []
+      }
       access_code_attempts: {
         Row: {
           at: string
@@ -2209,6 +2236,14 @@ export type Database = {
       }
     }
     Functions: {
+      ab_results: {
+        Args: { _experiment: string }
+        Returns: {
+          converts: number
+          variant: string
+          views: number
+        }[]
+      }
       accept_invite: { Args: { _token: string }; Returns: Json }
       accept_trip_invite: { Args: { p_token: string }; Returns: string }
       add_product_to_request: {
