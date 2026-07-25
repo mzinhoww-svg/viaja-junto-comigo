@@ -34,6 +34,10 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           use_sticky_comment: false
           track_progress: false
+          # DIAGNÓSTICO TEMPORÁRIO — remover assim que o nome exato da
+          # ferramenta negada (permission_denials_count > 0 sem comentário
+          # postado) for identificado no log desta run.
+          show_full_output: true
           claude_args: |
             --model claude-sonnet-5
             --disallowedTools "Bash(git push:*),Bash(git commit:*),Bash(git merge:*),Bash(git checkout:*),Bash(gh pr merge:*)"
