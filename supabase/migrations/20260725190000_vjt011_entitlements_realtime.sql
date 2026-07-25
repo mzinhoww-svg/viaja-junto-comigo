@@ -9,6 +9,9 @@
 -- Nenhuma policy de escrita é adicionada aqui: `entitlements` continua com
 -- apenas `ent_select_own` (select). A ativação de bônus Pro+/Vip+ segue
 -- sendo feita via SQL Editor/service role — nunca por mutação client-side.
+-- Procedimento operacional dessa ativação (achar o user_id, o SQL de ativação
+-- e de revogação, verificação e troubleshooting):
+-- docs/runbook-ativacao-manual-entitlements.md (VJT-011b).
 -- Checkout Stripe (que também escreveria aqui) é escopo do VJT-012, ainda
 -- não iniciado.
 --

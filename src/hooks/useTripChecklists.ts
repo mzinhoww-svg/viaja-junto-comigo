@@ -13,7 +13,8 @@ import {
   type ChecklistRow,
   type GrupoPorMarco,
 } from "@/lib/trip-checklists";
-import type { ChecklistTipo } from "@/lib/trip-templates";
+import { tripVariablesFromTrip } from "@/lib/trip-destinations";
+import type { ChecklistTipo, PlanTier, TripVariables } from "@/lib/trip-templates";
 
 export type ChecklistListaData = {
   checklist: ChecklistRow;
@@ -104,30 +105,92 @@ export function useTripChecklists(tripId: string | undefined) {
   });
 }
 
-export function premiumChecklistCountsQueryKey() {
-  return ["checklist-templates", "premium-counts"] as const;
+export function tripVariablesQueryKey(tripId: string | undefined) {
+  return ["trip", "variables", tripId] as const;
 }
 
 /**
- * Contagem de templates premium por tipo (catálogo completo, não por trip —
- * ver `contarTemplatesPremiumPorTipo`) — alimenta a linha teaser travada do
- * gatilho "abrir item de checklist premium" (VJT-011). Leitura pública
- * (policy `templates_read`), independente de tripId.
+ * Variáveis de clonagem (`regiao`/`clima`/`destinoPack`/`comCriancas`) da trip
+ * que está sendo vista — insumo de `usePremiumChecklistCounts` (VJT-011b).
+ * Busca **pelo `tripId` da rota**, não pela primeira trip do usuário
+ * (`useCurrentTrip`), porque quem já teve premium pode ter várias trips: usar
+ * a primeira daria o número de outra viagem. `trips` não persiste as variáveis
+ * (o wizard só as usa na clonagem), então são reconstruídas do destino salvo
+ * por `tripVariablesFromTrip`.
  */
-export function usePremiumChecklistCounts() {
+export function useTripVariables(tripId: string | undefined) {
   return useQuery({
-    queryKey: premiumChecklistCountsQueryKey(),
+    queryKey: tripVariablesQueryKey(tripId),
+    enabled: !!tripId,
+    queryFn: async (): Promise<TripVariables> => {
+      const { data, error } = await supabase
+        .from("trips")
+        .select("destino_pais, destino_cidade, num_criancas")
+        .eq("id", tripId as string)
+        .single();
+      if (error) throw error;
+      return tripVariablesFromTrip({
+        destinoPais: data.destino_pais,
+        destinoCidade: data.destino_cidade,
+        numCriancas: data.num_criancas,
+      });
+    },
+  });
+}
+
+export function premiumChecklistCountsQueryKey(vars: TripVariables | undefined) {
+  return [
+    "checklist-templates",
+    "premium-counts",
+    vars
+      ? {
+          regiao: vars.regiao,
+          clima: vars.clima,
+          destinoPack: vars.destinoPack,
+          comCriancas: vars.comCriancas,
+          duracaoDias: vars.duracaoDias,
+        }
+      : null,
+  ] as const;
+}
+
+/**
+ * Contagem dos itens premium que **esta trip** ganharia ao virar premium —
+ * alimenta a linha teaser travada do gatilho "abrir item de checklist premium"
+ * (VJT-011). As variáveis da trip entram na conta via `templateAplica`
+ * (VJT-011b): sem elas o número somava packs de destino que nunca seriam
+ * clonados para aquela viagem. Leitura pública (policy `templates_read`), sem
+ * tripId — a chave de cache é a combinação de variáveis, então duas trips com
+ * o mesmo perfil de destino reaproveitam o mesmo resultado.
+ */
+export function usePremiumChecklistCounts(vars: TripVariables | undefined) {
+  return useQuery({
+    queryKey: premiumChecklistCountsQueryKey(vars),
+    enabled: !!vars,
     queryFn: async (): Promise<Partial<Record<ChecklistTipo, number>>> => {
       const { data, error } = await supabase
         .from("checklist_templates")
-        .select("tipo, tier")
+        .select(
+          "id, tipo, titulo, marco, prazo_dias_antes, tier, regiao, clima, min_duracao, com_crianca, destino_pack, ordem",
+        )
         .eq("tier", "premium");
       if (error) throw error;
       return contarTemplatesPremiumPorTipo(
         (data ?? []).map((row) => ({
+          id: row.id,
           tipo: row.tipo as ChecklistTipo,
-          tier: row.tier as "premium",
+          titulo: row.titulo,
+          marco: row.marco,
+          prazoDiasAntes: row.prazo_dias_antes,
+          tier: row.tier as PlanTier,
+          regiao: row.regiao,
+          clima: row.clima,
+          minDuracao: row.min_duracao,
+          comCrianca: row.com_crianca,
+          destinoPack: row.destino_pack,
+          ordem: row.ordem,
         })),
+        vars as TripVariables,
       );
     },
   });

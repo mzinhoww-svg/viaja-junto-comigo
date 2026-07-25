@@ -40,7 +40,10 @@ export type UseEntitlementResult = Entitlement & { isLoading: boolean };
  * migration deste ticket) para que uma ativação manual/admin (SQL Editor,
  * origem `manual`/`pacote_visto` — bônus Pro+/Vip+) libere o plano sem
  * reload da página; RLS `ent_select_own` já garante que só a própria linha
- * chega aqui, então a assinatura não vaza dado de outro usuário.
+ * chega aqui, então a assinatura não vaza dado de outro usuário. O passo a
+ * passo dessa ativação manual (achar o `user_id`, o SQL, como conferir e como
+ * revogar) está em `docs/runbook-ativacao-manual-entitlements.md` — é o
+ * procedimento oficial de quem opera, não estes comentários (VJT-011b).
  *
  * Backstop se o canal cair: `.subscribe` recebe o status da inscrição —
  * `CHANNEL_ERROR`/`TIMED_OUT`/`CLOSED` disparam um refetch imediato em vez

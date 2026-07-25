@@ -16,6 +16,7 @@ import {
   usePremiumChecklistCounts,
   useToggleChecklistItem,
   useTripChecklists,
+  useTripVariables,
   useUpdateChecklistItemTitulo,
 } from "@/hooks/useTripChecklists";
 import { useVistoContextual } from "@/hooks/useTripVistoContextual";
@@ -40,7 +41,12 @@ export function ChecklistsDashboard({ tripId }: { tripId: string }) {
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const entitlement = useEntitlement();
   const { openPaywall } = usePaywall();
-  const premiumCounts = usePremiumChecklistCounts();
+  // Variáveis reais desta trip (VJT-011b): sem elas o teaser contaria packs de
+  // destino que nunca seriam clonados para esta viagem. Enquanto não carregam,
+  // `undefined` mantém a contagem desabilitada — o teaser só aparece quando o
+  // número já é o certo, nunca com um número provisório inflado.
+  const tripVars = useTripVariables(tripId);
+  const premiumCounts = usePremiumChecklistCounts(tripVars.data);
 
   if (checklists.isLoading || !checklists.data) {
     return <ChecklistsLoading />;
