@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { capture } from "@/lib/posthog";
+import { TRIP_EVENTS } from "@/lib/trip-analytics";
 
 /** Id do usuário logado — usado para marcar "você" e decidir ações na lista de membros. */
 export function useCurrentUserId() {
@@ -86,6 +88,7 @@ export function useCreateTripInvite(tripId: string) {
       if (error) throw error;
       return { token: data.token };
     },
+    onSuccess: () => capture(TRIP_EVENTS.inviteSent, { trip_id: tripId }),
   });
 }
 
@@ -100,6 +103,7 @@ export function useAcceptTripInvite() {
       return data;
     },
     onSuccess: (tripId) => {
+      capture(TRIP_EVENTS.inviteAccepted, { trip_id: tripId });
       qc.invalidateQueries({ queryKey: ["trip", "current"] });
       invalidateMembers(qc, tripId);
     },

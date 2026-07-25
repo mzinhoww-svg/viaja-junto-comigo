@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
@@ -9,6 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import { createPremiumCheckout } from "@/lib/payments-stripe.functions";
 import { getStripe, getStripeEnvironment, paymentsConfigured } from "@/lib/stripe";
+import { PREMIUM_PRICE_BRL_CENTS } from "@/lib/entitlements";
+import { captureOnce } from "@/lib/posthog";
+import { TRIP_EVENTS } from "@/lib/trip-analytics";
 
 type Method = "pix" | "card";
 
@@ -22,11 +25,28 @@ type Method = "pix" | "card";
 export function PremiumCheckout() {
   const entitlement = useEntitlement();
   const [method, setMethod] = useState<Method>("pix");
-  const [hasSessionId] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      new URLSearchParams(window.location.search).has("session_id"),
+  const [sessionId] = useState(() =>
+    typeof window === "undefined"
+      ? null
+      : new URLSearchParams(window.location.search).get("session_id"),
   );
+  const hasSessionId = sessionId !== null;
+
+  /**
+   * `upgrade_purchase` (VJT-015) — último passo do funil grátis→compra.
+   * Disparado na volta do checkout, quando o webhook já ativou o entitlement
+   * (`useEntitlement()` reflete via realtime, VJT-011/012). Deduplicado pelo
+   * `session_id` do Stripe: recarregar esta tela não conta compra de novo.
+   * Quem chega em `/trip/checkout` já premium, sem `session_id`, não dispara
+   * nada — não houve compra nesta navegação.
+   */
+  useEffect(() => {
+    if (!sessionId || !entitlement.isPremium) return;
+    captureOnce(`upgrade_purchase:${sessionId}`, TRIP_EVENTS.upgradePurchase, {
+      valor_brl_cents: PREMIUM_PRICE_BRL_CENTS,
+      origem: entitlement.origem ?? "stripe",
+    });
+  }, [sessionId, entitlement.isPremium, entitlement.origem]);
 
   if (entitlement.isLoading) {
     return (

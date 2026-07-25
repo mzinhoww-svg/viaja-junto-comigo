@@ -1,5 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import type { PaywallTrigger } from "@/lib/entitlements";
+import { capture } from "@/lib/posthog";
+import { TRIP_EVENTS } from "@/lib/trip-analytics";
 
 type PaywallContextValue = {
   trigger: PaywallTrigger | null;
@@ -18,7 +20,17 @@ const PaywallContext = createContext<PaywallContextValue | null>(null);
 export function PaywallProvider({ children }: { children: ReactNode }) {
   const [trigger, setTrigger] = useState<PaywallTrigger | null>(null);
 
-  const openPaywall = useCallback((next: PaywallTrigger) => setTrigger(next), []);
+  /**
+   * `upgrade_view` (VJT-015) vive aqui, e só aqui: os 6 gatilhos passam por
+   * este mesmo `openPaywall`, então instrumentar o modal único evita 6
+   * disparos espalhados (e o risco de um deles ficar para trás). O gatilho
+   * específico vai como propriedade — o funil grátis→compra se destrincha por
+   * ela no painel sem precisar de um evento por gatilho.
+   */
+  const openPaywall = useCallback((next: PaywallTrigger) => {
+    capture(TRIP_EVENTS.upgradeView, { trigger: next });
+    setTrigger(next);
+  }, []);
   const closePaywall = useCallback(() => setTrigger(null), []);
 
   const value = useMemo(

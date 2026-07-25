@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { tripDashboardQueryKey } from "@/lib/trip-query-keys";
+import { capture } from "@/lib/posthog";
+import { TRIP_EVENTS } from "@/lib/trip-analytics";
 import {
   agruparPorMarco,
   calcularProgresso,
@@ -141,7 +143,15 @@ export function useToggleChecklistItem(tripId: string) {
         .eq("id", input.id);
       if (error) throw error;
     },
-    onSuccess: () => invalidateChecklists(qc, tripId),
+    onSuccess: (_data, input) => {
+      // `checklist_item_done` (VJT-015) mede progresso, não interação: só a
+      // marcação conta. Desmarcar (`done: false`) usa a mesma mutação e não
+      // dispara evento, senão o total infla com correções do usuário.
+      if (input.done) {
+        capture(TRIP_EVENTS.checklistItemDone, { trip_id: tripId, item_id: input.id });
+      }
+      invalidateChecklists(qc, tripId);
+    },
   });
 }
 
