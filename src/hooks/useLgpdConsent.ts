@@ -84,6 +84,7 @@ async function jaConsentiuAntes(userId: string): Promise<boolean> {
   }
 }
 
+/**
  * Registra o aceite da versão vigente como uma NOVA linha — o aceite anterior
  * (versão antiga) continua no log, que é append-only por design (sem policy
  * de update/delete na tabela). Violação de unique (mesma versão aceita duas
@@ -106,7 +107,9 @@ export function useAcceptLgpdConsent() {
       const { error } = await supabase
         .from("user_lgpd_consents")
         .insert({ user_id: userId, versao_termos: LGPD_CONSENT_VERSION });
-      if (error) throw error;
+      // Tolerância a unique violation vem do VJT-017b: aceitar duas vezes a
+      // MESMA versão (duplo clique, retry de rede) é sucesso, não erro.
+      if (error && error.code !== PG_UNIQUE_VIOLATION) throw error;
 
       return { primeiroAceite };
     },
@@ -125,7 +128,6 @@ export function useAcceptLgpdConsent() {
         });
       }
       qc.invalidateQueries({ queryKey: lgpdConsentQueryKey() });
-      if (error && error.code !== PG_UNIQUE_VIOLATION) throw error;
     },
   });
 }

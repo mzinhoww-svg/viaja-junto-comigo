@@ -144,6 +144,25 @@ describe("signup", () => {
     expect(eventos("signup")).toHaveLength(0);
   });
 
+  /**
+   * Composição das duas metades do consentimento: o VJT-017b trata unique
+   * violation (mesma versão aceita duas vezes — duplo clique, retry de rede)
+   * como sucesso, e o VJT-015 não pode transformar esse sucesso em `signup`.
+   */
+  it("NÃO dispara em aceite repetido da mesma versão (unique 23505 tratado como sucesso)", async () => {
+    setTableResult("user_lgpd_consents:select", { count: 1, error: null });
+    setTableResult("user_lgpd_consents:insert", {
+      data: null,
+      error: { code: "23505", message: "duplicate key value" },
+    });
+
+    const { result } = renderHook(() => useAcceptLgpdConsent(), { wrapper: criarWrapper() });
+    act(() => result.current.mutate());
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(eventos("signup")).toHaveLength(0);
+  });
+
   it("falha ao contar consentimentos anteriores não dispara (falha fechada) e não bloqueia o aceite", async () => {
     setTableResult("user_lgpd_consents:select", { count: null, error: { message: "rls" } });
     setTableResult("user_lgpd_consents:insert", { data: null, error: null });
