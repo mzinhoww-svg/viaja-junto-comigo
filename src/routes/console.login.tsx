@@ -22,21 +22,29 @@ export const Route = createFileRoute("/console/login")({
 function ConsoleLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [googlePending, setGooglePending] = useState(false);
   const nav = useNavigate();
   const search = Route.useSearch();
+
+  async function checkAdminAndGo() {
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) throw new Error("Sessão não encontrada.");
+    const { data: prof } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", userData.user.id)
+      .maybeSingle();
+    if (prof?.role !== "admin") {
+      await supabase.auth.signOut();
+      throw new Error("Esta conta não tem acesso ao console.");
+    }
+  }
+
   const mut = useMutation({
     mutationFn: async () => {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      const { data: prof } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", data.user.id)
-        .maybeSingle();
-      if (prof?.role !== "admin") {
-        await supabase.auth.signOut();
-        throw new Error("Esta conta não tem acesso ao console.");
-      }
+      await checkAdminAndGo();
     },
     onSuccess: () => {
       toast.success("Bem-vinda");
@@ -44,6 +52,27 @@ function ConsoleLogin() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  async function handleGoogle() {
+    setGooglePending(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin + "/console/login",
+      });
+      if (result.error) {
+        toast.error("Não conseguimos entrar com o Google.");
+        setGooglePending(false);
+        return;
+      }
+      if (result.redirected) return;
+      await checkAdminAndGo();
+      toast.success("Bem-vinda");
+      nav({ to: search.next ?? "/console" });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha no login com Google.");
+      setGooglePending(false);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-appbg flex items-center justify-center px-6">
