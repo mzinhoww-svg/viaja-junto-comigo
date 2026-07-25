@@ -5,7 +5,9 @@
   "auth": {
     "type": "oauth",
     "issuer": "https://urrlqljlibpzaqnemlwf.supabase.co/auth/v1",
-    "accepted_audiences": ["authenticated"]
+    "accepted_audiences": [
+      "authenticated"
+    ]
   },
   "mcp": {
     "server": {
@@ -72,7 +74,9 @@
               "description": "UUID do pedido."
             }
           },
-          "required": ["request_id"],
+          "required": [
+            "request_id"
+          ],
           "additionalProperties": false,
           "$schema": "http://json-schema.org/draft-07/schema#"
         },
@@ -92,7 +96,12 @@
           "properties": {
             "status": {
               "type": "string",
-              "enum": ["draft", "sent", "accepted", "declined"],
+              "enum": [
+                "draft",
+                "sent",
+                "accepted",
+                "declined"
+              ],
               "description": "Filtro opcional por proposal_status."
             },
             "limit": {
