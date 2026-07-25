@@ -109,3 +109,16 @@ export function adminCodeBlockMinutesLeft(state: AdminCodeAttempts, nowMs: numbe
   if (!isAdminCodeBlocked(state, nowMs)) return 0;
   return Math.ceil((state.bloqueadoAte! - nowMs) / 60_000);
 }
+
+/**
+ * E-mail da conta que o código de login da equipe abre (VJT-011d), lido de
+ * `TRIP_ADMIN_EMAIL`. O código nunca autentica um e-mail digitado na tela:
+ * ele só abre esta conta, configurada no ambiente. É a diferença entre uma
+ * credencial compartilhada de uma conta específica e um backdoor capaz de
+ * entrar em qualquer conta do produto.
+ */
+export function parseAdminEmail(raw: string | undefined | null): string | null {
+  const email = (raw ?? "").trim().toLowerCase();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return null;
+  return email;
+}

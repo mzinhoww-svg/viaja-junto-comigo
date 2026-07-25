@@ -57,6 +57,6 @@ describe("DeleteAccountCard", () => {
     expect(mutateMock).toHaveBeenCalledTimes(1);
     const [, options] = mutateMock.mock.calls[0];
     options.onSuccess();
-    expect(navigateMock).toHaveBeenCalledWith({ to: "/portal/login" });
+    expect(navigateMock).toHaveBeenCalledWith({ to: "/trip/login" });
   });
 });

@@ -35,7 +35,7 @@ export function DeleteAccountCard() {
   function handleDelete() {
     del.mutate(undefined, {
       onSuccess: () => {
-        nav({ to: "/portal/login" });
+        nav({ to: "/trip/login" });
       },
       onError: (e) => {
         toast.error((e as Error).message || "Não foi possível excluir sua conta agora.");

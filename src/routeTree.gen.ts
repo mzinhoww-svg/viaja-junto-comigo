@@ -58,6 +58,7 @@ import { Route as TripFinanceiroRouteImport } from './routes/trip.financeiro'
 import { Route as TripMaisRouteImport } from './routes/trip.mais'
 import { Route as TripNovoRouteImport } from './routes/trip.novo'
 import { Route as TripRoteiroRouteImport } from './routes/trip.roteiro'
+import { Route as TripLoginRouteImport } from './routes/trip_.login'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as ConsoleClienteIdRouteImport } from './routes/console.cliente.$id'
@@ -312,6 +313,11 @@ const TripRoteiroRoute = TripRoteiroRouteImport.update({
   path: '/roteiro',
   getParentRoute: () => TripRoute,
 } as any)
+const TripLoginRoute = TripLoginRouteImport.update({
+  id: '/trip_/login',
+  path: '/trip/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   id: '/.lovable/oauth/consent',
   path: '/.lovable/oauth/consent',
@@ -393,6 +399,7 @@ export interface FileRoutesByFullPath {
   '/trip/mais': typeof TripMaisRoute
   '/trip/novo': typeof TripNovoRoute
   '/trip/roteiro': typeof TripRoteiroRoute
+  '/trip/login': typeof TripLoginRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/trip/': typeof TripIndexRoute
@@ -447,6 +454,7 @@ export interface FileRoutesByTo {
   '/trip/mais': typeof TripMaisRoute
   '/trip/novo': typeof TripNovoRoute
   '/trip/roteiro': typeof TripRoteiroRoute
+  '/trip/login': typeof TripLoginRoute
   '/console': typeof ConsoleIndexRoute
   '/portal': typeof PortalIndexRoute
   '/trip': typeof TripIndexRoute
@@ -505,6 +513,7 @@ export interface FileRoutesById {
   '/trip/mais': typeof TripMaisRoute
   '/trip/novo': typeof TripNovoRoute
   '/trip/roteiro': typeof TripRoteiroRoute
+  '/trip_/login': typeof TripLoginRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/trip/': typeof TripIndexRoute
@@ -564,6 +573,7 @@ export interface FileRouteTypes {
     | '/trip/mais'
     | '/trip/novo'
     | '/trip/roteiro'
+    | '/trip/login'
     | '/console/'
     | '/portal/'
     | '/trip/'
@@ -618,6 +628,7 @@ export interface FileRouteTypes {
     | '/trip/mais'
     | '/trip/novo'
     | '/trip/roteiro'
+    | '/trip/login'
     | '/console'
     | '/portal'
     | '/trip'
@@ -675,6 +686,7 @@ export interface FileRouteTypes {
     | '/trip/mais'
     | '/trip/novo'
     | '/trip/roteiro'
+    | '/trip_/login'
     | '/console/'
     | '/portal/'
     | '/trip/'
@@ -701,6 +713,7 @@ export interface RootRouteChildren {
   VistosRoute: typeof VistosRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  TripLoginRoute: typeof TripLoginRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -1051,6 +1064,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TripRoteiroRouteImport
       parentRoute: typeof TripRoute
     }
+    '/trip_/login': {
+      id: '/trip_/login'
+      path: '/trip/login'
+      fullPath: '/trip/login'
+      preLoaderRoute: typeof TripLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/.lovable/oauth/consent': {
       id: '/.lovable/oauth/consent'
       path: '/.lovable/oauth/consent'
@@ -1224,6 +1244,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  TripLoginRoute: TripLoginRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,

@@ -14,6 +14,7 @@ import {
   matchesAdminCode,
   normalizeAdminCode,
   parseAdminCodes,
+  parseAdminEmail,
   registerAdminCodeFailure,
 } from "./trip-admin-code";
 
@@ -122,5 +123,18 @@ describe("bloqueio por tentativas", () => {
     expect(adminCodeBlockMinutesLeft(estado, t0)).toBe(2);
     expect(adminCodeBlockMinutesLeft(estado, t0 + 90_001)).toBe(0);
     expect(adminCodeBlockMinutesLeft(ADMIN_CODE_ATTEMPTS_ZERO, t0)).toBe(0);
+  });
+});
+
+describe("parseAdminEmail", () => {
+  it("normaliza espaços e maiúsculas", () => {
+    expect(parseAdminEmail("  Equipe@Viajaly.COM ")).toBe("equipe@viajaly.com");
+  });
+
+  it("sem e-mail válido devolve null (login da equipe desligado)", () => {
+    expect(parseAdminEmail(undefined)).toBeNull();
+    expect(parseAdminEmail("")).toBeNull();
+    expect(parseAdminEmail("não-é-email")).toBeNull();
+    expect(parseAdminEmail("sem@dominio")).toBeNull();
   });
 });
