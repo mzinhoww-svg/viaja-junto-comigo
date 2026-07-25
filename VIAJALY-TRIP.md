@@ -367,6 +367,8 @@ insert into public.checklist_templates (tipo, titulo, tier, marco, ordem) values
 
 **Regra geral, vale para toda sessão, não só execução de ticket**: nunca afirme o estado de um PR/issue/branch de memória ou por inferência de contexto anterior — sempre confirme contra a API do GitHub antes de declarar "mergeado", "aberto", "draft" etc. Se a última verificação real for antiga, reverifique antes de afirmar.
 
+**CI verde precisa ser do commit que vai efetivamente para a main.** Se o PR receber "Update branch" (ou merge de main na branch) depois do último run verde, o commit de merge resultante precisa de CI verde próprio antes do merge — o verde anterior não vale, porque a combinação dos dois lados nunca foi testada. Isso vale mesmo quando o git auto-mergeia sem conflito: regiões adjacentes de um mesmo arquivo podem produzir código inválido sem gerar marcador de conflito (achado real: PR [#67](https://github.com/mzinhoww-svg/viaja-junto-comigo/pull/67) + [#68](https://github.com/mzinhoww-svg/viaja-junto-comigo/pull/68) quebraram a main em 2026-07-25; conserto no PR [#70](https://github.com/mzinhoww-svg/viaja-junto-comigo/pull/70)).
+
 ### Revisor automatizado
 Além do CI, todo PR passa por uma sessão/rotina separada de revisão (Claude Code Remote, gatilho em PR aberto/sincronizado, nunca em comentário criado, para evitar auto-resposta). O revisor NUNCA implementa nem faz merge — só comenta no PR com achados concretos, sempre contra o diff real, nunca contra o resumo do próprio PR. Checklist obrigatório do revisor, nesta ordem:
 1. Toda fórmula/agregação nova reutiliza trip-math.ts (ou o módulo puro equivalente do domínio), ou reimplementa em paralelo?
