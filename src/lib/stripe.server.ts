@@ -84,6 +84,25 @@ export function getStripeErrorMessage(error: unknown): string {
   return "Stripe request failed";
 }
 
+/**
+ * Compara dois hex digests em tempo constante (byte a byte, XOR acumulado
+ * em vez de `===`/`.includes()`): sempre percorre a string inteira, mesmo
+ * quando a primeira diferença aparece logo no início — evita que um
+ * atacante meça o tempo de resposta do webhook para descobrir a assinatura
+ * correta byte a byte. Web Crypto não expõe um helper constant-time
+ * pronto (ao contrário de `crypto.timingSafeEqual` do Node), então esta
+ * função substitui a comparação por `.includes()`/`===` que `verifyWebhook`
+ * usava antes.
+ */
+export function timingSafeEqualHex(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
 export async function verifyWebhook(
   req: Request,
   env: StripeEnv,
@@ -122,7 +141,8 @@ export async function verifyWebhook(
     new TextEncoder().encode(`${timestamp}.${body}`),
   );
   const expected = Buffer.from(new Uint8Array(signed)).toString("hex");
-  if (!v1Signatures.includes(expected)) throw new Error("Invalid webhook signature");
+  const matches = v1Signatures.some((sig) => timingSafeEqualHex(sig, expected));
+  if (!matches) throw new Error("Invalid webhook signature");
 
   return JSON.parse(body);
 }

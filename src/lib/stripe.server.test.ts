@@ -6,7 +6,7 @@
  * checkout do Premium adicionado nesta rota.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { paymentsEnabled, verifyWebhook } from "./stripe.server";
+import { paymentsEnabled, timingSafeEqualHex, verifyWebhook } from "./stripe.server";
 
 const SECRET = "whsec_test_secret";
 
@@ -33,6 +33,38 @@ function makeRequest(body: string, signatureHeader: string | null): Request {
     headers: signatureHeader ? { "stripe-signature": signatureHeader } : {},
   });
 }
+
+describe("timingSafeEqualHex (comparação constant-time da assinatura do webhook)", () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it("retorna true para strings idênticas e false para diferentes", () => {
+    expect(timingSafeEqualHex("abcd1234", "abcd1234")).toBe(true);
+    expect(timingSafeEqualHex("abcd1234", "abcd1235")).toBe(false);
+    expect(timingSafeEqualHex("abcd1234", "abcd123")).toBe(false); // tamanhos diferentes
+  });
+
+  it("não retorna cedo: percorre a string inteira independente de onde a divergência aparece", () => {
+    const expected = "a".repeat(64);
+    const diffNoInicio = "b" + "a".repeat(63); // diverge na posição 0
+    const diffNoFim = "a".repeat(63) + "b"; // diverge na última posição
+
+    const spy = vi.spyOn(String.prototype, "charCodeAt");
+
+    timingSafeEqualHex(diffNoInicio, expected);
+    const chamadasDivergenciaInicial = spy.mock.calls.length;
+    spy.mockClear();
+
+    timingSafeEqualHex(diffNoFim, expected);
+    const chamadasDivergenciaFinal = spy.mock.calls.length;
+
+    // Se houvesse um "return false" no meio do loop assim que diff !== 0,
+    // a divergência logo no início leria muito menos caracteres do que a
+    // divergência no fim — o que vazaria, pelo tempo de execução, em qual
+    // posição a assinatura fornecida começa a divergir da esperada.
+    expect(chamadasDivergenciaInicial).toBe(chamadasDivergenciaFinal);
+    expect(chamadasDivergenciaInicial).toBe(expected.length * 2);
+  });
+});
 
 describe("paymentsEnabled (kill switch PAYMENTS_ENABLED)", () => {
   afterEach(() => vi.unstubAllEnvs());
