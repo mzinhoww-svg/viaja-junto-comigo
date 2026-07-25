@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { TripBottomNav } from "@/components/trip/BottomNav";
 import { PaywallModal } from "@/components/trip/paywall/PaywallModal";
 import { PaywallProvider } from "@/hooks/usePaywall";
+import { TRIP_PWA_THEME_COLOR, buildTripPwaLinks } from "@/lib/trip-pwa";
 
 /**
  * Pathless layout that gates everything under /trip/*.
@@ -10,9 +11,25 @@ import { PaywallProvider } from "@/hooks/usePaywall";
  * users are sent to the existing portal login. `next` preserves the
  * destination (e.g. /trip/aceitar-convite?token=...) so an invited person
  * without an active session yet lands back on the invite after logging in.
+ *
+ * head() here only ADDS PWA manifest/icon/splash links + iOS meta tags on top
+ * of __root.tsx's head — it never overrides anything outside /trip/*, so the
+ * main Viajaly portal (e.g. /portal/*) keeps its own head untouched (VJT-016).
  */
 export const Route = createFileRoute("/trip")({
   ssr: false,
+
+  head: () => ({
+    meta: [
+      { title: "Viajaly Trip" },
+      { name: "theme-color", content: TRIP_PWA_THEME_COLOR },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "Viajaly Trip" },
+      { name: "mobile-web-app-capable", content: "yes" },
+    ],
+    links: buildTripPwaLinks(),
+  }),
 
   beforeLoad: async ({ location }) => {
     const { data } = await supabase.auth.getSession();
