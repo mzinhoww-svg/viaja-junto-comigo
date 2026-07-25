@@ -68,6 +68,7 @@ end $fn$;
 \echo '=== seeding: owner A creates a trip and one row in every child table ==='
 insert into auth.users (id) values
   ('11111111-1111-1111-1111-111111111111'), -- A: owner/member
+  ('22222222-2222-2222-2222-222222222222'), -- B: legitimate editor member
   ('44444444-4444-4444-4444-444444444444'); -- D: outsider, member of nothing
 
 set role authenticated;
@@ -78,7 +79,7 @@ insert into public.trips (owner_id, destino_pais) values
 insert into public.trip_members (trip_id, user_id, role) values
   (:'trip_id', '11111111-1111-1111-1111-111111111111', 'owner');
 insert into public.trip_invites (trip_id, created_by) values
-  (:'trip_id', '11111111-1111-1111-1111-111111111111') returning id as invite_id \gset
+  (:'trip_id', '11111111-1111-1111-1111-111111111111') returning token as member_token \gset
 
 insert into public.budget_categories (trip_id, nome) values (:'trip_id', 'Passagens')
   returning id as category_id \gset
@@ -280,6 +281,35 @@ select public.rls_probe('paises_visto', 'DELETE', 'blocked',
 reset role;
 
 \echo ''
+\echo '=== probing as B: a LEGITIMATE editor member attempting privilege escalation ==='
+-- B joins the trip the supported way (accepting the invite), so every probe
+-- below starts from real, granted access -- these ask what a member can
+-- escalate to, not what an outsider can reach.
+set role authenticated;
+set request.jwt.claim.sub = '22222222-2222-2222-2222-222222222222';
+select public.accept_trip_invite(:'member_token') as joined \gset
+
+-- The escalation this migration closes: owner_id must be frozen against
+-- members. Left open, an editor self-assigns owner_id and (because
+-- trips_select now also matches on owner_id) keeps reading the trips row
+-- forever, including after leaving the trip.
+select public.rls_probe('trips [as member]', 'UPDATE owner_id (escalation)', 'blocked',
+  format('update public.trips set owner_id = %L where id = %L',
+         '22222222-2222-2222-2222-222222222222', :'trip_id'));
+
+-- Guardrail: freezing owner_id must not break the everyday member writes
+-- that VJT-004 and VJT-006 depend on.
+select public.rls_probe('trips [as member]', 'UPDATE nome (legit, VJT-004)', 'ALLOWED (legit)',
+  format('update public.trips set nome = %L where id = %L', 'Renomeada', :'trip_id'));
+select public.rls_probe('trips [as member]', 'UPDATE data/status (legit, VJT-004)', 'ALLOWED (legit)',
+  format('update public.trips set data_viagem = %L, status = %L where id = %L',
+         '2027-01-15', 'planejando', :'trip_id'));
+select public.rls_probe('trips [as member]', 'UPDATE cambio (legit, VJT-006)', 'ALLOWED (legit)',
+  format('update public.trips set cambio_manual = 5.43, moeda_destino = %L where id = %L',
+         'USD', :'trip_id'));
+reset role;
+
+\echo ''
 \echo '================== RLS AUDIT REPORT =================='
 \pset format aligned
 select
@@ -288,9 +318,13 @@ select
   expected,
   actual,
   case
-    -- Any row actually written/changed/removed by an outsider is a leak,
-    -- whether the probe expected an outright block (INSERT) or a zero-row
-    -- result because RLS should have filtered the target away (UPDATE/DELETE).
+    -- Writes that SHOULD succeed (a member editing their own trip): the
+    -- regression guard for hardening policies too far.
+    when expected = 'ALLOWED (legit)' and actual like 'ALLOWED%' then 'ok'
+    when expected = 'ALLOWED (legit)' then '!! LEGIT WRITE BROKEN'
+    -- Any other row actually written/changed/removed is a leak, whether the
+    -- probe expected an outright block (INSERT) or a zero-row result because
+    -- RLS should have filtered the target away (UPDATE/DELETE).
     when actual like 'ALLOWED%' then '*** LEAK ***'
     -- Rows visible to an outsider are a leak unless the table is public catalog.
     when expected = 'no rows' and actual like 'VISIBLE%' then '*** LEAK ***'
@@ -303,8 +337,36 @@ order by seq;
 \echo ''
 \echo '=== summary ==='
 select
-  count(*) filter (where actual like 'ALLOWED%')
+  count(*) filter (where expected <> 'ALLOWED (legit)' and actual like 'ALLOWED%')
   + count(*) filter (where expected = 'no rows' and actual like 'VISIBLE%') as leaks,
-  count(*) filter (where expected like 'VISIBLE%' and actual not like 'VISIBLE%') as unexpected_blocks,
+  count(*) filter (where expected like 'VISIBLE (public%' and actual not like 'VISIBLE%')
+  + count(*) filter (where expected = 'ALLOWED (legit)' and actual not like 'ALLOWED%') as broken,
   count(*) as total_probes
 from public.rls_audit_results;
+
+-- Exit non-zero when anything is wrong, so `--audit` is usable as a gate and
+-- not just a report someone has to read carefully.
+--
+-- A DO block, not `case when ... then 1 else 1/0 end`: Postgres constant-folds
+-- the 1/0 arm at plan time even when CASE would never select it, so that
+-- idiom aborts unconditionally here. (It is safe in
+-- rls_trip_invites.test.sql, where psql substitutes literals and the whole
+-- CASE folds to its true arm.) No psql :variables are referenced inside this
+-- block, so dollar-quoting is safe.
+do $audit$
+declare v_bad bigint;
+begin
+  select
+    count(*) filter (where expected <> 'ALLOWED (legit)' and actual like 'ALLOWED%')
+    + count(*) filter (where expected = 'no rows' and actual like 'VISIBLE%')
+    + count(*) filter (where expected like 'VISIBLE (public%' and actual not like 'VISIBLE%')
+    + count(*) filter (where expected = 'ALLOWED (legit)' and actual not like 'ALLOWED%')
+  into v_bad
+  from public.rls_audit_results;
+
+  if v_bad > 0 then
+    raise exception 'RLS audit FAILED: % problem(s) -- see the veredito column above', v_bad;
+  end if;
+  raise notice 'AUDIT CLEAN: no leaks, no broken legitimate writes';
+end
+$audit$;
