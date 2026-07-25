@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import {
   Dialog,
   DialogContent,
@@ -9,16 +10,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { PAYWALL_COPY } from "@/lib/entitlements";
 import { usePaywall } from "@/hooks/usePaywall";
+import { paymentsConfigured } from "@/lib/stripe";
 
 /**
  * Modal de paywall ÚNICO (VIAJALY-TRIP.md Seção 2) — a mesma instância é
  * reaproveitada pelos 6 gatilhos (`usePaywall().openPaywall(trigger)`), só
  * o copy muda conforme `PaywallTrigger`. Montado uma vez em `trip.tsx`.
- * Checkout Stripe é escopo do VJT-012 (ainda não iniciado): o CTA fica
- * desabilitado, sem simular uma compra falsa.
+ * O CTA leva para `/trip/checkout` (VJT-012), onde vive o checkout Stripe
+ * embutido — este modal só conecta o botão, sem hospedar o checkout.
  */
 export function PaywallModal() {
   const { trigger, closePaywall } = usePaywall();
+  const nav = useNavigate();
   const copy = trigger ? PAYWALL_COPY[trigger] : null;
 
   return (
@@ -38,9 +41,21 @@ export function PaywallModal() {
               </p>
             </div>
             <DialogFooter>
-              <Button disabled className="w-full sm:w-auto">
-                Assinar Premium (em breve)
-              </Button>
+              {paymentsConfigured() ? (
+                <Button
+                  className="w-full sm:w-auto"
+                  onClick={() => {
+                    closePaywall();
+                    nav({ to: "/trip/checkout" });
+                  }}
+                >
+                  Assinar Premium
+                </Button>
+              ) : (
+                <Button disabled className="w-full sm:w-auto">
+                  Pagamentos não configurados
+                </Button>
+              )}
             </DialogFooter>
           </>
         )}
