@@ -6,12 +6,17 @@
 // Provider: OpenRouter (API compatível com OpenAI), modelo DeepSeek por
 // custo — ver `AI_MODEL` em src/lib/ai-assistant.ts.
 //
-// Segredos exigidos (Supabase → Project Settings → Edge Functions → Secrets):
-//   OPENROUTER_API_KEY  — nunca exposta ao client/Vercel (Seção 3)
-//   AI_ENABLED          — kill switch ("false" desativa o assistente inteiro)
-//   AI_DAILY_MSG_CAP    — teto diário global de mensagens (proteção de custo), default 300
+// Cadastre estes como secrets de Edge Function do projeto Supabase (a
+// interface exata depende de como o projeto é administrado — este repo usa
+// Lovable Cloud e não há evidência aqui de qual painel/CLI está em uso, então
+// não afirmamos um caminho de menu):
+//   OPENROUTER_API_KEY  — obrigatória; nunca exposta ao client/Vercel (Seção 3)
+//   AI_ENABLED          — opcional; kill switch, ver `isAiEnabled` (fail-safe:
+//                         valor não reconhecido DESLIGA; ausente = ligado)
+//   AI_DAILY_MSG_CAP    — opcional; teto diário global de mensagens, default 300
 //   AI_MODEL            — opcional; troca o modelo sem novo deploy (default: DeepSeek)
 //   OPENROUTER_REFERER  — opcional; atribuição no ranking do OpenRouter
+// SUPABASE_URL e SUPABASE_ANON_KEY são injetadas pelo runtime — não cadastrar.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import {
   resolveEntitlement,
@@ -31,6 +36,7 @@ import {
   AI_MODEL,
   AI_MAX_TOKENS,
   AI_HISTORY_LIMIT,
+  isAiEnabled,
   isMessageValid,
   isVisaQuestion,
   buildSystemPrompt,
@@ -46,11 +52,16 @@ const CORS = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY") ?? "";
-const AI_ENABLED = (Deno.env.get("AI_ENABLED") ?? "true") !== "false";
+// Kill switch com fail-safe: valor não reconhecido desliga. Ver `isAiEnabled`.
+const AI_ENABLED = isAiEnabled(Deno.env.get("AI_ENABLED"));
 const AI_DAILY_MSG_CAP = Number(Deno.env.get("AI_DAILY_MSG_CAP") ?? "300");
 // Permite trocar de modelo pelo painel de secrets, sem novo deploy da função.
 const AI_MODEL_ID = Deno.env.get("AI_MODEL") ?? AI_MODEL;
-const OPENROUTER_REFERER = Deno.env.get("OPENROUTER_REFERER") ?? "https://viajaly.app";
+// Atribuição pública no ranking do OpenRouter — cosmético, não afeta a
+// resposta. Usa o domínio institucional (`viajaly.com`, o `url` da
+// Organization no schema.org das landings) e não o `viajaly.app`, que no repo
+// aparece para portal/e-mail transacional. Sobrescrevível pelo secret.
+const OPENROUTER_REFERER = Deno.env.get("OPENROUTER_REFERER") ?? "https://viajaly.com";
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {

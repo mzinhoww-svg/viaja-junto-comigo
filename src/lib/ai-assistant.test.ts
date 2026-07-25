@@ -3,6 +3,7 @@ import {
   AI_MAX_MESSAGE_LENGTH,
   buildSystemPrompt,
   buildTripContextBlock,
+  isAiEnabled,
   isMessageValid,
   isVisaQuestion,
   type TripAiContext,
@@ -34,6 +35,44 @@ describe("isMessageValid", () => {
 
   it("aceita mensagem exatamente no limite", () => {
     expect(isMessageValid("a".repeat(AI_MAX_MESSAGE_LENGTH))).toBe(true);
+  });
+});
+
+describe("isAiEnabled (kill switch com fail-safe)", () => {
+  it("secret ausente ou vazio mantém o assistente ligado (default documentado)", () => {
+    expect(isAiEnabled(undefined)).toBe(true);
+    expect(isAiEnabled(null)).toBe(true);
+    expect(isAiEnabled("")).toBe(true);
+    expect(isAiEnabled("   ")).toBe(true);
+  });
+
+  it.each(["false", "False", "FALSE", "0", "no", "NO", "off", "Off", "disabled", "nao", "não"])(
+    "desliga com o valor falsy %j (case-insensitive)",
+    (valor) => {
+      expect(isAiEnabled(valor)).toBe(false);
+    },
+  );
+
+  it.each(["true", "True", "1", "yes", "on", "ON", "enabled", "sim"])(
+    "mantém ligado com o valor truthy %j",
+    (valor) => {
+      expect(isAiEnabled(valor)).toBe(true);
+    },
+  );
+
+  it("ignora espaços em volta", () => {
+    expect(isAiEnabled("  0  ")).toBe(false);
+    expect(isAiEnabled("\tFalse\n")).toBe(false);
+    expect(isAiEnabled(" true ")).toBe(true);
+  });
+
+  it("valor não reconhecido DESLIGA (fail-safe) — inclusive erros de digitação", () => {
+    // O caso que motiva a regra: alguém tentando desligar às pressas durante
+    // um incidente e errando a grafia não pode acabar deixando ligado.
+    expect(isAiEnabled("flase")).toBe(false);
+    expect(isAiEnabled("desligado")).toBe(false);
+    expect(isAiEnabled("OFF!")).toBe(false);
+    expect(isAiEnabled("banana")).toBe(false);
   });
 });
 

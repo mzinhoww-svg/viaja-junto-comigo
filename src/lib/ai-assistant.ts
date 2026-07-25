@@ -24,6 +24,40 @@ export const AI_HISTORY_LIMIT = 20;
 /** Tamanho máximo de uma mensagem do usuário (evita prompts absurdamente longos). */
 export const AI_MAX_MESSAGE_LENGTH = 1000;
 
+/** Valores que ligam o assistente explicitamente (case-insensitive, com trim). */
+const AI_ENABLED_TRUTHY = ["true", "1", "yes", "on", "enabled", "sim"] as const;
+
+/** Valores que desligam explicitamente (case-insensitive, com trim). */
+const AI_ENABLED_FALSY = ["false", "0", "no", "off", "disabled", "nao", "não"] as const;
+
+/**
+ * Interpreta o secret `AI_ENABLED` (kill switch, Seção 7).
+ *
+ * Duas regras deliberadas, ambas assimétricas de propósito:
+ *
+ * 1. **Ausente/vazio = ligado.** É o default documentado (`AI_ENABLED` é
+ *    opcional), e "ninguém configurou nada" é inequívoco — não há intenção a
+ *    adivinhar.
+ *
+ * 2. **Valor não reconhecido = DESLIGADO.** Este é o ponto do fail-safe. Os
+ *    dois erros possíveis não custam a mesma coisa: ficar ligado por engano
+ *    queima dinheiro de API e continua mandando dado da viagem para
+ *    terceiros, enquanto ficar desligado por engano quebra a feature de forma
+ *    óbvia, imediata e reversível. Além disso, quem quer o assistente ligado
+ *    não digita um valor estranho no kill switch — deixa o secret ausente. Um
+ *    valor fora das listas é quase sempre uma tentativa de DESLIGAR com a
+ *    grafia errada ("flase", "desligado", "OFF!", "0 "), e é justamente nessa
+ *    hora (incidente em andamento) que o switch não pode falhar aberto.
+ */
+export function isAiEnabled(raw: string | null | undefined): boolean {
+  if (raw == null) return true;
+  const valor = raw.trim().toLowerCase();
+  if (valor === "") return true;
+  if ((AI_ENABLED_FALSY as readonly string[]).includes(valor)) return false;
+  if ((AI_ENABLED_TRUTHY as readonly string[]).includes(valor)) return true;
+  return false;
+}
+
 export type TripAiContext = {
   nome: string;
   destinoPais: string;
