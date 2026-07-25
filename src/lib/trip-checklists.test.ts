@@ -9,6 +9,12 @@ import {
   type ChecklistItemRow,
   type ChecklistRow,
 } from "./trip-checklists";
+import {
+  selecionarTemplates,
+  type ChecklistTemplateRow,
+  type ChecklistTipo,
+  type TripVariables,
+} from "./trip-templates";
 
 function checklist(overrides: Partial<ChecklistRow> = {}): ChecklistRow {
   return {
@@ -144,21 +150,140 @@ describe("validarNovoItem", () => {
 });
 
 describe("contarTemplatesPremiumPorTipo (gatilho: abrir item de checklist premium)", () => {
+  function template(overrides: Partial<ChecklistTemplateRow> = {}): ChecklistTemplateRow {
+    return {
+      id: "tpl-1",
+      tipo: "documentos",
+      titulo: "Item premium",
+      marco: null,
+      prazoDiasAntes: null,
+      tier: "premium",
+      regiao: null,
+      clima: null,
+      minDuracao: null,
+      comCrianca: null,
+      destinoPack: null,
+      ordem: 0,
+      ...overrides,
+    };
+  }
+
+  function vars(overrides: Partial<TripVariables> = {}): TripVariables {
+    return {
+      regiao: null,
+      clima: null,
+      destinoPack: null,
+      comCriancas: false,
+      duracaoDias: null,
+      ...overrides,
+    };
+  }
+
+  /**
+   * Catálogo reduzido com a mesma estrutura do real (VJT-003/VJT-003b):
+   * um bloco premium genérico, dois packs de destino e um item só para quem
+   * viaja com crianças.
+   */
+  const CATALOGO: ChecklistTemplateRow[] = [
+    template({ id: "free-1", tier: "free", titulo: "Passaporte" }),
+    template({ id: "free-2", tier: "free", tipo: "mala", titulo: "Adaptador" }),
+    template({ id: "gen-1", titulo: "Genérico premium 1" }),
+    template({ id: "gen-2", tipo: "mala", titulo: "Genérico premium 2" }),
+    template({ id: "gen-3", tipo: "mala", titulo: "Genérico premium 3" }),
+    template({ id: "orlando-1", tipo: "compras", destinoPack: "orlando", titulo: "Ingressos" }),
+    template({ id: "orlando-2", tipo: "mala", destinoPack: "orlando", titulo: "Poncho" }),
+    template({ id: "europa-1", tipo: "documentos", destinoPack: "europa", titulo: "Etias" }),
+    template({ id: "crianca-1", tipo: "mala", comCrianca: true, titulo: "Carrinho" }),
+    template({ id: "asia-1", tipo: "preparativos", regiao: "asia", titulo: "Vacina" }),
+  ];
+
   it("conta só os templates de tier premium, agrupados por tipo", () => {
-    const templates = [
-      { tipo: "documentos" as const, tier: "premium" as const },
-      { tipo: "documentos" as const, tier: "premium" as const },
-      { tipo: "documentos" as const, tier: "free" as const },
-      { tipo: "mala" as const, tier: "premium" as const },
-    ];
-    expect(contarTemplatesPremiumPorTipo(templates)).toEqual({ documentos: 2, mala: 1 });
+    expect(
+      contarTemplatesPremiumPorTipo(
+        [
+          template({ id: "a" }),
+          template({ id: "b" }),
+          template({ id: "c", tier: "free" }),
+          template({ id: "d", tipo: "mala" }),
+        ],
+        vars(),
+      ),
+    ).toEqual({ documentos: 2, mala: 1 });
+  });
+
+  it("ignora packs de destino que não são os da trip", () => {
+    // Chile: sem pack, região america_sul — não ganha nada de orlando/europa/asia.
+    expect(
+      contarTemplatesPremiumPorTipo(CATALOGO, vars({ regiao: "america_sul", clima: "frio" })),
+    ).toEqual({ documentos: 1, mala: 2 });
+  });
+
+  it("soma o pack do destino da trip", () => {
+    expect(
+      contarTemplatesPremiumPorTipo(
+        CATALOGO,
+        vars({ regiao: "america_norte", clima: "quente", destinoPack: "orlando" }),
+      ),
+    ).toEqual({ documentos: 1, mala: 3, compras: 1 });
+  });
+
+  it("só conta itens de criança quando a trip tem crianças", () => {
+    const semCriancas = contarTemplatesPremiumPorTipo(CATALOGO, vars({ comCriancas: false }));
+    const comCriancas = contarTemplatesPremiumPorTipo(CATALOGO, vars({ comCriancas: true }));
+    expect(semCriancas.mala).toBe(2);
+    expect(comCriancas.mala).toBe(3);
   });
 
   it("catálogo só com templates free retorna objeto vazio", () => {
-    expect(contarTemplatesPremiumPorTipo([{ tipo: "compras", tier: "free" }])).toEqual({});
+    expect(contarTemplatesPremiumPorTipo([template({ tier: "free" })], vars())).toEqual({});
   });
 
   it("lista vazia retorna objeto vazio", () => {
-    expect(contarTemplatesPremiumPorTipo([])).toEqual({});
+    expect(contarTemplatesPremiumPorTipo([], vars())).toEqual({});
+  });
+
+  /**
+   * Aceite do VJT-011b: o número do teaser tem que ser exatamente o que a
+   * clonagem entregaria a mais se o usuário virasse premium — comparado
+   * contra `selecionarTemplates` de verdade, não contra número escrito à mão.
+   */
+  describe("paridade com selecionarTemplates (o que a trip realmente ganharia)", () => {
+    function deltaReal(v: TripVariables): Partial<Record<ChecklistTipo, number>> {
+      const porTipo = (tier: "free" | "premium") => {
+        const contagem: Partial<Record<ChecklistTipo, number>> = {};
+        for (const t of selecionarTemplates(CATALOGO, tier, v)) {
+          contagem[t.tipo] = (contagem[t.tipo] ?? 0) + 1;
+        }
+        return contagem;
+      };
+      const free = porTipo("free");
+      const premium = porTipo("premium");
+      const delta: Partial<Record<ChecklistTipo, number>> = {};
+      for (const [tipo, total] of Object.entries(premium) as [ChecklistTipo, number][]) {
+        const ganho = total - (free[tipo] ?? 0);
+        if (ganho > 0) delta[tipo] = ganho;
+      }
+      return delta;
+    }
+
+    it("cenário 1: Orlando com crianças", () => {
+      const v = vars({
+        regiao: "america_norte",
+        clima: "quente",
+        destinoPack: "orlando",
+        comCriancas: true,
+      });
+      expect(contarTemplatesPremiumPorTipo(CATALOGO, v)).toEqual(deltaReal(v));
+    });
+
+    it("cenário 2: Chile sem crianças e sem pack", () => {
+      const v = vars({ regiao: "america_sul", clima: "frio" });
+      expect(contarTemplatesPremiumPorTipo(CATALOGO, v)).toEqual(deltaReal(v));
+    });
+
+    it("cenário 3: destino digitado à mão (todas as variáveis nulas)", () => {
+      const v = vars();
+      expect(contarTemplatesPremiumPorTipo(CATALOGO, v)).toEqual(deltaReal(v));
+    });
   });
 });

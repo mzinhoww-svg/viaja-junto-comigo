@@ -9,7 +9,10 @@ import {
   CHECKLIST_TIPOS,
   MARCOS_CONHECIDOS,
   labelMarco,
+  templateAplica,
+  type ChecklistTemplateRow,
   type ChecklistTipo,
+  type TripVariables,
 } from "./trip-templates";
 
 export type ChecklistRow = {
@@ -96,19 +99,34 @@ export function proximaOrdem(itensDaLista: ChecklistItemRow[]): number {
 }
 
 /**
- * Conta quantos `checklist_templates` de tier premium existem por tipo —
+ * Conta, por tipo, quantos itens **esta trip** ganharia ao virar premium —
  * alimenta a linha "teaser" travada exibida para usuários free (gatilho
- * "abrir item de checklist premium", VJT-011). Não há relação entre
- * `checklist_items` clonados e o template de origem (a clonagem não guarda
- * essa linhagem), então a contagem é do catálogo completo, não da trip
- * específica — suficiente para o teaser, que só precisa comunicar volume.
+ * "abrir item de checklist premium", VJT-011).
+ *
+ * Conta só templates de tier premium que passam por `templateAplica` com as
+ * variáveis reais da trip (`regiao`/`clima`/`destinoPack`/`comCriancas`), a
+ * mesma função que o motor de clonagem usa em `useCreateTrip` — reuso, nunca
+ * reimplementação da regra (VJT-011b). Isso equivale exatamente ao delta
+ * `selecionarTemplates(premium) − selecionarTemplates(free)`, porque o filtro
+ * de variáveis independe do tier e o tier free só exclui os premium.
+ *
+ * Antes (VJT-011) a contagem era do catálogo inteiro por tipo, sem variáveis:
+ * uma trip para o Chile somava no número os packs `orlando`/`europa` que nunca
+ * seriam clonados para ela, prometendo itens que a compra não entregaria.
+ *
+ * Continua não existindo linhagem entre `checklist_items` clonados e o
+ * template de origem, então a conta é sobre o catálogo aplicável — não sobre
+ * o que já foi clonado. Para um usuário free (único que vê o teaser) as duas
+ * coisas coincidem: nenhum item premium foi clonado para ele.
  */
 export function contarTemplatesPremiumPorTipo(
-  templates: { tipo: ChecklistTipo; tier: "free" | "premium" }[],
+  templates: ChecklistTemplateRow[],
+  vars: TripVariables,
 ): Partial<Record<ChecklistTipo, number>> {
   const contagem: Partial<Record<ChecklistTipo, number>> = {};
   for (const template of templates) {
     if (template.tier !== "premium") continue;
+    if (!templateAplica(template, "premium", vars)) continue;
     contagem[template.tipo] = (contagem[template.tipo] ?? 0) + 1;
   }
   return contagem;
