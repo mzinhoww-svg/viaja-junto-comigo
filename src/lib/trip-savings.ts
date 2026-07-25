@@ -49,6 +49,19 @@ export function formatMesAnoLabel(mesAno: string): string {
   return `${nomeCapitalizado} de ${ano}`;
 }
 
+/**
+ * Rótulo de atribuição de um registro de economia quando o autor não existe
+ * mais (conta excluída, VJT-017) — `null` quando o autor ainda existe (hoje
+ * a UI não resolve `created_by` para nome/avatar em nenhum caso; isto só
+ * cobre o estado "removido" explicitamente, para nunca mostrar um id cru ou
+ * um estado quebrado). O valor do registro continua contando no acumulado
+ * da trip (`created_by` vira NULL em vez de apagar a linha) — só a
+ * atribuição pessoal desaparece.
+ */
+export function entryAutorLabel(createdBy: string | null): string | null {
+  return createdBy === null ? "Membro removido" : null;
+}
+
 /** Soma os registros de economia de um mês específico (todos os membros da trip). */
 export function calcularValorRegistradoNoMes(
   entries: SavingsEntrySummary[],
