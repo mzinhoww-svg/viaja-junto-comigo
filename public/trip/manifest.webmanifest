@@ -1,0 +1,33 @@
+{
+  "name": "Viajaly Trip",
+  "short_name": "Viajaly Trip",
+  "description": "Planeje sua viagem internacional: financeiro, checklists, roteiro e visto em um só lugar.",
+  "id": "/trip",
+  "start_url": "/trip",
+  "scope": "/trip",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#10204A",
+  "theme_color": "#10204A",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/trip/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/trip/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/trip/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

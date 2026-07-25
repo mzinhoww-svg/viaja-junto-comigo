@@ -5,7 +5,7 @@
  * ou digitado em "outro destino") contra `paises_visto.pais_nome` por nome
  * normalizado — não há FK entre as duas tabelas.
  */
-import { waLink, type WaTracking } from "./whatsapp";
+import { waLink, type WaTracking } from "./whatsapp.ts";
 
 export type PaisVistoRow = {
   paisIso: string;
