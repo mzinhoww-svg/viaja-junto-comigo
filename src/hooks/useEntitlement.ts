@@ -37,13 +37,16 @@ export type UseEntitlementResult = Entitlement & { isLoading: boolean };
  * Nenhum componente deve consultar `entitlements` ad hoc ou reimplementar a
  * lógica free/premium — sempre via este hook. Assina mudanças em tempo real
  * na própria linha (tabela adicionada à publicação `supabase_realtime` na
- * migration deste ticket) para que uma ativação manual/admin (SQL Editor,
- * origem `manual`/`pacote_visto` — bônus Pro+/Vip+) libere o plano sem
- * reload da página; RLS `ent_select_own` já garante que só a própria linha
- * chega aqui, então a assinatura não vaza dado de outro usuário. O passo a
- * passo dessa ativação manual (achar o `user_id`, o SQL, como conferir e como
- * revogar) está em `docs/runbook-ativacao-manual-entitlements.md` — é o
- * procedimento oficial de quem opera, não estes comentários (VJT-011b).
+ * migration deste ticket) para que uma ativação fora do checkout (origem
+ * `manual`/`pacote_visto` — bônus Pro+/Vip+) libere o plano sem reload da
+ * página; RLS `ent_select_own` já garante que só a própria linha chega aqui,
+ * então a assinatura não vaza dado de outro usuário. Hoje existem **dois**
+ * caminhos de ativação fora do checkout: o código de acesso em `/trip/mais`
+ * e `/trip/login` (VJT-011c/VJT-011d, o padrão do dia a dia) e o SQL Editor
+ * (VJT-011b, para o que o código não cobre — ativar em nome de terceiro,
+ * `origem = 'pacote_visto'`, prazo em `expires_at`, revogação). O passo a
+ * passo dos dois está em `docs/runbook-ativacao-manual-entitlements.md` — é
+ * o procedimento oficial de quem opera, não estes comentários.
  *
  * Backstop se o canal cair: `.subscribe` recebe o status da inscrição —
  * `CHANNEL_ERROR`/`TIMED_OUT`/`CLOSED` disparam um refetch imediato em vez

@@ -63,6 +63,9 @@ async function logRedeem(userId: string, already: boolean): Promise<void> {
  * autenticado. O código válido vem de `TRIP_ADMIN_CODE` (env só do servidor)
  * e nunca é devolvido ao client — nem em mensagem de erro, nem em log.
  *
+ * Procedimento operacional (incluindo o que este caminho não cobre e cai no
+ * SQL): `docs/runbook-ativacao-manual-entitlements.md`.
+ *
  * "Código inválido" e "recurso desligado neste ambiente" são mensagens
  * distintas: os dois casos só chegam a quem já está autenticado, e separá-los
  * evita o suporte caçar um código errado quando o que falta é a variável de
