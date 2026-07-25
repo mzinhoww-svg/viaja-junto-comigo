@@ -15,9 +15,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { captureMock, supabaseMock, setTableResult, resetDb, invokeMock } = vi.hoisted(() => {
+const { captureMock, supabaseMock, setTableResult, resetDb, sendAiChatMock } = vi.hoisted(() => {
   const captureMock = vi.fn();
-  const invokeMock = vi.fn();
+  const sendAiChatMock = vi.fn();
   let resultados: Record<string, unknown> = {};
 
   function setTableResult(table: string, result: unknown) {
@@ -61,16 +61,18 @@ const { captureMock, supabaseMock, setTableResult, resetDb, invokeMock } = vi.ho
   const supabaseMock = {
     from: (table: string) => builder(table),
     rpc: (_fn: string, _args: unknown) => Promise.resolve({ data: "trip-1", error: null }),
-    functions: { invoke: invokeMock },
     auth: {
       getUser: () => Promise.resolve({ data: { user: { id: "user-1" } }, error: null }),
     },
   };
 
-  return { captureMock, supabaseMock, setTableResult, resetDb, invokeMock };
+  return { captureMock, supabaseMock, setTableResult, resetDb, sendAiChatMock };
 });
 
 vi.mock("@/integrations/supabase/client", () => ({ supabase: supabaseMock }));
+// O assistente saiu da Edge Function `ai-chat` para o server function
+// `sendAiChatMessage`; o mock acompanha o hook, senão o envio nunca resolve.
+vi.mock("@/lib/ai-chat.functions", () => ({ sendAiChatMessage: sendAiChatMock }));
 vi.mock("@/lib/posthog", () => ({
   capture: captureMock,
   captureOnce: vi.fn(),
@@ -333,14 +335,11 @@ describe("budget_item_created", () => {
 
 describe("ai_message_sent", () => {
   it("dispara com a cota do plano e sinaliza redirecionamento de visto", async () => {
-    invokeMock.mockResolvedValue({
-      data: {
-        conversation_id: "conv-1",
-        message: "resposta",
-        usage: { used: 3, limit: 10 },
-        redirect: { whatsapp_url: "https://wa.me/..." },
-      },
-      error: null,
+    sendAiChatMock.mockResolvedValue({
+      conversation_id: "conv-1",
+      message: "resposta",
+      usage: { used: 3, limit: 10 },
+      redirect: { whatsapp_url: "https://wa.me/..." },
     });
 
     const { result } = renderHook(() => useAiChat("trip-1"), { wrapper: criarWrapper() });
@@ -358,8 +357,8 @@ describe("ai_message_sent", () => {
     expect(JSON.stringify(props)).not.toContain("visto para os EUA");
   });
 
-  it("não dispara quando a cota está esgotada (erro da Edge Function)", async () => {
-    invokeMock.mockResolvedValue({ data: null, error: new Error("quota_exceeded") });
+  it("não dispara quando a cota está esgotada (erro do servidor)", async () => {
+    sendAiChatMock.mockRejectedValue(new Error("quota_exceeded"));
 
     const { result } = renderHook(() => useAiChat("trip-1"), { wrapper: criarWrapper() });
     act(() => result.current.mutate("oi"));
