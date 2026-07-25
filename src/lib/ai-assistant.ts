@@ -1,13 +1,19 @@
 /**
  * Assistente IA do Viajaly Trip (VJT-014, VIAJALY-TRIP.md Seção 7).
- * Módulo puro: sem I/O, sem acesso a Supabase/Anthropic — mesma convenção de
- * trip-math.ts/entitlements.ts/trip-visa.ts. Reaproveitado tanto pelo client
- * quanto pela Edge Function `supabase/functions/ai-chat` (import relativo,
- * runtime Deno consegue importar este arquivo sem alteração).
+ * Módulo puro: sem I/O, sem acesso a Supabase/provider de IA — mesma
+ * convenção de trip-math.ts/entitlements.ts/trip-visa.ts. Reaproveitado tanto
+ * pelo client quanto pela Edge Function `supabase/functions/ai-chat` (import
+ * relativo, runtime Deno consegue importar este arquivo sem alteração).
  */
 
-/** Classe econômica exigida pela Seção 3 ("modelo econômico, classe Haiku"). */
-export const AI_MODEL = "claude-haiku-4-5";
+/**
+ * Modelo econômico (Seção 3). Servido via OpenRouter, que usa o formato de
+ * API do OpenAI — o identificador precisa vir no formato `vendor/modelo`.
+ * DeepSeek foi escolhido por custo bem abaixo da classe Haiku.
+ * A Edge Function permite sobrescrever isto pelo secret `AI_MODEL`, então dá
+ * para testar outro modelo sem novo deploy.
+ */
+export const AI_MODEL = "deepseek/deepseek-chat";
 
 /** Teto de tokens de saída — respostas de assistente de viagem são curtas. */
 export const AI_MAX_TOKENS = 1024;
@@ -36,7 +42,7 @@ export function isMessageValid(message: string): boolean {
 /**
  * Termos que sinalizam dúvida sobre visto — gatilho para o redirecionamento
  * determinístico ao WhatsApp (Seção 7: "redireciona visto com UTM"), sem
- * gastar uma chamada à Anthropic. Lista pequena e específica de propósito
+ * gastar uma chamada ao modelo. Lista pequena e específica de propósito
  * (não tenta cobrir "fora de escopo" em geral — isso fica a cargo do prompt
  * de sistema, ver `buildSystemPrompt`).
  */
