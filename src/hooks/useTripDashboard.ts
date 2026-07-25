@@ -1,7 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { calcularDiasRestantes, construirJourneySteps, type JourneyStep } from "@/lib/trip-journey";
 import { calcularTripMath, determinarModoTrip, type TripMathResult } from "@/lib/trip-math";
+import { tripDashboardQueryKey, tripSavingsQueryKey } from "@/lib/trip-query-keys";
 
 export type TripDashboardTrip = {
   id: string;
@@ -23,7 +24,7 @@ export type TripDashboardData = {
 
 export function useTripDashboard(tripId: string | undefined) {
   return useQuery({
-    queryKey: ["trip", "dashboard", tripId],
+    queryKey: tripDashboardQueryKey(tripId),
     enabled: !!tripId,
     queryFn: async (): Promise<TripDashboardData> => {
       const id = tripId as string;
@@ -110,7 +111,19 @@ export function useTripDashboard(tripId: string | undefined) {
  * para "modo sonho" ao enviar `null`). Mantém `trips.status` coerente com
  * `determinarModoTrip`, mas o dashboard sempre recalcula o modo no client a
  * partir de `data_viagem` — a coluna é só para consumidores externos (ex. SQL).
+ *
+ * `data_viagem` também alimenta a Economia Mensal (VJT-005,
+ * `["trip","savings",tripId]`, via `meses_restantes`/`sugestao_mensal`) —
+ * invalida as duas, senão a Economia Mensal fica com valores desatualizados
+ * até um reload. `["trip","current"]` é de `useCurrentTrip`/roteiro
+ * (VJT-008), não relacionada ao Financeiro.
  */
+export function invalidateAfterTripDateChange(qc: QueryClient, tripId: string) {
+  qc.invalidateQueries({ queryKey: tripDashboardQueryKey(tripId) });
+  qc.invalidateQueries({ queryKey: tripSavingsQueryKey(tripId) });
+  qc.invalidateQueries({ queryKey: ["trip", "current"] });
+}
+
 export function useUpdateTripDate(tripId: string) {
   const qc = useQueryClient();
   return useMutation({
@@ -122,9 +135,6 @@ export function useUpdateTripDate(tripId: string) {
         .eq("id", tripId);
       if (error) throw error;
     },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["trip", "dashboard", tripId] });
-      qc.invalidateQueries({ queryKey: ["trip", "current"] });
-    },
+    onSuccess: () => invalidateAfterTripDateChange(qc, tripId),
   });
 }

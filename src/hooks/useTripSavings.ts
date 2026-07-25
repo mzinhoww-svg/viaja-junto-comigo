@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   calcularValorRegistradoNoMes,
@@ -6,6 +6,7 @@ import {
   type SavingsEntrySummary,
 } from "@/lib/trip-savings";
 import { calcularTripMath, type TripMathResult } from "@/lib/trip-math";
+import { tripDashboardQueryKey, tripSavingsQueryKey } from "@/lib/trip-query-keys";
 
 export type SavingsEntry = {
   id: string;
@@ -23,9 +24,20 @@ export type TripSavingsData = {
 
 const POSTGRES_UNIQUE_VIOLATION = "23505";
 
+/**
+ * savings_entries também alimenta o Dashboard (VJT-004,
+ * `["trip","dashboard",tripId]`, via `tripMath.acumuladoBrlCents`) — toda
+ * mutação aqui precisa invalidar as duas, senão o progresso combinado do
+ * Dashboard fica desatualizado até um reload.
+ */
+export function invalidateSavings(qc: QueryClient, tripId: string) {
+  qc.invalidateQueries({ queryKey: tripSavingsQueryKey(tripId) });
+  qc.invalidateQueries({ queryKey: tripDashboardQueryKey(tripId) });
+}
+
 export function useTripSavings(tripId: string | undefined) {
   return useQuery({
-    queryKey: ["trip", "savings", tripId],
+    queryKey: tripSavingsQueryKey(tripId),
     enabled: !!tripId,
     queryFn: async (): Promise<TripSavingsData> => {
       const id = tripId as string;
@@ -109,7 +121,7 @@ export function useAddSavingsEntry(tripId: string) {
         throw error;
       }
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["trip", "savings", tripId] }),
+    onSuccess: () => invalidateSavings(qc, tripId),
   });
 }
 
@@ -123,7 +135,7 @@ export function useUpdateSavingsEntry(tripId: string) {
         .eq("id", input.id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["trip", "savings", tripId] }),
+    onSuccess: () => invalidateSavings(qc, tripId),
   });
 }
 
@@ -134,6 +146,6 @@ export function useDeleteSavingsEntry(tripId: string) {
       const { error } = await supabase.from("savings_entries").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["trip", "savings", tripId] }),
+    onSuccess: () => invalidateSavings(qc, tripId),
   });
 }
