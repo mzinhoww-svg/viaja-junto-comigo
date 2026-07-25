@@ -1,5 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { tripDashboardQueryKey } from "@/lib/trip-query-keys";
 import {
   agruparPorMarco,
   calcularProgresso,
@@ -22,24 +23,25 @@ export type TripChecklistsData = {
   progressoGlobal: ChecklistProgresso;
 };
 
-function queryKey(tripId: string | undefined) {
+export function tripChecklistsQueryKey(tripId: string | undefined) {
   return ["trip", "checklists", tripId] as const;
 }
 
 /**
  * `checklist_items.done`/`marco` também alimentam o progresso/stepper do
- * Dashboard (VJT-004, `["trip","dashboard",tripId]`) — toda mutação precisa
- * invalidar as duas chaves, senão marcar um item aqui não atualiza o
- * Dashboard até reload (mesma lição do cross-invalidation do VJT-006).
+ * Dashboard (VJT-004) — toda mutação precisa invalidar as duas chaves,
+ * senão marcar um item aqui não atualiza o Dashboard até reload (mesma
+ * lição do cross-invalidation do VJT-006/VJT-006b). Chave do Dashboard
+ * vem de `trip-query-keys.ts` (fonte única), nunca redeclarada aqui.
  */
-function invalidateChecklists(qc: ReturnType<typeof useQueryClient>, tripId: string) {
-  qc.invalidateQueries({ queryKey: queryKey(tripId) });
-  qc.invalidateQueries({ queryKey: ["trip", "dashboard", tripId] });
+export function invalidateChecklists(qc: QueryClient, tripId: string) {
+  qc.invalidateQueries({ queryKey: tripChecklistsQueryKey(tripId) });
+  qc.invalidateQueries({ queryKey: tripDashboardQueryKey(tripId) });
 }
 
 export function useTripChecklists(tripId: string | undefined) {
   return useQuery({
-    queryKey: queryKey(tripId),
+    queryKey: tripChecklistsQueryKey(tripId),
     enabled: !!tripId,
     queryFn: async (): Promise<TripChecklistsData> => {
       const id = tripId as string;
