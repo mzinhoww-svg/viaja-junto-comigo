@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
 # Spins up a disposable local Postgres cluster, applies the real
-# supabase/migrations/20260723120000_viajaly_trip_initial_schema.sql
-# (trips/trip_members/trip_invites + RLS policies + accept_trip_invite),
-# and runs supabase/tests/rls_trip_invites.test.sql against it.
+# supabase/migrations/*.sql (trips/trip_members/trip_invites + RLS policies +
+# accept_trip_invite), and runs the RLS suite against it.
+#
+#   scripts/test-rls.sh            # VJT-013 assertions (fails the build on a gap)
+#   scripts/test-rls.sh --audit    # full-schema probe report across every table
 #
 # This exists because the project has no local Supabase/Docker stack
 # available in this session/CI (see VIAJALY-TRIP.md, Seção 3) -- it lets us
 # test the actual RLS policies instead of only reading them.
 set -euo pipefail
+
+MODE="assert"
+if [ "${1:-}" = "--audit" ]; then MODE="audit"; fi
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MIGRATIONS=(
@@ -15,7 +20,11 @@ MIGRATIONS=(
   "$REPO_ROOT/supabase/migrations/20260725200000_vjt013_trips_select_owner_bootstrap.sql"
 )
 AUTH_MOCK="$REPO_ROOT/supabase/tests/fixtures/auth_mock.sql"
-TEST_SQL="$REPO_ROOT/supabase/tests/rls_trip_invites.test.sql"
+if [ "$MODE" = "audit" ]; then
+  TEST_SQL="$REPO_ROOT/supabase/tests/rls_full_schema_audit.sql"
+else
+  TEST_SQL="$REPO_ROOT/supabase/tests/rls_trip_invites.test.sql"
+fi
 
 PG_BIN="$(pg_config --bindir 2>/dev/null || true)"
 if [ -z "$PG_BIN" ] || [ ! -x "$PG_BIN/initdb" ]; then
@@ -65,7 +74,12 @@ for m in "${MIGRATIONS[@]}"; do
 done
 PSQL -f "'$AUTH_MOCK'" "${MIGRATION_ARGS[@]}"
 
-echo "--- running RLS assertions ---"
-PSQL -f "'$TEST_SQL'"
-
-echo "test-rls.sh: PASS"
+if [ "$MODE" = "audit" ]; then
+  echo "--- running full-schema RLS audit ---"
+  PSQL -f "'$TEST_SQL'"
+  echo "test-rls.sh --audit: report above (see the 'veredito' column)"
+else
+  echo "--- running RLS assertions ---"
+  PSQL -f "'$TEST_SQL'"
+  echo "test-rls.sh: PASS"
+fi
