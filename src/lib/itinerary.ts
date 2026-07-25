@@ -1,3 +1,8 @@
+import type { PlanTier } from "@/lib/entitlements";
+
+/** Alias local — fonte única do tipo é `@/lib/entitlements` (VJT-011). */
+export type ItineraryPlanTier = PlanTier;
+
 export type SlotPeriod = "manha" | "tarde" | "noite";
 
 export const SLOT_PERIODS: readonly SlotPeriod[] = ["manha", "tarde", "noite"];
@@ -18,9 +23,6 @@ export type ItineraryDay = {
   slots: ItinerarySlot[];
 };
 
-export type ItineraryPlanTier = "free" | "premium";
-
-/** Ponto plugável: VJT-011 substitui por um lookup real de `entitlements`. */
 export const FREE_ITINERARY_DAY_LIMIT = 5;
 
 export function getItineraryDayLimit(tier: ItineraryPlanTier): number | null {
@@ -32,7 +34,6 @@ export function isDayLimitReached(currentDayCount: number, tier: ItineraryPlanTi
   return limit !== null && currentDayCount >= limit;
 }
 
-/** Ponto plugável: VJT-011 substitui por um lookup real de `entitlements`. */
 export function canExportItineraryPdf(tier: ItineraryPlanTier): boolean {
   return tier === "premium";
 }

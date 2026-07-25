@@ -95,6 +95,25 @@ export function proximaOrdem(itensDaLista: ChecklistItemRow[]): number {
   return itensDaLista.reduce((max, item) => Math.max(max, item.ordem), -1) + 1;
 }
 
+/**
+ * Conta quantos `checklist_templates` de tier premium existem por tipo —
+ * alimenta a linha "teaser" travada exibida para usuários free (gatilho
+ * "abrir item de checklist premium", VJT-011). Não há relação entre
+ * `checklist_items` clonados e o template de origem (a clonagem não guarda
+ * essa linhagem), então a contagem é do catálogo completo, não da trip
+ * específica — suficiente para o teaser, que só precisa comunicar volume.
+ */
+export function contarTemplatesPremiumPorTipo(
+  templates: { tipo: ChecklistTipo; tier: "free" | "premium" }[],
+): Partial<Record<ChecklistTipo, number>> {
+  const contagem: Partial<Record<ChecklistTipo, number>> = {};
+  for (const template of templates) {
+    if (template.tier !== "premium") continue;
+    contagem[template.tipo] = (contagem[template.tipo] ?? 0) + 1;
+  }
+  return contagem;
+}
+
 /** Valida o título de um novo item. Retorna a mensagem de erro, ou `null` se válido. */
 export function validarNovoItem(titulo: string): string | null {
   if (!titulo.trim()) return "Título do item é obrigatório.";

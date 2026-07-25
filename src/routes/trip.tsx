@@ -1,6 +1,8 @@
 import { createFileRoute, redirect, Outlet } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { TripBottomNav } from "@/components/trip/BottomNav";
+import { PaywallModal } from "@/components/trip/paywall/PaywallModal";
+import { PaywallProvider } from "@/hooks/usePaywall";
 
 /**
  * Pathless layout that gates everything under /trip/*.
@@ -19,11 +21,14 @@ export const Route = createFileRoute("/trip")({
 
 function TripLayout() {
   return (
-    <div className="min-h-screen bg-background">
-      <main className="mx-auto w-full max-w-md pb-24">
-        <Outlet />
-      </main>
-      <TripBottomNav />
-    </div>
+    <PaywallProvider>
+      <div className="min-h-screen bg-background">
+        <main className="mx-auto w-full max-w-md pb-24">
+          <Outlet />
+        </main>
+        <TripBottomNav />
+      </div>
+      <PaywallModal />
+    </PaywallProvider>
   );
 }

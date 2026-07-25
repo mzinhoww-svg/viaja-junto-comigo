@@ -4,8 +4,12 @@
  * e devolve os itens agrupados nas 4 listas fixas do produto.
  */
 
+import type { PlanTier as SharedPlanTier } from "@/lib/entitlements";
+
+/** Alias local — fonte única do tipo é `@/lib/entitlements` (VJT-011). */
+export type PlanTier = SharedPlanTier;
+
 export type ChecklistTipo = "documentos" | "preparativos" | "mala" | "compras" | "custom";
-export type PlanTier = "free" | "premium";
 
 export type ChecklistTemplateRow = {
   id: string;

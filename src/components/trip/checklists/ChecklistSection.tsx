@@ -17,6 +17,8 @@ type Props = {
   onAddItem: (titulo: string, marco: number | null) => void;
   /** Card contextual extra (ex. item de visto, VJT-009) — renderizado antes dos grupos. */
   topContent?: ReactNode;
+  /** Linha extra depois dos grupos (ex. teaser premium travado, VJT-011). */
+  bottomContent?: ReactNode;
 };
 
 function pct(valor: number): number {
@@ -35,6 +37,7 @@ export function ChecklistSection({
   onDeleteItem,
   onAddItem,
   topContent,
+  bottomContent,
 }: Props) {
   const { checklist, grupos, progresso } = lista;
 
@@ -75,6 +78,7 @@ export function ChecklistSection({
           ))
         )}
         <ChecklistItemForm isSaving={isAddingItem} onSubmit={onAddItem} />
+        {bottomContent}
       </AccordionContent>
     </AccordionItem>
   );
