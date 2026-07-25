@@ -2002,16 +2002,19 @@ export type Database = {
       user_lgpd_consents: {
         Row: {
           aceito_em: string;
+          id: string;
           user_id: string;
           versao_termos: string;
         };
         Insert: {
           aceito_em?: string;
+          id?: string;
           user_id: string;
-          versao_termos?: string;
+          versao_termos: string;
         };
         Update: {
           aceito_em?: string;
+          id?: string;
           user_id?: string;
           versao_termos?: string;
         };

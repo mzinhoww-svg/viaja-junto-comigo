@@ -5,6 +5,7 @@
 #
 #   scripts/test-rls.sh            # VJT-013 assertions (fails the build on a gap)
 #   scripts/test-rls.sh --audit    # full-schema probe report across every table
+#   scripts/test-rls.sh --lgpd     # VJT-017b: consent log (append-only + history)
 #
 # This exists because the project has no local Supabase/Docker stack
 # available in this session/CI (see VIAJALY-TRIP.md, Seção 3) -- it lets us
@@ -12,7 +13,10 @@
 set -euo pipefail
 
 MODE="assert"
-if [ "${1:-}" = "--audit" ]; then MODE="audit"; fi
+case "${1:-}" in
+  --audit) MODE="audit" ;;
+  --lgpd) MODE="lgpd" ;;
+esac
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MIGRATIONS=(
@@ -22,6 +26,15 @@ MIGRATIONS=(
 AUTH_MOCK="$REPO_ROOT/supabase/tests/fixtures/auth_mock.sql"
 if [ "$MODE" = "audit" ]; then
   TEST_SQL="$REPO_ROOT/supabase/tests/rls_full_schema_audit.sql"
+elif [ "$MODE" = "lgpd" ]; then
+  # user_lgpd_consents nasce no VJT-017 e vira log append-only no VJT-017b;
+  # as duas migrations entram no replay, nesta ordem, para o teste rodar
+  # contra a estrutura e as policies reais.
+  MIGRATIONS+=(
+    "$REPO_ROOT/supabase/migrations/20260725200000_vjt017_lgpd_nps_account_deletion.sql"
+    "$REPO_ROOT/supabase/migrations/20260725220000_vjt017b_lgpd_consent_history.sql"
+  )
+  TEST_SQL="$REPO_ROOT/supabase/tests/rls_lgpd_consents.test.sql"
 else
   TEST_SQL="$REPO_ROOT/supabase/tests/rls_trip_invites.test.sql"
 fi
@@ -78,6 +91,10 @@ if [ "$MODE" = "audit" ]; then
   echo "--- running full-schema RLS audit ---"
   PSQL -f "'$TEST_SQL'"
   echo "test-rls.sh --audit: report above (see the 'veredito' column)"
+elif [ "$MODE" = "lgpd" ]; then
+  echo "--- running LGPD consent-log assertions ---"
+  PSQL -f "'$TEST_SQL'"
+  echo "test-rls.sh --lgpd: PASS"
 else
   echo "--- running RLS assertions ---"
   PSQL -f "'$TEST_SQL'"

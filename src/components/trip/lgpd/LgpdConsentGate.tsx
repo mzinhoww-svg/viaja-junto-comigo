@@ -6,11 +6,17 @@ import { useAcceptLgpdConsent, useLgpdConsent } from "@/hooks/useLgpdConsent";
 import { LGPD_CONSENT_TEXT } from "@/lib/lgpd-consent";
 
 /**
- * Bloqueia `/trip/*` até o consentimento LGPD (VJT-017) — é o ponto de
- * contato equivalente a um "signup" para o produto Trip, já que a conta em
- * si nasce compartilhada com o app de visto (sem formulário próprio de
- * cadastro). Montado no layout `trip.tsx`, em volta de tudo (inclusive o
- * bottom nav) para que nada do produto seja acessível antes do aceite.
+ * Bloqueia `/trip/*` até o consentimento LGPD **da versão vigente** (VJT-017,
+ * versionamento no VJT-017b) — é o ponto de contato equivalente a um "signup"
+ * para o produto Trip, já que a conta em si nasce compartilhada com o app de
+ * visto (sem formulário próprio de cadastro). Montado no layout `trip.tsx`,
+ * em volta de tudo (inclusive o bottom nav) para que nada do produto seja
+ * acessível antes do aceite.
+ *
+ * Dois estados de bloqueio, com copy diferente: primeiro aceite e
+ * re-consentimento (quem aceitou uma versão anterior do texto — hoje, quem
+ * aceitou o v1, que não mencionava o assistente de IA nem os
+ * subprocessadores).
  */
 export function LgpdConsentGate({ children }: { children: ReactNode }) {
   const consent = useLgpdConsent();
@@ -25,13 +31,19 @@ export function LgpdConsentGate({ children }: { children: ReactNode }) {
     );
   }
 
-  if (!consent.data) {
+  if (!consent.data?.consentido) {
+    const reConsentimento = !!consent.data?.versaoAceita;
+
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-6 text-center">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-6 py-10 text-center">
         <ShieldCheck className="h-8 w-8 text-primary" aria-hidden />
-        <h1 className="text-lg font-semibold text-foreground">Antes de continuar</h1>
-        <p className="text-sm text-muted-foreground">
-          Para usar a Viajaly Trip, precisamos do seu consentimento para tratar seus dados pessoais.
+        <h1 className="text-lg font-semibold text-foreground">
+          {reConsentimento ? "Atualizamos nossos termos" : "Antes de continuar"}
+        </h1>
+        <p className="max-w-sm text-sm text-muted-foreground">
+          {reConsentimento
+            ? "O assistente de IA da Viajaly Trip passou a processar os dados da sua viagem em provedores fora do Brasil. Precisamos do seu consentimento de novo para continuar."
+            : "Para usar a Viajaly Trip, precisamos do seu consentimento para tratar seus dados pessoais."}
         </p>
 
         <label className="flex max-w-sm items-start gap-3 text-left">
