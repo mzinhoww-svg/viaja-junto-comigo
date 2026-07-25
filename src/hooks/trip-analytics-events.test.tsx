@@ -71,6 +71,10 @@ const { captureMock, supabaseMock, setTableResult, resetDb, invokeMock } = vi.ho
 });
 
 vi.mock("@/integrations/supabase/client", () => ({ supabase: supabaseMock }));
+// O assistente saiu de `supabase.functions.invoke("ai-chat")` para o server
+// function `sendAiChatMessage` (commit "Migrou AI para createServerFn"); o
+// ponto de disparo do `ai_message_sent` continua o mesmo `onSuccess`.
+vi.mock("@/lib/ai-chat.functions", () => ({ sendAiChatMessage: invokeMock }));
 vi.mock("@/lib/posthog", () => ({
   capture: captureMock,
   captureOnce: vi.fn(),
@@ -334,13 +338,10 @@ describe("budget_item_created", () => {
 describe("ai_message_sent", () => {
   it("dispara com a cota do plano e sinaliza redirecionamento de visto", async () => {
     invokeMock.mockResolvedValue({
-      data: {
-        conversation_id: "conv-1",
-        message: "resposta",
-        usage: { used: 3, limit: 10 },
-        redirect: { whatsapp_url: "https://wa.me/..." },
-      },
-      error: null,
+      conversation_id: "conv-1",
+      message: "resposta",
+      usage: { used: 3, limit: 10 },
+      redirect: { whatsapp_url: "https://wa.me/..." },
     });
 
     const { result } = renderHook(() => useAiChat("trip-1"), { wrapper: criarWrapper() });
@@ -359,7 +360,7 @@ describe("ai_message_sent", () => {
   });
 
   it("não dispara quando a cota está esgotada (erro da Edge Function)", async () => {
-    invokeMock.mockResolvedValue({ data: null, error: new Error("quota_exceeded") });
+    invokeMock.mockRejectedValue(new Error("quota_exceeded"));
 
     const { result } = renderHook(() => useAiChat("trip-1"), { wrapper: criarWrapper() });
     act(() => result.current.mutate("oi"));
