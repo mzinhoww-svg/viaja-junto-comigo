@@ -1913,6 +1913,44 @@ export type Database = {
           },
         ];
       };
+      trip_nps_responses: {
+        Row: {
+          comentario: string | null;
+          created_at: string;
+          id: string;
+          nota: number;
+          trip_id: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          comentario?: string | null;
+          created_at?: string;
+          id?: string;
+          nota: number;
+          trip_id: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          comentario?: string | null;
+          created_at?: string;
+          id?: string;
+          nota?: number;
+          trip_id?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "trip_nps_responses_trip_id_fkey";
+            columns: ["trip_id"];
+            isOneToOne: false;
+            referencedRelation: "trips";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       trips: {
         Row: {
           cambio_atualizado_em: string | null;
@@ -1958,6 +1996,24 @@ export type Database = {
           num_pessoas?: number;
           owner_id?: string;
           status?: Database["public"]["Enums"]["trip_status"];
+        };
+        Relationships: [];
+      };
+      user_lgpd_consents: {
+        Row: {
+          aceito_em: string;
+          user_id: string;
+          versao_termos: string;
+        };
+        Insert: {
+          aceito_em?: string;
+          user_id: string;
+          versao_termos?: string;
+        };
+        Update: {
+          aceito_em?: string;
+          user_id?: string;
+          versao_termos?: string;
         };
         Relationships: [];
       };

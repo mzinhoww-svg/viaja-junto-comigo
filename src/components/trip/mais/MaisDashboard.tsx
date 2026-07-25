@@ -1,6 +1,7 @@
 import { Loader2, MoreHorizontal } from "lucide-react";
 import { TripSectionPlaceholder } from "@/components/trip/SectionPlaceholder";
 import { AiAssistantCard } from "@/components/trip/mais/AiAssistantCard";
+import { DeleteAccountCard } from "@/components/trip/mais/DeleteAccountCard";
 import { InviteMemberCard } from "@/components/trip/mais/InviteMemberCard";
 import { PlanStatusCard } from "@/components/trip/mais/PlanStatusCard";
 import { useCurrentTrip } from "@/hooks/useItinerary";
@@ -22,13 +23,18 @@ export function MaisDashboard() {
 
   if (!trip.data) {
     return (
-      <TripSectionPlaceholder
-        icon={MoreHorizontal}
-        title="Mais"
-        description="Crie sua viagem para gerenciar membros, assistente IA e seu plano."
-        ctaTo="/trip/novo"
-        ctaLabel="Criar minha viagem"
-      />
+      <div className="space-y-3 pb-8">
+        <TripSectionPlaceholder
+          icon={MoreHorizontal}
+          title="Mais"
+          description="Crie sua viagem para gerenciar membros, assistente IA e seu plano."
+          ctaTo="/trip/novo"
+          ctaLabel="Criar minha viagem"
+        />
+        <div className="px-4">
+          <DeleteAccountCard />
+        </div>
+      </div>
     );
   }
 
@@ -41,6 +47,7 @@ export function MaisDashboard() {
       <PlanStatusCard />
       <InviteMemberCard tripId={trip.data.id} />
       <AiAssistantCard />
+      <DeleteAccountCard />
     </div>
   );
 }
