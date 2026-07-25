@@ -5,6 +5,7 @@ import { Accordion } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChecklistGlobalProgress } from "@/components/trip/checklists/ChecklistGlobalProgress";
 import { ChecklistSection } from "@/components/trip/checklists/ChecklistSection";
+import { VisaContextualCard } from "@/components/trip/checklists/VisaContextualCard";
 import { useCurrentTrip } from "@/hooks/useItinerary";
 import {
   useAddChecklistItem,
@@ -13,6 +14,7 @@ import {
   useTripChecklists,
   useUpdateChecklistItemTitulo,
 } from "@/hooks/useTripChecklists";
+import { useVistoContextual } from "@/hooks/useTripVistoContextual";
 import { proximaOrdem } from "@/lib/trip-checklists";
 
 function ChecklistsLoading() {
@@ -25,6 +27,7 @@ function ChecklistsLoading() {
 
 export function ChecklistsDashboard({ tripId }: { tripId: string }) {
   const trip = useCurrentTrip();
+  const vistoContextual = useVistoContextual(trip.data?.destinoPais);
   const checklists = useTripChecklists(tripId);
   const toggleItem = useToggleChecklistItem(tripId);
   const addItem = useAddChecklistItem(tripId);
@@ -62,6 +65,11 @@ export function ChecklistsDashboard({ tripId }: { tripId: string }) {
               editingItemId={editingItemId}
               isAddingItem={addItem.isPending}
               isSavingItem={toggleItem.isPending || updateTitulo.isPending}
+              topContent={
+                lista.checklist.tipo === "documentos" && vistoContextual.visto ? (
+                  <VisaContextualCard pais={vistoContextual.visto} />
+                ) : undefined
+              }
               onToggleItem={(id, done) =>
                 toggleItem.mutate(
                   { id, done },

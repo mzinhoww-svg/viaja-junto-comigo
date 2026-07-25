@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ChecklistItemForm } from "@/components/trip/checklists/ChecklistItemForm";
 import { ChecklistItemRow } from "@/components/trip/checklists/ChecklistItemRow";
@@ -14,6 +15,8 @@ type Props = {
   onSaveTituloItem: (id: string, titulo: string) => void;
   onDeleteItem: (id: string) => void;
   onAddItem: (titulo: string, marco: number | null) => void;
+  /** Card contextual extra (ex. item de visto, VJT-009) — renderizado antes dos grupos. */
+  topContent?: ReactNode;
 };
 
 function pct(valor: number): number {
@@ -31,6 +34,7 @@ export function ChecklistSection({
   onSaveTituloItem,
   onDeleteItem,
   onAddItem,
+  topContent,
 }: Props) {
   const { checklist, grupos, progresso } = lista;
 
@@ -45,6 +49,7 @@ export function ChecklistSection({
         </div>
       </AccordionTrigger>
       <AccordionContent className="space-y-4">
+        {topContent}
         {grupos.length === 0 ? (
           <p className="text-sm text-muted-foreground">Nenhum item nesta lista ainda.</p>
         ) : (
