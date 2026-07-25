@@ -5,11 +5,15 @@ import { Accordion } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChecklistGlobalProgress } from "@/components/trip/checklists/ChecklistGlobalProgress";
 import { ChecklistSection } from "@/components/trip/checklists/ChecklistSection";
+import { PremiumChecklistTeaserRow } from "@/components/trip/checklists/PremiumChecklistTeaserRow";
 import { VisaContextualCard } from "@/components/trip/checklists/VisaContextualCard";
 import { useCurrentTrip } from "@/hooks/useItinerary";
+import { useEntitlement } from "@/hooks/useEntitlement";
+import { usePaywall } from "@/hooks/usePaywall";
 import {
   useAddChecklistItem,
   useDeleteChecklistItem,
+  usePremiumChecklistCounts,
   useToggleChecklistItem,
   useTripChecklists,
   useUpdateChecklistItemTitulo,
@@ -34,6 +38,9 @@ export function ChecklistsDashboard({ tripId }: { tripId: string }) {
   const updateTitulo = useUpdateChecklistItemTitulo(tripId);
   const deleteItem = useDeleteChecklistItem(tripId);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const entitlement = useEntitlement();
+  const { openPaywall } = usePaywall();
+  const premiumCounts = usePremiumChecklistCounts();
 
   if (checklists.isLoading || !checklists.data) {
     return <ChecklistsLoading />;
@@ -68,6 +75,14 @@ export function ChecklistsDashboard({ tripId }: { tripId: string }) {
               topContent={
                 lista.checklist.tipo === "documentos" && vistoContextual.visto ? (
                   <VisaContextualCard pais={vistoContextual.visto} />
+                ) : undefined
+              }
+              bottomContent={
+                !entitlement.isPremium && (premiumCounts.data?.[lista.checklist.tipo] ?? 0) > 0 ? (
+                  <PremiumChecklistTeaserRow
+                    count={premiumCounts.data?.[lista.checklist.tipo] ?? 0}
+                    onOpen={() => openPaywall("checklist_premium")}
+                  />
                 ) : undefined
               }
               onToggleItem={(id, done) =>

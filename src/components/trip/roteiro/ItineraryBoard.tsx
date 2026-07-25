@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
 import { Map, Plus, Loader2, FileDown } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { TripSectionPlaceholder } from "@/components/trip/SectionPlaceholder";
 import { ItineraryDayCard } from "@/components/trip/roteiro/ItineraryDayCard";
+import { useEntitlement } from "@/hooks/useEntitlement";
+import { usePaywall } from "@/hooks/usePaywall";
 import {
   useAddItineraryDay,
   useCurrentTrip,
@@ -15,11 +16,8 @@ import {
   useUpdateItinerarySlot,
   type CurrentTrip,
 } from "@/hooks/useItinerary";
-import { canExportItineraryPdf, isDayLimitReached, type ItineraryPlanTier } from "@/lib/itinerary";
+import { canExportItineraryPdf, isDayLimitReached } from "@/lib/itinerary";
 import { exportItineraryPdf } from "@/lib/itinerary-pdf";
-
-/** Ponto plugável: VJT-011 substitui por `useEntitlement()`. */
-const CURRENT_PLAN_TIER: ItineraryPlanTier = "free";
 
 export function ItineraryBoard() {
   const trip = useCurrentTrip();
@@ -62,9 +60,11 @@ function TripItineraryBoard({ trip }: { trip: CurrentTrip }) {
   const removeDay = useRemoveItineraryDay(tripId, days);
   const moveDay = useMoveItineraryDay(tripId, days);
   const updateSlot = useUpdateItinerarySlot(tripId);
+  const entitlement = useEntitlement();
+  const { openPaywall } = usePaywall();
 
-  const limitReached = isDayLimitReached(days.length, CURRENT_PLAN_TIER);
-  const canExportPdf = canExportItineraryPdf(CURRENT_PLAN_TIER);
+  const limitReached = isDayLimitReached(days.length, entitlement.tier);
+  const canExportPdf = canExportItineraryPdf(entitlement.tier);
 
   function toggleCollapsed(dayId: string) {
     setCollapsedDayIds((prev) => {
@@ -76,12 +76,18 @@ function TripItineraryBoard({ trip }: { trip: CurrentTrip }) {
   }
 
   function handleAddDay() {
-    if (limitReached) return;
+    if (limitReached) {
+      openPaywall("roteiro_dia_6");
+      return;
+    }
     addDay.mutate(undefined, { onError: (e) => toast.error((e as Error).message) });
   }
 
   function handleExportPdf() {
-    if (!canExportPdf) return;
+    if (!canExportPdf) {
+      openPaywall("exportar_pdf");
+      return;
+    }
     try {
       exportItineraryPdf(
         {
@@ -127,18 +133,12 @@ function TripItineraryBoard({ trip }: { trip: CurrentTrip }) {
           <p className="text-sm text-muted-foreground">{trip.nome}</p>
         </div>
         <div className="flex flex-col items-end gap-1">
-          <Button variant="outline" size="sm" onClick={handleExportPdf} disabled={!canExportPdf}>
+          <Button variant="outline" size="sm" onClick={handleExportPdf}>
             <FileDown className="h-4 w-4" /> Exportar PDF
           </Button>
           {!canExportPdf && (
             <p className="max-w-[10rem] text-right text-xs text-muted-foreground">
-              Recurso Premium.{" "}
-              <Link
-                to="/trip/mais"
-                className="font-medium text-primary underline-offset-2 hover:underline"
-              >
-                Conheça
-              </Link>
+              Recurso Premium.
             </p>
           )}
         </div>
@@ -180,19 +180,13 @@ function TripItineraryBoard({ trip }: { trip: CurrentTrip }) {
           className="w-full"
           variant="outline"
           onClick={handleAddDay}
-          disabled={limitReached || addDay.isPending}
+          disabled={addDay.isPending}
         >
           <Plus className="h-4 w-4" /> Adicionar dia
         </Button>
         {limitReached && (
           <p className="text-center text-xs text-muted-foreground">
-            O plano gratuito inclui até 5 dias de roteiro.{" "}
-            <Link
-              to="/trip/mais"
-              className="font-medium text-primary underline-offset-2 hover:underline"
-            >
-              Conheça o Premium
-            </Link>
+            O plano gratuito inclui até 5 dias de roteiro.
           </p>
         )}
       </div>

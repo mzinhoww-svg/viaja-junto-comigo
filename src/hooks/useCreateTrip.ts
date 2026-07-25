@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchEntitlement } from "@/hooks/useEntitlement";
+import { ownedTripCountQueryKey } from "@/hooks/useOwnedTripCount";
 import { determinarModoTrip } from "@/lib/trip-math";
 import {
   agruparEmChecklists,
@@ -61,12 +63,8 @@ export function useCreateTrip() {
       if (userError || !userData.user) throw new Error("Sessão expirada. Faça login novamente.");
       const userId = userData.user.id;
 
-      const { data: entitlement } = await supabase
-        .from("entitlements")
-        .select("plano")
-        .eq("user_id", userId)
-        .maybeSingle();
-      const tier: PlanTier = entitlement?.plano === "premium" ? "premium" : "free";
+      const entitlement = await fetchEntitlement(userId);
+      const tier: PlanTier = entitlement.tier;
 
       const status = determinarModoTrip(input.dataViagem);
 
@@ -154,6 +152,7 @@ export function useCreateTrip() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["trip", "current"] });
+      qc.invalidateQueries({ queryKey: ownedTripCountQueryKey() });
     },
   });
 }

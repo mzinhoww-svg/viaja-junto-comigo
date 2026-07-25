@@ -4,12 +4,14 @@ import { tripDashboardQueryKey } from "@/lib/trip-query-keys";
 import {
   agruparPorMarco,
   calcularProgresso,
+  contarTemplatesPremiumPorTipo,
   ordenarChecklists,
   type ChecklistItemRow,
   type ChecklistProgresso,
   type ChecklistRow,
   type GrupoPorMarco,
 } from "@/lib/trip-checklists";
+import type { ChecklistTipo } from "@/lib/trip-templates";
 
 export type ChecklistListaData = {
   checklist: ChecklistRow;
@@ -96,6 +98,35 @@ export function useTripChecklists(tripId: string | undefined) {
         listas,
         progressoGlobal: calcularProgresso(itens),
       };
+    },
+  });
+}
+
+export function premiumChecklistCountsQueryKey() {
+  return ["checklist-templates", "premium-counts"] as const;
+}
+
+/**
+ * Contagem de templates premium por tipo (catálogo completo, não por trip —
+ * ver `contarTemplatesPremiumPorTipo`) — alimenta a linha teaser travada do
+ * gatilho "abrir item de checklist premium" (VJT-011). Leitura pública
+ * (policy `templates_read`), independente de tripId.
+ */
+export function usePremiumChecklistCounts() {
+  return useQuery({
+    queryKey: premiumChecklistCountsQueryKey(),
+    queryFn: async (): Promise<Partial<Record<ChecklistTipo, number>>> => {
+      const { data, error } = await supabase
+        .from("checklist_templates")
+        .select("tipo, tier")
+        .eq("tier", "premium");
+      if (error) throw error;
+      return contarTemplatesPremiumPorTipo(
+        (data ?? []).map((row) => ({
+          tipo: row.tipo as ChecklistTipo,
+          tier: row.tier as "premium",
+        })),
+      );
     },
   });
 }

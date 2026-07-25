@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   agruparPorMarco,
   calcularProgresso,
+  contarTemplatesPremiumPorTipo,
   ordenarChecklists,
   proximaOrdem,
   validarNovoItem,
@@ -139,5 +140,25 @@ describe("validarNovoItem", () => {
 
   it("aceita título válido", () => {
     expect(validarNovoItem("Levar protetor solar")).toBeNull();
+  });
+});
+
+describe("contarTemplatesPremiumPorTipo (gatilho: abrir item de checklist premium)", () => {
+  it("conta só os templates de tier premium, agrupados por tipo", () => {
+    const templates = [
+      { tipo: "documentos" as const, tier: "premium" as const },
+      { tipo: "documentos" as const, tier: "premium" as const },
+      { tipo: "documentos" as const, tier: "free" as const },
+      { tipo: "mala" as const, tier: "premium" as const },
+    ];
+    expect(contarTemplatesPremiumPorTipo(templates)).toEqual({ documentos: 2, mala: 1 });
+  });
+
+  it("catálogo só com templates free retorna objeto vazio", () => {
+    expect(contarTemplatesPremiumPorTipo([{ tipo: "compras", tier: "free" }])).toEqual({});
+  });
+
+  it("lista vazia retorna objeto vazio", () => {
+    expect(contarTemplatesPremiumPorTipo([])).toEqual({});
   });
 });
