@@ -1,6 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { type StripeEnv, createStripeClient, getStripeErrorMessage } from "@/lib/stripe.server";
+import {
+  type StripeEnv,
+  createStripeClient,
+  getStripeErrorMessage,
+  paymentsEnabled,
+} from "@/lib/stripe.server";
+import { PREMIUM_PRICE_BRL_CENTS, resolveEntitlement } from "@/lib/entitlements";
 
 type PaymentMethod = "card" | "pix";
 
@@ -211,6 +217,80 @@ export const createTaxesCheckout = createServerFn({ method: "POST" })
           kind: "taxes",
         },
         expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
+      });
+
+      return { clientSecret: session.client_secret ?? "" };
+    } catch (error) {
+      return { error: getStripeErrorMessage(error) };
+    }
+  });
+
+/**
+ * Checkout one-time do plano Premium do Viajaly Trip (VJT-012). O webhook
+ * (metadata.kind = "premium") ativa `entitlements` a partir de
+ * `metadata.user_id` — ver `src/lib/premium-entitlement.server.ts`.
+ * Kill switch `PAYMENTS_ENABLED`: só a criação do checkout é bloqueada; um
+ * pagamento já coletado é sempre ativado pelo webhook.
+ */
+export const createPremiumCheckout = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { method: PaymentMethod; returnUrl: string; environment: StripeEnv }) => {
+    if (data.method !== "card" && data.method !== "pix") throw new Error("Invalid method");
+    if (!data.returnUrl.startsWith("http")) throw new Error("Invalid returnUrl");
+    return data;
+  })
+  .handler(async ({ data, context }): Promise<CheckoutResult> => {
+    if (!paymentsEnabled()) {
+      return {
+        error: "Checkout do Premium está temporariamente indisponível. Tente novamente mais tarde.",
+      };
+    }
+    try {
+      const { supabase, userId } = context;
+
+      const { data: row, error: entError } = await supabase
+        .from("entitlements")
+        .select("plano, origem, expires_at")
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (entError) throw entError;
+
+      const current = resolveEntitlement(
+        row ? { plano: row.plano, origem: row.origem, expiresAt: row.expires_at } : null,
+        new Date().toISOString(),
+      );
+      if (current.isPremium) return { error: "Você já é Premium." };
+
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
+
+      const stripe = createStripeClient(data.environment);
+
+      const session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        ui_mode: "embedded_page",
+        return_url: `${data.returnUrl}?session_id={CHECKOUT_SESSION_ID}`,
+        payment_method_types: [data.method],
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: "brl",
+              product_data: {
+                name: "Viajaly Trip Premium",
+                description: "Acesso Premium — pagamento único, por pessoa.",
+              },
+              unit_amount: PREMIUM_PRICE_BRL_CENTS,
+            },
+          },
+        ],
+        ...(userData.user?.email && { customer_email: userData.user.email }),
+        payment_intent_data: {
+          description: "Viajaly Trip Premium",
+          metadata: { user_id: userId, method: data.method, kind: "premium" },
+        },
+        metadata: { user_id: userId, method: data.method, kind: "premium" },
+        expires_at: Math.floor(Date.now() / 1000) + 30 * 60, // 30 min
       });
 
       return { clientSecret: session.client_secret ?? "" };

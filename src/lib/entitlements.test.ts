@@ -7,6 +7,7 @@ import {
   memberLimit,
   PAYWALL_TRIGGERS,
   PAYWALL_COPY,
+  PREMIUM_PRICE_BRL_CENTS,
   resolveEntitlement,
 } from "./entitlements";
 
@@ -111,5 +112,11 @@ describe("PAYWALL_COPY", () => {
       expect(copy.descricao.trim().length).toBeGreaterThan(0);
     }
     expect(Object.keys(PAYWALL_COPY).sort()).toEqual([...PAYWALL_TRIGGERS].sort());
+  });
+});
+
+describe("PREMIUM_PRICE_BRL_CENTS (VJT-012)", () => {
+  it("é o preço de lançamento (R$ 67), em centavos", () => {
+    expect(PREMIUM_PRICE_BRL_CENTS).toBe(6700);
   });
 });

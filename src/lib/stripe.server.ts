@@ -8,6 +8,18 @@ const getEnv = (key: string): string => {
 
 export type StripeEnv = "sandbox" | "live";
 
+/**
+ * Kill switch do checkout Premium (VJT-012). Falha fechado: qualquer valor
+ * diferente de `"true"` (incluindo a variável ausente) mantém o checkout
+ * desativado — novos deploys não vendem Premium até alguém ligar
+ * explicitamente. Não afeta o processamento do webhook: um pagamento já
+ * coletado pelo Stripe é sempre ativado, mesmo que a chave tenha sido
+ * desligada depois da sessão de checkout ser criada.
+ */
+export function paymentsEnabled(): boolean {
+  return process.env.PAYMENTS_ENABLED === "true";
+}
+
 const GATEWAY_STRIPE_BASE = "https://connector-gateway.lovable.dev/stripe";
 
 export function getConnectionApiKey(env: StripeEnv): string {

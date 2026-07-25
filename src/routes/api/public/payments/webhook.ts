@@ -2,6 +2,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { type StripeEnv, verifyWebhook } from "@/lib/stripe.server";
+import { activatePremiumEntitlement, readPremiumUserId } from "@/lib/premium-entitlement.server";
 import type { Database } from "@/integrations/supabase/types";
 
 let _supabase: ReturnType<typeof createClient<Database>> | null = null;
@@ -16,11 +17,13 @@ function getSupabase() {
   return _supabase;
 }
 
-type CheckoutKind = "consultancy" | "taxes";
+type CheckoutKind = "consultancy" | "taxes" | "premium";
 
 function readKind(meta: Record<string, unknown> | undefined | null): CheckoutKind {
   const k = (meta?.kind ?? "") as string;
-  return k === "taxes" ? "taxes" : "consultancy";
+  if (k === "taxes") return "taxes";
+  if (k === "premium") return "premium";
+  return "consultancy";
 }
 
 function readRequestId(meta: Record<string, unknown> | undefined | null): string | null {
@@ -86,9 +89,24 @@ async function handleTaxesCheckout(session: any) {
   if (error) console.error("mark_taxes_paid_from_stripe error:", error);
 }
 
+async function handlePremiumCheckout(session: any) {
+  const userId = readPremiumUserId(session.metadata);
+  if (!userId) {
+    console.error("premium webhook missing user_id metadata", session.id);
+    return;
+  }
+  const paymentId: string = session.payment_intent ?? session.id;
+  try {
+    await activatePremiumEntitlement(userId, paymentId);
+  } catch (e) {
+    console.error("activatePremiumEntitlement error:", e);
+  }
+}
+
 async function handleCheckoutCompleted(session: any) {
   const kind = readKind(session.metadata);
   if (kind === "taxes") return handleTaxesCheckout(session);
+  if (kind === "premium") return handlePremiumCheckout(session);
   return handleConsultancyCheckout(session);
 }
 
@@ -98,6 +116,17 @@ async function handlePaymentIntentSucceeded(intent: any) {
   const method: string | null = charges[0]?.payment_method_details?.type ?? null;
   const amount: number | null = intent.amount_received ?? intent.amount ?? null;
   const supabase = getSupabase();
+
+  if (kind === "premium") {
+    const userId = readPremiumUserId(intent.metadata);
+    if (!userId) return;
+    try {
+      await activatePremiumEntitlement(userId, intent.id);
+    } catch (e) {
+      console.error("activatePremiumEntitlement error:", e);
+    }
+    return;
+  }
 
   if (kind === "taxes") {
     const requestId = readRequestId(intent.metadata);
