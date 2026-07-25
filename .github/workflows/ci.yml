@@ -35,5 +35,8 @@ jobs:
           fi
           bash scripts/test-rls.sh
 
+      - name: RLS tests (VJT-017b LGPD consent log — append-only + histórico)
+        run: bash scripts/test-rls.sh --lgpd
+
       - name: Build
         run: bun run build
