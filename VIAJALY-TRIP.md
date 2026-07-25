@@ -363,6 +363,8 @@ insert into public.checklist_templates (tipo, titulo, tier, marco, ordem) values
 11. **Execução em paralelo**: se este ticket rodar simultaneamente com outros da mesma onda (sessões/ambientes separados), NÃO edite a Seção 0 nem a Seção 8 deste arquivo no seu PR — apenas descreva o resultado completo no corpo do PR e da issue. A consolidação da Seção 0 e do Log em VIAJALY-TRIP.md acontece em uma única sessão de fechamento de onda, depois que todos os PRs da onda estiverem mergeados na main
 12. Pare. Não mergeie. Não inicie o próximo ticket até essa entrada ser seguida de "Mergeado" no log (o humano avisa, ou você confere o status da issue/PR na próxima sessão)
 
+**Regra geral, vale para toda sessão, não só execução de ticket**: nunca afirme o estado de um PR/issue/branch de memória ou por inferência de contexto anterior — sempre confirme contra a API do GitHub antes de declarar "mergeado", "aberto", "draft" etc. Se a última verificação real for antiga, reverifique antes de afirmar.
+
 ### Revisor automatizado
 Além do CI, todo PR passa por uma sessão/rotina separada de revisão (Claude Code Remote, gatilho em PR aberto/sincronizado, nunca em comentário criado, para evitar auto-resposta). O revisor NUNCA implementa nem faz merge — só comenta no PR com achados concretos, sempre contra o diff real, nunca contra o resumo do próprio PR. Checklist obrigatório do revisor, nesta ordem:
 1. Toda fórmula/agregação nova reutiliza trip-math.ts (ou o módulo puro equivalente do domínio), ou reimplementa em paralelo?
