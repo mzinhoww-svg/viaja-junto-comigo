@@ -46,7 +46,7 @@ export function MaisDashboard() {
       </div>
       <PlanStatusCard />
       <InviteMemberCard tripId={trip.data.id} />
-      <AiAssistantCard />
+      <AiAssistantCard tripId={trip.data.id} />
       <DeleteAccountCard />
     </div>
   );

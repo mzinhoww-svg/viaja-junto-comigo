@@ -1,4 +1,4 @@
-import { WHATSAPP_NUMBER } from "./contact";
+import { WHATSAPP_NUMBER } from "./contact.ts";
 
 /**
  * WhatsApp helpers — usa wa.me (sem custo de API oficial).

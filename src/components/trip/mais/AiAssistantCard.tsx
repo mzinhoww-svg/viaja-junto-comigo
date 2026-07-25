@@ -1,22 +1,23 @@
 import { Bot } from "lucide-react";
-import { toast } from "sonner";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { AiChatSheet } from "@/components/trip/mais/AiChatSheet";
 import { useAiUsage } from "@/hooks/useAiUsage";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import { usePaywall } from "@/hooks/usePaywall";
 import { aiMsgLimit, isAiQuotaExhausted } from "@/lib/entitlements";
 
 /**
- * Stub do "Assistente IA" (gatilho: esgotar cota de IA, VJT-011). O
- * assistente em si (Edge Function, contexto da trip, chat) é escopo do
- * VJT-014, ainda não implementado — mock aceito no ticket. A cota lida aqui
- * é real (`ai_usage`, já existente desde o VJT-001).
+ * Card "Assistente IA" (gatilho: esgotar cota de IA, VJT-011; chat real,
+ * Edge Function e contexto da trip, VJT-014). A cota lida aqui é real
+ * (`ai_usage`, já existente desde o VJT-001).
  */
-export function AiAssistantCard() {
+export function AiAssistantCard({ tripId }: { tripId: string }) {
   const entitlement = useEntitlement();
   const usage = useAiUsage();
   const { openPaywall } = usePaywall();
+  const [chatOpen, setChatOpen] = useState(false);
 
   const used = usage.data ?? 0;
   const limit = aiMsgLimit(entitlement.tier);
@@ -27,7 +28,7 @@ export function AiAssistantCard() {
       openPaywall("cota_ia");
       return;
     }
-    toast("Assistente IA chega em breve (VJT-014).");
+    setChatOpen(true);
   }
 
   return (
@@ -46,6 +47,7 @@ export function AiAssistantCard() {
           Perguntar
         </Button>
       </CardContent>
+      <AiChatSheet tripId={tripId} open={chatOpen} onOpenChange={setChatOpen} />
     </Card>
   );
 }
