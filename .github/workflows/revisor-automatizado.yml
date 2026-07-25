@@ -1,8 +1,19 @@
 name: Revisor Automatizado (Claude Code)
 
+# DESATIVADO (2026-07-25) — pausado após 3 rodadas de diagnóstico sem
+# sucesso (~US$4,47 gastos, nenhum comentário real postado no PR; ver
+# VIAJALY-TRIP.md Seção 0 e Seção 8 para a causa raiz e o histórico
+# completo). Gatilho automático em pull_request trocado por
+# workflow_dispatch para não continuar rodando (e cobrando) em todo PR
+# sem entregar o resultado. Reative trocando de volta para o bloco
+# `pull_request` comentado abaixo, só depois de corrigir a causa raiz
+# (permissão de rede do Bash dentro do sandbox da claude-code-action).
+#
+# on:
+#   pull_request:
+#     types: [opened, ready_for_review, synchronize]
 on:
-  pull_request:
-    types: [opened, ready_for_review, synchronize]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -34,10 +45,6 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           use_sticky_comment: false
           track_progress: false
-          # DIAGNÓSTICO TEMPORÁRIO — remover assim que o nome exato da
-          # ferramenta negada (permission_denials_count > 0 sem comentário
-          # postado) for identificado no log desta run.
-          show_full_output: true
           claude_args: |
             --model claude-sonnet-5
             --disallowedTools "Bash(git push:*),Bash(git commit:*),Bash(git merge:*),Bash(git checkout:*),Bash(gh pr merge:*)"
