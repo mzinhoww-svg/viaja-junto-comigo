@@ -1,5 +1,6 @@
 import { Loader2, MoreHorizontal } from "lucide-react";
 import { TripSectionPlaceholder } from "@/components/trip/SectionPlaceholder";
+import { AdminCodeCard } from "@/components/trip/mais/AdminCodeCard";
 import { AiAssistantCard } from "@/components/trip/mais/AiAssistantCard";
 import { DeleteAccountCard } from "@/components/trip/mais/DeleteAccountCard";
 import { InviteMemberCard } from "@/components/trip/mais/InviteMemberCard";
@@ -32,7 +33,8 @@ export function MaisDashboard() {
           ctaTo="/trip/novo"
           ctaLabel="Criar minha viagem"
         />
-        <div className="px-4">
+        <div className="space-y-3 px-4">
+          <AdminCodeCard />
           <DeleteAccountCard />
         </div>
       </div>
@@ -46,6 +48,7 @@ export function MaisDashboard() {
         <p className="text-sm text-muted-foreground">{trip.data.nome}</p>
       </div>
       <PlanStatusCard />
+      <AdminCodeCard />
       <InviteMemberCard tripId={trip.data.id} />
       <TripMembersList tripId={trip.data.id} />
       <AiAssistantCard tripId={trip.data.id} />
