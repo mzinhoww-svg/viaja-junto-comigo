@@ -39,8 +39,16 @@ export type UseEntitlementResult = Entitlement & { isLoading: boolean };
  * na própria linha (tabela adicionada à publicação `supabase_realtime` na
  * migration deste ticket) para que uma ativação manual/admin (SQL Editor,
  * origem `manual`/`pacote_visto` — bônus Pro+/Vip+) libere o plano sem
- * reload; RLS `ent_select_own` já garante que só a própria linha chega
- * aqui, então a assinatura não vaza dado de outro usuário.
+ * reload da página; RLS `ent_select_own` já garante que só a própria linha
+ * chega aqui, então a assinatura não vaza dado de outro usuário.
+ *
+ * Backstop se o canal cair: `.subscribe` recebe o status da inscrição —
+ * `CHANNEL_ERROR`/`TIMED_OUT`/`CLOSED` disparam um refetch imediato em vez
+ * de deixar o dado parado até o próximo mount/foco da janela (o app
+ * desliga `refetchOnWindowFocus` globalmente em `router.tsx`, então não há
+ * esse fallback automático). Escolhido em vez de `refetchOnWindowFocus`
+ * por query porque reage à falha real do canal no momento em que ela
+ * acontece, sem depender do usuário trocar de janela/aba.
  */
 export function useEntitlement(): UseEntitlementResult {
   const qc = useQueryClient();
@@ -75,7 +83,11 @@ export function useEntitlement(): UseEntitlementResult {
           },
           () => qc.invalidateQueries({ queryKey: entitlementQueryKey() }),
         )
-        .subscribe();
+        .subscribe((status) => {
+          if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+            qc.invalidateQueries({ queryKey: entitlementQueryKey() });
+          }
+        });
     });
 
     return () => {
