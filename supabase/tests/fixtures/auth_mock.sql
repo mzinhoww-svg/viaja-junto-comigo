@@ -22,3 +22,20 @@ $$;
 -- `set role authenticated` (Postgres bypasses RLS for superusers/table owners).
 drop role if exists authenticated;
 create role authenticated nologin noinherit;
+
+-- Supabase ships this publication; a vanilla cluster does not, and the VJT-011
+-- migration does `alter publication supabase_realtime add table ...`. Its
+-- duplicate_object guard does not cover the publication being absent, so
+-- create it here to let the real migrations replay unmodified.
+do $$
+begin
+  create publication supabase_realtime;
+exception when duplicate_object then null;
+end $$;
+
+-- Supabase's service_role, referenced by some migrations' grants.
+do $$
+begin
+  create role service_role nologin noinherit bypassrls;
+exception when duplicate_object then null;
+end $$;
