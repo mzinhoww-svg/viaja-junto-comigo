@@ -2,7 +2,7 @@ name: Revisor Automatizado (Claude Code)
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, ready_for_review, synchronize]
 
 permissions:
   contents: read
@@ -17,6 +17,10 @@ concurrency:
 jobs:
   revisor:
     runs-on: ubuntu-latest
+    # PRs em draft (onde a maior parte dos pushes de correção acontece) não
+    # disparam revisão — só quando abre já pronto, quando sai de draft
+    # (ready_for_review), ou em push subsequente já fora de draft.
+    if: github.event.pull_request.draft == false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,7 +35,7 @@ jobs:
           use_sticky_comment: false
           track_progress: false
           claude_args: |
-            --allowedTools "Read,Grep,Glob,Bash(git diff:*),Bash(git log:*),Bash(git show:*)"
+            --model claude-sonnet-5
             --disallowedTools "Bash(git push:*),Bash(git commit:*),Bash(git merge:*),Bash(git checkout:*),Bash(gh pr merge:*)"
           prompt: |
             Você é o revisor automatizado do repositório mzinhoww-svg/viaja-junto-comigo,
