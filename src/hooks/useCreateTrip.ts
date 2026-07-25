@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchEntitlement } from "@/hooks/useEntitlement";
 import { ownedTripCountQueryKey } from "@/hooks/useOwnedTripCount";
 import { determinarModoTrip } from "@/lib/trip-math";
+import { capture } from "@/lib/posthog";
+import { TRIP_EVENTS } from "@/lib/trip-analytics";
 import {
   agruparEmChecklists,
   CHECKLIST_TIPOS,
@@ -147,6 +149,20 @@ export function useCreateTrip() {
         );
         if (itemsError) throw itemsError;
       }
+
+      // `trip_created` (VJT-015): disparado aqui, com a trip já completa
+      // (membro owner + checklists clonados + orçamento inicial), e não em
+      // `onSuccess`, porque `tier` e `status` só existem neste escopo — sem
+      // isso o funil grátis→compra perde a segmentação por plano de origem.
+      capture(TRIP_EVENTS.tripCreated, {
+        trip_id: tripId,
+        destino_pais: input.destino.pais,
+        tem_data_viagem: input.dataViagem != null,
+        status,
+        num_pessoas: input.viajantes.numPessoas,
+        num_criancas: input.viajantes.numCriancas,
+        tier,
+      });
 
       return tripId;
     },
