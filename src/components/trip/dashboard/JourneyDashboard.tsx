@@ -43,6 +43,7 @@ export function JourneyDashboard({ tripId }: { tripId: string }) {
     return (
       <div className="space-y-4 px-4 pt-4">
         <ConcludedSummary
+          tripId={tripId}
           tripNome={trip.data?.nome ?? dashboard.data.trip.nome}
           progressoChecklists={tripMath.progressoChecklists}
           progressoFinanceiro={tripMath.progressoFinanceiro}

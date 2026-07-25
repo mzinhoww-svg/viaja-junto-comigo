@@ -3,11 +3,22 @@ import { formatBRL } from "./money";
 import {
   calcularDicaEconomia,
   calcularValorRegistradoNoMes,
+  entryAutorLabel,
   formatMesAnoLabel,
   inputMonthFromMesAno,
   mesAnoAtual,
   mesAnoFromInputMonth,
 } from "./trip-savings";
+
+describe("entryAutorLabel", () => {
+  it("retorna 'Membro removido' quando created_by é null (conta excluída, VJT-017)", () => {
+    expect(entryAutorLabel(null)).toBe("Membro removido");
+  });
+
+  it("retorna null quando o autor ainda existe (nenhum rótulo extra a mostrar)", () => {
+    expect(entryAutorLabel("11111111-1111-1111-1111-111111111111")).toBeNull();
+  });
+});
 
 describe("mesAnoAtual", () => {
   it("retorna o primeiro dia do mês corrente", () => {

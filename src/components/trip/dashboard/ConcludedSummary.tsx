@@ -3,8 +3,10 @@ import { PartyPopper } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { TripDateEditor } from "@/components/trip/dashboard/TripDateEditor";
+import { TripNpsForm } from "@/components/trip/dashboard/TripNpsForm";
 
 type Props = {
+  tripId: string;
   tripNome: string;
   progressoChecklists: number;
   progressoFinanceiro: number;
@@ -20,10 +22,13 @@ function pct(valor: number): number {
 }
 
 /**
- * Retrospectiva da viagem concluída (VJT-004). O formulário de NPS fica para
- * o VJT-017 (bloqueado por VJT-011) — aqui é só o resumo final + CTA.
+ * Retrospectiva da viagem concluída (VJT-004) + NPS (VJT-017). O CTA
+ * "Planejar nova viagem" já navega para `/trip/novo`, cuja rota é montada
+ * com `CreateTripGate` (VJT-011) — o gatilho de paywall da 2ª viagem
+ * acontece lá, via `useEntitlement()`; nada a duplicar aqui.
  */
 export function ConcludedSummary({
+  tripId,
   tripNome,
   progressoChecklists,
   progressoFinanceiro,
@@ -52,6 +57,8 @@ export function ConcludedSummary({
             <p className="text-muted-foreground">Meta financeira atingida</p>
           </div>
         </div>
+
+        <TripNpsForm tripId={tripId} />
 
         <Button asChild className="w-full">
           <Link to="/trip/novo">Planejar nova viagem</Link>

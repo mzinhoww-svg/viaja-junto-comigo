@@ -121,3 +121,10 @@ export function aiMsgLimit(tier: PlanTier): number {
 export function isAiQuotaExhausted(tier: PlanTier, usedThisMonth: number): boolean {
   return usedThisMonth >= aiMsgLimit(tier);
 }
+
+/**
+ * Preço vigente do Premium cobrado no checkout Stripe (VJT-012): pagamento
+ * único, por pessoa, valor de lançamento (R$ 97 é o preço de tabela exibido
+ * no `PaywallModal`, não cobrado enquanto o lançamento estiver vigente).
+ */
+export const PREMIUM_PRICE_BRL_CENTS = 6700;

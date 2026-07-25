@@ -51,7 +51,9 @@ import { Route as PortalPropostaRouteImport } from './routes/portal.proposta'
 import { Route as PortalRoteiroRouteImport } from './routes/portal.roteiro'
 import { Route as PortalTaxasRouteImport } from './routes/portal.taxas'
 import { Route as TripIndexRouteImport } from './routes/trip.index'
+import { Route as TripAceitarConviteRouteImport } from './routes/trip.aceitar-convite'
 import { Route as TripChecklistsRouteImport } from './routes/trip.checklists'
+import { Route as TripCheckoutRouteImport } from './routes/trip.checkout'
 import { Route as TripFinanceiroRouteImport } from './routes/trip.financeiro'
 import { Route as TripMaisRouteImport } from './routes/trip.mais'
 import { Route as TripNovoRouteImport } from './routes/trip.novo'
@@ -275,9 +277,19 @@ const TripIndexRoute = TripIndexRouteImport.update({
   path: '/',
   getParentRoute: () => TripRoute,
 } as any)
+const TripAceitarConviteRoute = TripAceitarConviteRouteImport.update({
+  id: '/aceitar-convite',
+  path: '/aceitar-convite',
+  getParentRoute: () => TripRoute,
+} as any)
 const TripChecklistsRoute = TripChecklistsRouteImport.update({
   id: '/checklists',
   path: '/checklists',
+  getParentRoute: () => TripRoute,
+} as any)
+const TripCheckoutRoute = TripCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
   getParentRoute: () => TripRoute,
 } as any)
 const TripFinanceiroRoute = TripFinanceiroRouteImport.update({
@@ -374,7 +386,9 @@ export interface FileRoutesByFullPath {
   '/portal/proposta': typeof PortalPropostaRoute
   '/portal/roteiro': typeof PortalRoteiroRoute
   '/portal/taxas': typeof PortalTaxasRoute
+  '/trip/aceitar-convite': typeof TripAceitarConviteRoute
   '/trip/checklists': typeof TripChecklistsRoute
+  '/trip/checkout': typeof TripCheckoutRoute
   '/trip/financeiro': typeof TripFinanceiroRoute
   '/trip/mais': typeof TripMaisRoute
   '/trip/novo': typeof TripNovoRoute
@@ -426,7 +440,9 @@ export interface FileRoutesByTo {
   '/portal/proposta': typeof PortalPropostaRoute
   '/portal/roteiro': typeof PortalRoteiroRoute
   '/portal/taxas': typeof PortalTaxasRoute
+  '/trip/aceitar-convite': typeof TripAceitarConviteRoute
   '/trip/checklists': typeof TripChecklistsRoute
+  '/trip/checkout': typeof TripCheckoutRoute
   '/trip/financeiro': typeof TripFinanceiroRoute
   '/trip/mais': typeof TripMaisRoute
   '/trip/novo': typeof TripNovoRoute
@@ -482,7 +498,9 @@ export interface FileRoutesById {
   '/portal/proposta': typeof PortalPropostaRoute
   '/portal/roteiro': typeof PortalRoteiroRoute
   '/portal/taxas': typeof PortalTaxasRoute
+  '/trip/aceitar-convite': typeof TripAceitarConviteRoute
   '/trip/checklists': typeof TripChecklistsRoute
+  '/trip/checkout': typeof TripCheckoutRoute
   '/trip/financeiro': typeof TripFinanceiroRoute
   '/trip/mais': typeof TripMaisRoute
   '/trip/novo': typeof TripNovoRoute
@@ -539,7 +557,9 @@ export interface FileRouteTypes {
     | '/portal/proposta'
     | '/portal/roteiro'
     | '/portal/taxas'
+    | '/trip/aceitar-convite'
     | '/trip/checklists'
+    | '/trip/checkout'
     | '/trip/financeiro'
     | '/trip/mais'
     | '/trip/novo'
@@ -591,7 +611,9 @@ export interface FileRouteTypes {
     | '/portal/proposta'
     | '/portal/roteiro'
     | '/portal/taxas'
+    | '/trip/aceitar-convite'
     | '/trip/checklists'
+    | '/trip/checkout'
     | '/trip/financeiro'
     | '/trip/mais'
     | '/trip/novo'
@@ -646,7 +668,9 @@ export interface FileRouteTypes {
     | '/portal/proposta'
     | '/portal/roteiro'
     | '/portal/taxas'
+    | '/trip/aceitar-convite'
     | '/trip/checklists'
+    | '/trip/checkout'
     | '/trip/financeiro'
     | '/trip/mais'
     | '/trip/novo'
@@ -978,11 +1002,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TripIndexRouteImport
       parentRoute: typeof TripRoute
     }
+    '/trip/aceitar-convite': {
+      id: '/trip/aceitar-convite'
+      path: '/aceitar-convite'
+      fullPath: '/trip/aceitar-convite'
+      preLoaderRoute: typeof TripAceitarConviteRouteImport
+      parentRoute: typeof TripRoute
+    }
     '/trip/checklists': {
       id: '/trip/checklists'
       path: '/checklists'
       fullPath: '/trip/checklists'
       preLoaderRoute: typeof TripChecklistsRouteImport
+      parentRoute: typeof TripRoute
+    }
+    '/trip/checkout': {
+      id: '/trip/checkout'
+      path: '/checkout'
+      fullPath: '/trip/checkout'
+      preLoaderRoute: typeof TripCheckoutRouteImport
       parentRoute: typeof TripRoute
     }
     '/trip/financeiro': {
@@ -1147,7 +1185,9 @@ const PortalRouteWithChildren =
   PortalRoute._addFileChildren(PortalRouteChildren)
 
 interface TripRouteChildren {
+  TripAceitarConviteRoute: typeof TripAceitarConviteRoute
   TripChecklistsRoute: typeof TripChecklistsRoute
+  TripCheckoutRoute: typeof TripCheckoutRoute
   TripFinanceiroRoute: typeof TripFinanceiroRoute
   TripMaisRoute: typeof TripMaisRoute
   TripNovoRoute: typeof TripNovoRoute
@@ -1156,7 +1196,9 @@ interface TripRouteChildren {
 }
 
 const TripRouteChildren: TripRouteChildren = {
+  TripAceitarConviteRoute: TripAceitarConviteRoute,
   TripChecklistsRoute: TripChecklistsRoute,
+  TripCheckoutRoute: TripCheckoutRoute,
   TripFinanceiroRoute: TripFinanceiroRoute,
   TripMaisRoute: TripMaisRoute,
   TripNovoRoute: TripNovoRoute,
