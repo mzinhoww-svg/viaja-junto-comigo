@@ -96,15 +96,7 @@ export function TripLogin({ next }: { next: string }) {
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {
-        let destino = next;
-        try {
-          const salvo = sessionStorage.getItem("viajaly:post-login-next");
-          if (salvo) destino = salvo;
-          sessionStorage.removeItem("viajaly:post-login-next");
-        } catch {
-          /* Safari privado, etc. */
-        }
-        window.location.replace(destino);
+        window.location.replace(consumePostLoginNext(next));
       }
     });
     return () => sub.subscription.unsubscribe();
@@ -112,11 +104,7 @@ export function TripLogin({ next }: { next: string }) {
 
   const googleMut = useMutation({
     mutationFn: async () => {
-      try {
-        sessionStorage.setItem("viajaly:post-login-next", next);
-      } catch {
-        /* Safari privado, etc. — seguimos sem persistir o destino */
-      }
+      savePostLoginNext(next);
       const result = await lovable.auth.signInWithOAuth("google", {
         // Rota React same-origin que monta o cliente Supabase e consome o
         // hash `#access_token` no retorno do provedor. Apontar para `/`
@@ -126,8 +114,8 @@ export function TripLogin({ next }: { next: string }) {
       });
       if (result.error) throw result.error;
       if (result.redirected) return;
-      // Popup: sessão já foi setada — leva o usuário para o destino.
-      window.location.href = next;
+      // Popup: sessão já foi setada — leva o usuário para o destino salvo.
+      window.location.href = consumePostLoginNext(next);
     },
     onError: () => toast.error("Não foi possível abrir o login do Google. Tente o e-mail."),
   });
