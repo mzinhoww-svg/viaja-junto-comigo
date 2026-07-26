@@ -75,7 +75,7 @@ describe("PaywallModal (modal único)", () => {
     fireEvent.click(screen.getByText("abrir-cota_ia"));
     expect(screen.queryByRole("dialog")).not.toBeNull();
 
-    fireEvent.click(screen.getByText("Close"));
+    fireEvent.click(screen.getByText("Fechar"));
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 });
