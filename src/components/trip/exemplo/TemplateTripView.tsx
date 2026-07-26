@@ -1,12 +1,26 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Check, ChevronDown, Eye, Loader2, Map, Moon, Plane, Sun, Sunset } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarDays,
+  Check,
+  ChevronDown,
+  Eye,
+  ListChecks,
+  Loader2,
+  MapPin,
+  Moon,
+  PiggyBank,
+  Sun,
+  Sunset,
+  Users,
+  Wallet,
+} from "lucide-react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Progress } from "@/components/ui/progress";
+import { ViajalyLogo } from "@/components/trip/ViajalyLogo";
 import { useAuth } from "@/hooks/useAuth";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import { useOwnedTripCount } from "@/hooks/useOwnedTripCount";
@@ -14,6 +28,7 @@ import { usePaywall } from "@/hooks/usePaywall";
 import { useCloneTemplateTrip, useMyTemplateClone, useTemplateTrip } from "@/hooks/useTemplateTrip";
 import { brl } from "@/lib/format";
 import type { SlotPeriod } from "@/lib/itinerary";
+import { consolidarValorBRL } from "@/lib/trip-math";
 import { proximoPassoCta, resumirTemplateTrip, type TemplateTrip } from "@/lib/trip-template";
 import { cn } from "@/lib/utils";
 
@@ -22,19 +37,31 @@ const PERIODO_META: Record<SlotPeriod, { label: string; icon: typeof Sun }> = {
   tarde: { label: "Tarde", icon: Sunset },
   noite: { label: "Noite", icon: Moon },
 };
+const ORDEM_PERIODO: SlotPeriod[] = ["manha", "tarde", "noite"];
 
 function pct(valor: number): number {
   return Math.round(Math.min(1, Math.max(0, valor)) * 100);
 }
 
+/** Atraso do stagger, em passos de 60ms — entrada em cascata, não em bloco. */
+function atraso(indice: number): { animationDelay: string } {
+  return { animationDelay: `${Math.min(indice, 8) * 60}ms` };
+}
+
 /**
- * Viagem exemplo pública (VJT-020). Somente leitura e sem bottom nav: nada
- * aqui escreve no banco, e as policies do VJT-020 abrem apenas SELECT — a
- * ausência de controles de edição é decisão de produto E o que o banco
- * permite, nesta ordem de garantia.
+ * Viagem exemplo pública (VJT-020, identidade visual no VJT-021). Somente
+ * leitura e sem bottom nav: nada aqui escreve no banco, e as policies do
+ * VJT-020 abrem apenas SELECT — a ausência de controles de edição é decisão
+ * de produto E o que o banco permite, nesta ordem de garantia.
  */
-export function TemplateTripView({ clonarAoEntrar }: { clonarAoEntrar: boolean }) {
-  const template = useTemplateTrip();
+export function TemplateTripView({
+  slug,
+  clonarAoEntrar,
+}: {
+  slug: string;
+  clonarAoEntrar: boolean;
+}) {
+  const template = useTemplateTrip(slug);
 
   if (template.isLoading) {
     return (
@@ -49,26 +76,28 @@ export function TemplateTripView({ clonarAoEntrar }: { clonarAoEntrar: boolean }
   if (!template.data) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
-        <Plane className="h-10 w-10 text-muted-foreground" aria-hidden />
-        <h1 className="mt-4 text-lg font-semibold">Nenhum exemplo disponível</h1>
+        <ViajalyLogo size="md" />
+        <h1 className="mt-6 text-lg font-semibold">Nenhum exemplo disponível</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           A viagem de demonstração está fora do ar no momento.
         </p>
-        <Button asChild className="mt-6">
+        <Button asChild className="mt-6 h-12">
           <a href="/trip/novo">Criar minha viagem do zero</a>
         </Button>
       </div>
     );
   }
 
-  return <TemplateTripContent trip={template.data} clonarAoEntrar={clonarAoEntrar} />;
+  return <TemplateTripContent trip={template.data} slug={slug} clonarAoEntrar={clonarAoEntrar} />;
 }
 
 function TemplateTripContent({
   trip,
+  slug,
   clonarAoEntrar,
 }: {
   trip: TemplateTrip;
+  slug: string;
   clonarAoEntrar: boolean;
 }) {
   const resumo = useMemo(() => resumirTemplateTrip(trip), [trip]);
@@ -77,62 +106,16 @@ function TemplateTripContent({
   return (
     <div className="min-h-screen bg-background">
       <ExemploBanner />
+      <Hero trip={trip} totalDias={resumo.totalDias} />
 
-      <main className="mx-auto w-full max-w-md space-y-4 px-4 pb-28 pt-4">
-        <header>
-          <h1 className="text-xl font-bold leading-tight text-foreground">{trip.nome}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {trip.destinoCidade ? `${trip.destinoCidade}, ` : ""}
-            {trip.destinoPais} · {trip.numPessoas} pessoa{trip.numPessoas > 1 ? "s" : ""}
-            {trip.numCriancas > 0
-              ? ` (${trip.numCriancas} criança${trip.numCriancas > 1 ? "s" : ""})`
-              : ""}
-          </p>
-        </header>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Progresso da jornada
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <span className="text-2xl font-bold">{pct(resumo.math.progressoJornada)}%</span>
-              <Progress className="mt-2" value={pct(resumo.math.progressoJornada)} />
-            </div>
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <p className="text-muted-foreground">Checklists</p>
-                <p className="font-medium">
-                  {resumo.totalItensChecklistDone}/{resumo.totalItensChecklist} itens
-                </p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Financeiro</p>
-                {/* Edge case da Seção 2: meta zero esconde o indicador em vez
-                    de exibir uma divisão por zero disfarçada de 0%. */}
-                <p className="font-medium">
-                  {metaZero ? "Sem orçamento" : `${pct(resumo.math.progressoFinanceiro)}%`}
-                </p>
-              </div>
-            </div>
-            {!metaZero && (
-              <p className="text-xs text-muted-foreground">
-                {brl(resumo.math.acumuladoBrlCents / 100)} guardados de{" "}
-                {brl(resumo.math.metaBrlCents / 100)} — economia do exemplo somada, sem identificar
-                quem registrou.
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        <SecaoOrcamento trip={trip} />
+      <main className="mx-auto w-full max-w-md space-y-4 px-4 pb-32 pt-4">
+        <CartaoProgresso resumo={resumo} metaZero={metaZero} />
+        <SecaoOrcamento trip={trip} metaBrlCents={resumo.math.metaBrlCents} />
         <SecaoChecklists trip={trip} />
         <SecaoRoteiro trip={trip} />
       </main>
 
-      <CtaBar trip={trip} clonarAoEntrar={clonarAoEntrar} />
+      <CtaBar trip={trip} slug={slug} clonarAoEntrar={clonarAoEntrar} />
     </div>
   );
 }
@@ -144,48 +127,221 @@ function TemplateTripContent({
  */
 function ExemploBanner() {
   return (
-    <div className="sticky top-0 z-20 flex items-center gap-2 border-b border-primary/20 bg-primary/10 px-4 py-2 backdrop-blur">
-      <Eye className="h-4 w-4 shrink-0 text-primary" aria-hidden />
-      <p className="text-sm font-medium text-foreground">Você está vendo um exemplo</p>
+    <div className="sticky top-0 z-30 flex items-center gap-2 border-b border-white/10 bg-[var(--color-navy)]/95 px-4 py-2 text-white backdrop-blur">
+      <Eye className="h-4 w-4 shrink-0 text-[var(--color-coral)]" aria-hidden />
+      <p className="text-sm font-medium">Você está vendo um exemplo</p>
     </div>
   );
 }
 
-function SecaoOrcamento({ trip }: { trip: TemplateTrip }) {
-  if (!trip.categorias.length) return null;
+/**
+ * Hero navy full-bleed. É a primeira coisa que um desconhecido vê do produto,
+ * então carrega marca, destino e os quatro números que respondem "isso aqui
+ * planeja de verdade?" antes de qualquer rolagem.
+ */
+function Hero({ trip, totalDias }: { trip: TemplateTrip; totalDias: number }) {
+  const data = trip.dataViagem
+    ? new Date(`${trip.dataViagem}T12:00:00`).toLocaleDateString("pt-BR", {
+        month: "long",
+        year: "numeric",
+      })
+    : null;
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base">Orçamento</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {trip.categorias.map((categoria) => (
-          <div key={categoria.id}>
-            <div className="flex items-center gap-2">
-              <span
-                className="h-2.5 w-2.5 shrink-0 rounded-full"
-                style={{ backgroundColor: categoria.cor }}
-                aria-hidden
-              />
-              <p className="text-sm font-medium">{categoria.nome}</p>
-            </div>
-            <ul className="mt-2 space-y-1">
-              {categoria.itens.map((item) => (
-                <li key={item.id} className="flex justify-between gap-3 text-sm">
-                  <span className="text-muted-foreground">{item.nome}</span>
-                  <span className="shrink-0 font-medium tabular-nums">
-                    {item.estimadoBrlCents != null
-                      ? brl(item.estimadoBrlCents / 100)
-                      : `${item.estimadoDestinoCents != null ? (item.estimadoDestinoCents / 100).toFixed(0) : 0} ${trip.moedaDestino ?? ""}`}
-                  </span>
-                </li>
-              ))}
-            </ul>
+    <header className="vjt-trama relative overflow-hidden bg-[var(--color-navy)] px-4 pb-8 pt-6 text-white">
+      {/* Brilho coral atrás do título — o mesmo da marca, para o hero não ser
+          um retângulo azul chapado. `pointer-events-none` porque é decoração. */}
+      <div
+        className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-[var(--color-coral)]/25 blur-3xl"
+        aria-hidden
+      />
+
+      <div className="relative mx-auto w-full max-w-md">
+        <div className="vjt-sobe" style={atraso(0)}>
+          <ViajalyLogo size="sm" tone="light" />
+        </div>
+
+        <p
+          className="vjt-sobe mt-6 flex items-center gap-1.5 text-sm text-white/70"
+          style={atraso(1)}
+        >
+          <MapPin className="h-4 w-4" aria-hidden />
+          {trip.destinoCidade ? `${trip.destinoCidade}, ` : ""}
+          {trip.destinoPais}
+        </p>
+
+        <h1
+          className="vjt-sobe mt-1 font-display text-[28px] font-bold leading-tight text-white"
+          style={atraso(2)}
+        >
+          {trip.nome}
+        </h1>
+
+        <div className="vjt-sobe mt-5 grid grid-cols-4 gap-2" style={atraso(3)}>
+          <NumeroHero icone={CalendarDays} valor={String(totalDias)} rotulo="dias" />
+          <NumeroHero icone={Users} valor={String(trip.numPessoas)} rotulo="pessoas" />
+          <NumeroHero
+            icone={ListChecks}
+            valor={String(trip.checklists.reduce((t, c) => t + c.itens.length, 0))}
+            rotulo="itens"
+          />
+          <NumeroHero
+            icone={CalendarDays}
+            valor={data ? data.split(" ")[0].slice(0, 3) : "—"}
+            rotulo={data ? (data.split(" ").at(-1) ?? "") : "sem data"}
+          />
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function NumeroHero({
+  icone: Icone,
+  valor,
+  rotulo,
+}: {
+  icone: typeof Sun;
+  valor: string;
+  rotulo: string;
+}) {
+  return (
+    <div className="rounded-xl bg-white/10 px-2 py-2.5 text-center">
+      <Icone className="mx-auto h-3.5 w-3.5 text-white/60" aria-hidden />
+      <p className="mt-1 text-lg font-bold capitalize leading-none">{valor}</p>
+      <p className="mt-0.5 text-[10px] uppercase tracking-wide text-white/60">{rotulo}</p>
+    </div>
+  );
+}
+
+function CartaoProgresso({
+  resumo,
+  metaZero,
+}: {
+  resumo: ReturnType<typeof resumirTemplateTrip>;
+  metaZero: boolean;
+}) {
+  return (
+    <Card className="vjt-sobe -mt-12 border-none shadow-lg" style={atraso(4)}>
+      <CardContent className="space-y-4 p-4">
+        <div className="flex items-end justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              Progresso da jornada
+            </p>
+            <p className="font-display text-3xl font-bold leading-none">
+              {pct(resumo.math.progressoJornada)}%
+            </p>
           </div>
-        ))}
+          <p className="text-right text-xs text-muted-foreground">
+            {resumo.totalItensChecklistDone} de {resumo.totalItensChecklist}
+            <br />
+            itens prontos
+          </p>
+        </div>
+
+        <BarraProgresso valor={resumo.math.progressoJornada} />
+
+        <div className="grid grid-cols-2 gap-3 border-t border-border pt-3 text-sm">
+          <div className="flex items-start gap-2">
+            <ListChecks className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+            <div>
+              <p className="text-xs text-muted-foreground">Checklists</p>
+              <p className="font-semibold">{pct(resumo.math.progressoChecklists)}%</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <PiggyBank className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+            <div>
+              <p className="text-xs text-muted-foreground">Financeiro</p>
+              {/* Edge case da Seção 2: meta zero esconde o indicador em vez
+                  de exibir uma divisão por zero disfarçada de 0%. */}
+              <p className="font-semibold">
+                {metaZero ? "Sem orçamento" : `${pct(resumo.math.progressoFinanceiro)}%`}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {!metaZero && (
+          <p className="rounded-lg bg-muted/60 p-2.5 text-xs text-muted-foreground">
+            <strong className="font-semibold text-foreground">
+              {brl(resumo.math.acumuladoBrlCents / 100)}
+            </strong>{" "}
+            guardados de {brl(resumo.math.metaBrlCents / 100)} — economia do exemplo somada, sem
+            identificar quem registrou.
+          </p>
+        )}
       </CardContent>
     </Card>
+  );
+}
+
+function BarraProgresso({ valor, cor }: { valor: number; cor?: string }) {
+  return (
+    <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+      <div
+        className="vjt-barra h-full rounded-full"
+        style={{ width: `${pct(valor)}%`, backgroundColor: cor ?? "var(--color-coral)" }}
+      />
+    </div>
+  );
+}
+
+function SecaoOrcamento({ trip, metaBrlCents }: { trip: TemplateTrip; metaBrlCents: number }) {
+  if (!trip.categorias.length) return null;
+
+  // O peso de cada categoria no total sai do MESMO consolidador do trip-math
+  // que a meta usa — somar `estimadoBrlCents` cru aqui ignoraria os itens em
+  // moeda de destino e as duas leituras divergiriam na tela.
+  const categorias = trip.categorias
+    .map((c) => ({
+      ...c,
+      totalBrlCents: c.itens.reduce(
+        (t, i) =>
+          t +
+          consolidarValorBRL(
+            { brlCents: i.estimadoBrlCents, destinoCents: i.estimadoDestinoCents },
+            trip.cambioManual,
+          ),
+        0,
+      ),
+    }))
+    .sort((a, b) => b.totalBrlCents - a.totalBrlCents);
+
+  return (
+    <SecaoCard titulo="Orçamento" icone={Wallet} indice={5}>
+      {categorias.map((categoria) => (
+        <div key={categoria.id} className="space-y-2">
+          <div className="flex items-baseline justify-between gap-3">
+            <p className="text-sm font-semibold">{categoria.nome}</p>
+            <p className="shrink-0 text-sm font-semibold tabular-nums">
+              {brl(categoria.totalBrlCents / 100)}
+            </p>
+          </div>
+          <BarraProgresso
+            valor={metaBrlCents > 0 ? categoria.totalBrlCents / metaBrlCents : 0}
+            cor={categoria.cor}
+          />
+          <ul className="space-y-1 pl-0.5">
+            {categoria.itens.map((item) => (
+              <li key={item.id} className="flex justify-between gap-3 text-xs">
+                <span className="text-muted-foreground">{item.nome}</span>
+                <span className="shrink-0 tabular-nums text-muted-foreground">
+                  {item.estimadoBrlCents != null
+                    ? brl(item.estimadoBrlCents / 100)
+                    : `${((item.estimadoDestinoCents ?? 0) / 100).toFixed(0)} ${trip.moedaDestino ?? ""}`}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+      <div className="flex items-baseline justify-between border-t border-border pt-3">
+        <p className="text-sm font-semibold">Total estimado</p>
+        <p className="font-display text-lg font-bold tabular-nums">{brl(metaBrlCents / 100)}</p>
+      </div>
+    </SecaoCard>
   );
 }
 
@@ -193,43 +349,42 @@ function SecaoChecklists({ trip }: { trip: TemplateTrip }) {
   if (!trip.checklists.length) return null;
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base">Checklists</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        {trip.checklists.map((lista) => (
+    <SecaoCard titulo="Checklists" icone={ListChecks} indice={6}>
+      {trip.checklists.map((lista) => {
+        const feitos = lista.itens.filter((i) => i.done).length;
+        return (
           <BlocoColapsavel
             key={lista.id}
             titulo={lista.nome}
-            resumo={`${lista.itens.filter((i) => i.done).length}/${lista.itens.length}`}
+            resumo={`${feitos}/${lista.itens.length}`}
+            barra={lista.itens.length ? feitos / lista.itens.length : 0}
           >
-            <ul className="space-y-1.5 pt-2">
+            <ul className="space-y-2 pb-1 pt-2">
               {lista.itens.map((item) => (
-                <li key={item.id} className="flex items-start gap-2 text-sm">
+                <li key={item.id} className="flex items-start gap-2.5 text-sm">
                   {/* Ícone, não <Checkbox>: um checkbox desabilitado convida o
                       toque e devolve nada. Aqui o estado é informação. */}
                   <span
                     className={cn(
-                      "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border",
+                      "mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border",
                       item.done
-                        ? "border-primary bg-primary text-primary-foreground"
+                        ? "border-[var(--color-vgreen)] bg-[var(--color-vgreen)] text-white"
                         : "border-input",
                     )}
                     aria-hidden
                   >
-                    {item.done && <Check className="h-3 w-3" />}
+                    {item.done && <Check className="h-3 w-3" strokeWidth={3} />}
                   </span>
-                  <span className={cn(item.done && "text-muted-foreground line-through")}>
+                  <span className={cn("leading-snug", item.done && "text-muted-foreground")}>
                     {item.titulo}
                   </span>
                 </li>
               ))}
             </ul>
           </BlocoColapsavel>
-        ))}
-      </CardContent>
-    </Card>
+        );
+      })}
+    </SecaoCard>
   );
 }
 
@@ -237,55 +392,85 @@ function SecaoRoteiro({ trip }: { trip: TemplateTrip }) {
   if (!trip.dias.length) return null;
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Map className="h-4 w-4" aria-hidden />
-          Roteiro
-          <Badge variant="secondary">{trip.dias.length} dias</Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
+    <SecaoCard titulo="Roteiro dia a dia" icone={CalendarDays} indice={7}>
+      {/* Linha do tempo: o traço vertical amarra os 12 dias como uma sequência
+          contínua em vez de 12 cartões soltos — é o que faz a página parecer
+          uma viagem planejada e não uma lista. */}
+      <div className="relative space-y-1 pl-7">
+        <span className="absolute bottom-3 left-[9px] top-3 w-px bg-border" aria-hidden />
         {trip.dias.map((dia) => (
-          <BlocoColapsavel
-            key={dia.id}
-            titulo={`Dia ${dia.diaNumero}`}
-            resumo={dia.data ?? ""}
-            aberto={dia.diaNumero === 1}
-          >
-            <div className="space-y-2 pt-2">
-              {dia.slots
-                .slice()
-                .sort(
-                  (a, b) =>
-                    Object.keys(PERIODO_META).indexOf(a.periodo) -
-                    Object.keys(PERIODO_META).indexOf(b.periodo),
-                )
-                .map((slot) => {
-                  const meta = PERIODO_META[slot.periodo];
+          <div key={dia.id} className="relative">
+            <span
+              className="absolute -left-[22px] top-3.5 h-2.5 w-2.5 rounded-full bg-[var(--color-coral)] ring-4 ring-card"
+              aria-hidden
+            />
+            <BlocoColapsavel
+              titulo={`Dia ${dia.diaNumero}`}
+              resumo={
+                dia.data
+                  ? new Date(`${dia.data}T12:00:00`).toLocaleDateString("pt-BR", {
+                      day: "2-digit",
+                      month: "short",
+                    })
+                  : ""
+              }
+              aberto={dia.diaNumero === 1}
+            >
+              <div className="space-y-2 pb-2 pt-1">
+                {ORDEM_PERIODO.map((periodo) => {
+                  const slot = dia.slots.find((s) => s.periodo === periodo);
+                  if (!slot || (!slot.ondeIr && !slot.ondeComer && !slot.observacoes)) return null;
+                  const meta = PERIODO_META[periodo];
                   const Icone = meta.icon;
-                  const vazio = !slot.ondeIr && !slot.ondeComer && !slot.observacoes;
-                  if (vazio) return null;
                   return (
-                    <div key={slot.id} className="rounded-md bg-muted/50 p-2 text-sm">
-                      <p className="flex items-center gap-1.5 font-medium">
+                    <div key={slot.id} className="rounded-lg bg-muted/60 p-2.5 text-sm">
+                      <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                         <Icone className="h-3.5 w-3.5" aria-hidden />
                         {meta.label}
                       </p>
-                      {slot.ondeIr && <p className="mt-1 text-muted-foreground">{slot.ondeIr}</p>}
+                      {slot.ondeIr && (
+                        <p className="mt-1 font-medium leading-snug">{slot.ondeIr}</p>
+                      )}
                       {slot.ondeComer && (
-                        <p className="text-muted-foreground">🍽 {slot.ondeComer}</p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">🍽 {slot.ondeComer}</p>
                       )}
                       {slot.observacoes && (
-                        <p className="mt-1 text-xs text-muted-foreground">{slot.observacoes}</p>
+                        <p className="mt-1 text-xs leading-snug text-muted-foreground">
+                          {slot.observacoes}
+                        </p>
                       )}
                     </div>
                   );
                 })}
-            </div>
-          </BlocoColapsavel>
+              </div>
+            </BlocoColapsavel>
+          </div>
         ))}
-      </CardContent>
+      </div>
+    </SecaoCard>
+  );
+}
+
+function SecaoCard({
+  titulo,
+  icone: Icone,
+  indice,
+  children,
+}: {
+  titulo: string;
+  icone: typeof Sun;
+  indice: number;
+  children: ReactNode;
+}) {
+  return (
+    <Card className="vjt-sobe" style={atraso(indice)}>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 font-display text-base">
+          <Icone className="h-4 w-4 text-[var(--color-coral)]" aria-hidden />
+          {titulo}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4 pt-0">{children}</CardContent>
     </Card>
   );
 }
@@ -293,11 +478,13 @@ function SecaoRoteiro({ trip }: { trip: TemplateTrip }) {
 function BlocoColapsavel({
   titulo,
   resumo,
+  barra,
   aberto = false,
   children,
 }: {
   titulo: string;
   resumo?: string;
+  barra?: number;
   aberto?: boolean;
   children: ReactNode;
 }) {
@@ -305,11 +492,24 @@ function BlocoColapsavel({
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
-      <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md py-2 text-left">
-        <span className="text-sm font-medium">{titulo}</span>
-        <span className="flex items-center gap-2 text-xs text-muted-foreground">
+      <CollapsibleTrigger className="vjt-toque flex w-full items-center justify-between gap-3 rounded-lg py-2.5 text-left">
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-semibold">{titulo}</span>
+          {barra != null && (
+            <span className="mt-1.5 block h-1.5 w-full overflow-hidden rounded-full bg-muted">
+              <span
+                className="vjt-barra block h-full rounded-full bg-[var(--color-teal)]"
+                style={{ width: `${pct(barra)}%` }}
+              />
+            </span>
+          )}
+        </span>
+        <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground">
           {resumo}
-          <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} />
+          <ChevronDown
+            className={cn("h-4 w-4 transition-transform duration-200", open && "rotate-180")}
+            aria-hidden
+          />
         </span>
       </CollapsibleTrigger>
       <CollapsibleContent>{children}</CollapsibleContent>
@@ -322,7 +522,15 @@ function BlocoColapsavel({
  * app. O visitante deslogado não tem para onde navegar aqui, então o rodapé
  * tem uma ação só.
  */
-function CtaBar({ trip, clonarAoEntrar }: { trip: TemplateTrip; clonarAoEntrar: boolean }) {
+function CtaBar({
+  trip,
+  slug,
+  clonarAoEntrar,
+}: {
+  trip: TemplateTrip;
+  slug: string;
+  clonarAoEntrar: boolean;
+}) {
   const navigate = useNavigate();
   const auth = useAuth();
   const entitlement = useEntitlement();
@@ -337,6 +545,7 @@ function CtaBar({ trip, clonarAoEntrar }: { trip: TemplateTrip; clonarAoEntrar: 
 
   const passo = proximoPassoCta({
     temSessao: !!auth.user,
+    slug,
     cloneExistenteId: cloneExistente.data ?? null,
     tier: entitlement.tier,
     viagensDoUsuario: ownedCount.data ?? 0,
@@ -385,10 +594,10 @@ function CtaBar({ trip, clonarAoEntrar }: { trip: TemplateTrip; clonarAoEntrar: 
       : "Criar minha viagem a partir deste exemplo";
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 p-3 backdrop-blur">
+    <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 px-4 pb-4 pt-3 backdrop-blur">
       <div className="mx-auto w-full max-w-md">
         <Button
-          className="h-12 w-full text-base"
+          className="vjt-toque h-auto min-h-14 w-full whitespace-normal py-3 text-base font-semibold leading-tight"
           onClick={executar}
           disabled={carregando || clone.isPending}
         >
@@ -398,10 +607,13 @@ function CtaBar({ trip, clonarAoEntrar }: { trip: TemplateTrip; clonarAoEntrar: 
               Criando sua viagem…
             </>
           ) : (
-            rotulo
+            <>
+              <span>{rotulo}</span>
+              <ArrowRight className="ml-2 h-4 w-4 shrink-0" aria-hidden />
+            </>
           )}
         </Button>
-        <p className="mt-1.5 text-center text-xs text-muted-foreground">
+        <p className="mt-2 text-center text-xs text-muted-foreground">
           Uma cópia sua, editável. O exemplo continua aqui, intacto.
         </p>
       </div>

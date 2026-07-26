@@ -119,8 +119,16 @@ export function resumirTemplateTrip(trip: TemplateTrip, hoje?: Date): TemplateTr
  */
 export const TEMPLATE_CLONE_FLAG = "sim";
 
+/**
+ * Slug da viagem exemplo em cartaz. A rota pública é `/{slug}` (VJT-021) —
+ * URL curta e legível, que é o formato de quem manda o link por WhatsApp.
+ */
+export const TEMPLATE_SLUG_PADRAO = "orlando";
+
 /** Para onde o login devolve o visitante depois de autenticar. */
-export const TEMPLATE_CLONE_NEXT = `/trip/exemplo?clonar=${TEMPLATE_CLONE_FLAG}`;
+export function templateCloneNext(slug: string = TEMPLATE_SLUG_PADRAO): string {
+  return `/${slug}?clonar=${TEMPLATE_CLONE_FLAG}`;
+}
 
 export type TemplateCtaStep =
   | { tipo: "login"; next: string }
@@ -141,11 +149,12 @@ export type TemplateCtaStep =
  */
 export function proximoPassoCta(input: {
   temSessao: boolean;
+  slug: string;
   cloneExistenteId: string | null;
   tier: PlanTier;
   viagensDoUsuario: number;
 }): TemplateCtaStep {
-  if (!input.temSessao) return { tipo: "login", next: TEMPLATE_CLONE_NEXT };
+  if (!input.temSessao) return { tipo: "login", next: templateCloneNext(input.slug) };
   if (input.cloneExistenteId) return { tipo: "abrir-clone", tripId: input.cloneExistenteId };
   if (!canCreateAnotherTrip(input.tier, input.viagensDoUsuario)) {
     return { tipo: "paywall", trigger: "segunda_viagem" };

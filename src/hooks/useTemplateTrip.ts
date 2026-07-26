@@ -9,8 +9,8 @@ import {
   type TemplateTrip,
 } from "@/lib/trip-template";
 
-export function templateTripQueryKey() {
-  return ["trip", "template"] as const;
+export function templateTripQueryKey(slug: string) {
+  return ["trip", "template", slug] as const;
 }
 
 export function templateCloneQueryKey(templateId: string | undefined) {
@@ -22,14 +22,15 @@ export function templateCloneQueryKey(templateId: string | undefined) {
  * tudo o que ela lê está coberto pelas policies de SELECT público em trips
  * com `is_template` e nas 6 filhas.
  *
- * A trip é achada por `is_template`, não por uuid fixo: o uuid do exemplo é
- * dado de banco, e um literal aqui viraria deploy toda vez que o exemplo
+ * A trip é achada por `template_slug` + `is_template`, não por uuid fixo: o
+ * exemplo é dado de banco, e um literal aqui viraria deploy toda vez que ele
  * mudasse. Como o `anon` só enxerga trips template, a busca não tem como
- * alcançar a viagem de ninguém.
+ * alcançar a viagem de ninguém — o slug escolhe QUAL exemplo, nunca amplia o
+ * conjunto visível.
  */
-export function useTemplateTrip() {
+export function useTemplateTrip(slug: string) {
   return useQuery({
-    queryKey: templateTripQueryKey(),
+    queryKey: templateTripQueryKey(slug),
     // A viagem exemplo é conteúdo editorial, não dado do usuário: não faz
     // sentido refetch a cada foco de janela.
     staleTime: 5 * 60 * 1000,
@@ -37,11 +38,10 @@ export function useTemplateTrip() {
       const { data: tripRow, error: tripError } = await supabase
         .from("trips")
         .select(
-          "id, nome, destino_pais, destino_cidade, data_viagem, num_pessoas, num_criancas, moeda_destino, cambio_manual",
+          "id, nome, destino_pais, destino_cidade, data_viagem, num_pessoas, num_criancas, moeda_destino, cambio_manual, template_slug",
         )
         .eq("is_template", true)
-        .order("created_at", { ascending: true })
-        .limit(1)
+        .eq("template_slug", slug)
         .maybeSingle();
       if (tripError) throw tripError;
       if (!tripRow) return null;

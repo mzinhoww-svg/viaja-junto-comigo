@@ -1968,6 +1968,7 @@ export type Database = {
           num_pessoas: number;
           owner_id: string;
           status: Database["public"]["Enums"]["trip_status"];
+          template_slug: string | null;
         };
         Insert: {
           cambio_atualizado_em?: string | null;
@@ -1985,6 +1986,7 @@ export type Database = {
           num_pessoas?: number;
           owner_id: string;
           status?: Database["public"]["Enums"]["trip_status"];
+          template_slug?: string | null;
         };
         Update: {
           cambio_atualizado_em?: string | null;
@@ -2002,6 +2004,7 @@ export type Database = {
           num_pessoas?: number;
           owner_id?: string;
           status?: Database["public"]["Enums"]["trip_status"];
+          template_slug?: string | null;
         };
         Relationships: [];
       };
@@ -2230,6 +2233,7 @@ export type Database = {
       accept_trip_invite: { Args: { p_token: string }; Returns: string };
       clone_template_trip: { Args: { p_trip_id: string }; Returns: string };
       is_template_trip: { Args: { p_trip_id: string }; Returns: boolean };
+      trip_template_slug: { Args: { p_trip_id: string }; Returns: string };
       template_trip_savings_total: { Args: { p_trip_id: string }; Returns: number };
       add_product_to_request: {
         Args: {

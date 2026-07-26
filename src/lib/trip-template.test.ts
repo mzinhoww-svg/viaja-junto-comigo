@@ -4,7 +4,7 @@ import {
   proximoPassoCta,
   resumirTemplateTrip,
   TEMPLATE_CLONE_FLAG,
-  TEMPLATE_CLONE_NEXT,
+  templateCloneNext,
   type TemplateTrip,
 } from "@/lib/trip-template";
 
@@ -118,6 +118,7 @@ describe("resumirTemplateTrip", () => {
 describe("proximoPassoCta", () => {
   const logado = {
     temSessao: true,
+    slug: "orlando",
     cloneExistenteId: null,
     tier: "free" as const,
     viagensDoUsuario: 0,
@@ -125,8 +126,8 @@ describe("proximoPassoCta", () => {
 
   it("sem sessão manda para o login carregando a volta para o exemplo", () => {
     const passo = proximoPassoCta({ ...logado, temSessao: false });
-    expect(passo).toEqual({ tipo: "login", next: TEMPLATE_CLONE_NEXT });
-    expect(TEMPLATE_CLONE_NEXT).toContain(`clonar=${TEMPLATE_CLONE_FLAG}`);
+    expect(passo).toEqual({ tipo: "login", next: templateCloneNext("orlando") });
+    expect(templateCloneNext("orlando")).toBe(`/orlando?clonar=${TEMPLATE_CLONE_FLAG}`);
   });
 
   it("com sessão e sem viagem, clona", () => {

@@ -334,8 +334,8 @@ insert into auth.users (id) values ('33333333-3333-3333-3333-333333333333');
 -- Semeada como dona da tabela, e não via `set role authenticated`, porque a
 -- policy trips_insert do VJT-020 barra `is_template = true` vindo de usuário
 -- -- que é exatamente o comportamento desejado e é sondado mais abaixo.
-insert into public.trips (owner_id, destino_pais, destino_cidade, is_template)
-  values ('33333333-3333-3333-3333-333333333333', 'Estados Unidos', 'Orlando', true)
+insert into public.trips (owner_id, destino_pais, destino_cidade, is_template, template_slug)
+  values ('33333333-3333-3333-3333-333333333333', 'Estados Unidos', 'Orlando', true, 'orlando')
   returning id as tpl_id \gset
 insert into public.trip_members (trip_id, user_id, role)
   values (:'tpl_id', '33333333-3333-3333-3333-333333333333', 'owner');
@@ -449,6 +449,14 @@ select public.rls_probe('trips [as owner]', 'UPDATE is_template (publicação!)'
 select public.rls_probe('trips [as owner]', 'INSERT is_template (publicação!)', 'blocked',
   format('insert into public.trips (owner_id, destino_pais, is_template) values (%L, %L, true)',
          '11111111-1111-1111-1111-111111111111', 'Trip auto-publicada'));
+-- VJT-021: sequestrar a URL do exemplo é a mesma escalação por outra porta —
+-- basta gravar `template_slug` para tomar `/orlando`, ou só ocupar o índice
+-- único e impedir o operador de publicar.
+select public.rls_probe('trips [as owner]', 'UPDATE template_slug (sequestro de URL!)', 'no rows',
+  format('update public.trips set template_slug = %L where id = %L', 'orlando', :'trip_id'));
+select public.rls_probe('trips [as owner]', 'INSERT template_slug (sequestro de URL!)', 'blocked',
+  format('insert into public.trips (owner_id, destino_pais, template_slug) values (%L, %L, %L)',
+         '11111111-1111-1111-1111-111111111111', 'Trip com slug', 'paris'));
 select public.rls_probe('trips [as owner]', 'UPDATE nome (legit, regressão)', 'ALLOWED (legit)',
   format('update public.trips set nome = %L where id = %L', 'Ainda edito a minha', :'trip_id'));
 reset role;
@@ -524,6 +532,13 @@ select 'clone_template_trip', 'FK do item aponta para a categoria do clone', '= 
     select 1 from public.budget_items bi
      where bi.trip_id = :'clone_1' and bi.category_id = :'tpl_category_id'
   ) then '= sim' else '= NÃO (vazou id do template)' end;
+
+-- VJT-021: o clone é viagem de gente, não exemplo público — não pode nascer
+-- carregando o slug (tomaria a URL) nem marcado como template.
+insert into public.rls_audit_results (tabela, op, expected, actual)
+select 'clone_template_trip', 'clone não herda template_slug', '= slug nulo',
+  case when (select template_slug from public.trips where id = :'clone_1') is null
+       then '= slug nulo' else '= HERDOU O SLUG' end;
 
 -- Clonar o que não é template não pode funcionar: seria uma via de cópia da
 -- viagem privada de qualquer pessoa cujo uuid vazasse.

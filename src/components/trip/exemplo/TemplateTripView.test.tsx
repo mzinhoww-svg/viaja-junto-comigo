@@ -12,7 +12,7 @@ import { TemplateTripView } from "./TemplateTripView";
 import { PaywallModal } from "@/components/trip/paywall/PaywallModal";
 import { PaywallProvider } from "@/hooks/usePaywall";
 import { PAYWALL_COPY } from "@/lib/entitlements";
-import { TEMPLATE_CLONE_NEXT, type TemplateTrip } from "@/lib/trip-template";
+import { templateCloneNext, type TemplateTrip } from "@/lib/trip-template";
 
 const mocks = vi.hoisted(() => ({
   useAuth: vi.fn(),
@@ -97,7 +97,7 @@ const TRIP: TemplateTrip = {
 function renderView(clonarAoEntrar = false) {
   return render(
     <PaywallProvider>
-      <TemplateTripView clonarAoEntrar={clonarAoEntrar} />
+      <TemplateTripView slug="orlando" clonarAoEntrar={clonarAoEntrar} />
       <PaywallModal />
     </PaywallProvider>,
   );
@@ -162,7 +162,7 @@ describe("TemplateTripView — CTA", () => {
     );
 
     expect(href).toHaveBeenCalledWith(
-      `/trip/login?next=${encodeURIComponent(TEMPLATE_CLONE_NEXT)}`,
+      `/trip/login?next=${encodeURIComponent(templateCloneNext("orlando"))}`,
     );
   });
 
@@ -224,7 +224,7 @@ describe("TemplateTripView — CTA", () => {
 
     rerender(
       <PaywallProvider>
-        <TemplateTripView clonarAoEntrar={true} />
+        <TemplateTripView slug="orlando" clonarAoEntrar={true} />
         <PaywallModal />
       </PaywallProvider>,
     );
