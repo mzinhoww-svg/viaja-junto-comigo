@@ -86,6 +86,29 @@ export function TripLogin({ next }: { next: string }) {
    * para uma rota protegida. O destino desejado (`next`) fica guardado em
    * sessionStorage e é lido depois que a sessão está hidratada.
    */
+  // Quando o Google retorna via full-page redirect, ele volta com
+  // `#access_token=...` no hash. O cliente Supabase (detectSessionInUrl)
+  // consome esse hash automaticamente no primeiro load da página que
+  // monta o React — por isso o `redirect_uri` PRECISA ser uma rota React
+  // (ex.: `/trip/login`), NÃO a home (`/`), que serve HTML estático e
+  // deixaria os tokens presos na URL sem virar sessão.
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session) {
+        let destino = next;
+        try {
+          const salvo = sessionStorage.getItem("viajaly:post-login-next");
+          if (salvo) destino = salvo;
+          sessionStorage.removeItem("viajaly:post-login-next");
+        } catch {
+          /* Safari privado, etc. */
+        }
+        window.location.replace(destino);
+      }
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [next]);
+
   const googleMut = useMutation({
     mutationFn: async () => {
       try {
@@ -94,7 +117,11 @@ export function TripLogin({ next }: { next: string }) {
         /* Safari privado, etc. — seguimos sem persistir o destino */
       }
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+        // Rota React same-origin que monta o cliente Supabase e consome o
+        // hash `#access_token` no retorno do provedor. Apontar para `/`
+        // (HTML estático) fazia o usuário parar na home com os tokens
+        // visíveis na URL e sem sessão.
+        redirect_uri: `${window.location.origin}/trip/login`,
       });
       if (result.error) throw result.error;
       if (result.redirected) return;
