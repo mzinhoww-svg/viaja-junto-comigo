@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { AlertCircle, RefreshCw, Mail } from "lucide-react";
-import { lovable } from "@/integrations/lovable";
+
 
 import { z } from "zod";
 

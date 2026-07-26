@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
+
 import { Logo } from "@/components/viajaly/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
