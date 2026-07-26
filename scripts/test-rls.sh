@@ -34,6 +34,7 @@ if [ "$MODE" = "audit" ]; then
     "$REPO_ROOT/supabase/migrations/20260724150000_vjt003_trip_wizard.sql"
     "$REPO_ROOT/supabase/migrations/20260726120000_vjt020_template_trip_public_clone.sql"
     "$REPO_ROOT/supabase/migrations/20260726160000_vjt021_template_slug.sql"
+    "$REPO_ROOT/supabase/migrations/20260726220000_vjt022_orcamento_real_exemplo.sql"
   )
   TEST_SQL="$REPO_ROOT/supabase/tests/rls_full_schema_audit.sql"
 elif [ "$MODE" = "lgpd" ]; then
