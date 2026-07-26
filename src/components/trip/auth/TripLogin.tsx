@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { KeyRound, Loader2, Mail } from "lucide-react";
@@ -9,6 +9,7 @@ import { ViajalyLogo } from "@/components/trip/ViajalyLogo";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { loginWithAdminCode } from "@/lib/admin-login.functions";
+import { savePostLoginNext, consumePostLoginNext } from "@/lib/post-login-next";
 
 /**
  * Login próprio do Viajaly Trip (VJT-011d). O Trip é vendido separado da
@@ -86,20 +87,35 @@ export function TripLogin({ next }: { next: string }) {
    * para uma rota protegida. O destino desejado (`next`) fica guardado em
    * sessionStorage e é lido depois que a sessão está hidratada.
    */
+  // Quando o Google retorna via full-page redirect, ele volta com
+  // `#access_token=...` no hash. O cliente Supabase (detectSessionInUrl)
+  // consome esse hash automaticamente no primeiro load da página que
+  // monta o React — por isso o `redirect_uri` PRECISA ser uma rota React
+  // (ex.: `/trip/login`), NÃO a home (`/`), que serve HTML estático e
+  // deixaria os tokens presos na URL sem virar sessão.
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session) {
+        window.location.replace(consumePostLoginNext(next));
+      }
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [next]);
+
   const googleMut = useMutation({
     mutationFn: async () => {
-      try {
-        sessionStorage.setItem("viajaly:post-login-next", next);
-      } catch {
-        /* Safari privado, etc. — seguimos sem persistir o destino */
-      }
+      savePostLoginNext(next);
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+        // Rota React same-origin que monta o cliente Supabase e consome o
+        // hash `#access_token` no retorno do provedor. Apontar para `/`
+        // (HTML estático) fazia o usuário parar na home com os tokens
+        // visíveis na URL e sem sessão.
+        redirect_uri: `${window.location.origin}/trip/login`,
       });
       if (result.error) throw result.error;
       if (result.redirected) return;
-      // Popup: sessão já foi setada — leva o usuário para o destino.
-      window.location.href = next;
+      // Popup: sessão já foi setada — leva o usuário para o destino salvo.
+      window.location.href = consumePostLoginNext(next);
     },
     onError: () => toast.error("Não foi possível abrir o login do Google. Tente o e-mail."),
   });

@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
+import { savePostLoginNext, consumePostLoginNext } from "./post-login-next";
 
 export type NavFn = (opts: { to: string }) => void;
 
@@ -19,12 +20,15 @@ export type GoogleLoginOptions = {
  * - Console da agência: `requireAdmin=true` — se o profile não for admin,
  *   desloga e informa o usuário.
  *
- * Extraído em módulo próprio para permitir testes unitários com mocks de
- * `lovable`, `supabase` e `sonner`, sem montar as rotas inteiras.
+ * VJT-021c — `next` persiste em localStorage com TTL antes de qualquer
+ * chamada OAuth. Assim, tanto no fluxo popup (retorna nesta função) quanto
+ * no fluxo full-page redirect (recarrega a rota de login), o destino
+ * original é recuperado depois que a sessão está válida.
  */
 export async function loginWithGoogle(opts: GoogleLoginOptions): Promise<void> {
   const { redirectTo, next, nav, requireAdmin, successMessage, onDone } = opts;
   try {
+    savePostLoginNext(next);
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: redirectTo,
     });
@@ -56,9 +60,10 @@ export async function loginWithGoogle(opts: GoogleLoginOptions): Promise<void> {
     }
 
     toast.success(successMessage ?? "Bem-vindo(a)!");
-    nav({ to: next });
+    nav({ to: consumePostLoginNext(next) });
   } catch {
     toast.error("Não conseguimos entrar com o Google. Tente novamente.");
     onDone?.();
   }
 }
+

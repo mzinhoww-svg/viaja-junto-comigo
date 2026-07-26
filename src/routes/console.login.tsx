@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { consumePostLoginNext } from "@/lib/post-login-next";
 
 import { Logo } from "@/components/viajaly/Logo";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,22 @@ function ConsoleLogin() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  // VJT-021c — full-page redirect do Google recarrega esta rota; consumir o
+  // `next` salvo assim que a sessão estiver hidratada e a role validada.
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event !== "SIGNED_IN" || !session) return;
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", session.user.id)
+        .maybeSingle();
+      if (prof?.role !== "admin") return; // handleGoogle já sinaliza o erro
+      window.location.replace(consumePostLoginNext(search.next ?? "/console"));
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [search.next]);
 
   async function handleGoogle() {
     setGooglePending(true);

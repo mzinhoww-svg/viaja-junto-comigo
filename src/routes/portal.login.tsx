@@ -246,6 +246,18 @@ function PortalLogin() {
   };
 
   const [googlePending, setGooglePending] = useState(false);
+
+  // VJT-021c — full-page redirect do Google recarrega esta rota; consumir o
+  // `next` salvo assim que a sessão estiver hidratada.
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event !== "SIGNED_IN" || !session) return;
+      const { consumePostLoginNext } = await import("@/lib/post-login-next");
+      window.location.replace(consumePostLoginNext(search.next ?? "/portal"));
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [search.next]);
+
   async function handleGoogle() {
     setGooglePending(true);
     const { loginWithGoogle } = await import("@/lib/google-login");
