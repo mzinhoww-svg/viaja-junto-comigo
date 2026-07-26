@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ViajalyLogo } from "@/components/trip/ViajalyLogo";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { loginWithAdminCode } from "@/lib/admin-login.functions";
 
 /**
@@ -76,36 +77,33 @@ export function TripLogin({ next }: { next: string }) {
    * CORS ou rede, seguimos o fluxo normal: barrar um login que provavelmente
    * funciona seria pior que o risco de mostrar o erro.
    */
+  /**
+   * VJT-021b — usamos o helper gerenciado do Lovable Cloud
+   * (`lovable.auth.signInWithOAuth`), que já tem credenciais Google
+   * provisionadas e funciona no preview em iframe (fluxo web_message).
+   *
+   * `redirect_uri` PRECISA ser público same-origin — não pode apontar direto
+   * para uma rota protegida. O destino desejado (`next`) fica guardado em
+   * sessionStorage e é lido depois que a sessão está hidratada.
+   */
   const googleMut = useMutation({
     mutationFn: async () => {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}${next}`,
-          skipBrowserRedirect: true,
-        },
-      });
-      if (error) throw error;
-      if (!data?.url) throw new Error("SEM_URL");
-
-      let configurado = true;
       try {
-        const resposta = await fetch(data.url, { method: "GET", redirect: "manual" });
-        if (resposta.type !== "opaqueredirect" && resposta.status >= 400) configurado = false;
+        sessionStorage.setItem("viajaly:post-login-next", next);
       } catch {
-        /* CORS/rede: não dá para saber daqui — segue o caminho normal */
+        /* Safari privado, etc. — seguimos sem persistir o destino */
       }
-      if (!configurado) throw new Error("PROVIDER_NAO_CONFIGURADO");
-
-      window.location.href = data.url;
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) throw result.error;
+      if (result.redirected) return;
+      // Popup: sessão já foi setada — leva o usuário para o destino.
+      window.location.href = next;
     },
-    onError: (e: Error) =>
-      toast.error(
-        e.message === "PROVIDER_NAO_CONFIGURADO"
-          ? "O login com Google ainda não está disponível. Use o link por e-mail aqui embaixo — dá no mesmo."
-          : "Não foi possível abrir o login do Google. Tente o e-mail.",
-      ),
+    onError: () => toast.error("Não foi possível abrir o login do Google. Tente o e-mail."),
   });
+
 
   const linkMut = useMutation({
     mutationFn: async () => {
