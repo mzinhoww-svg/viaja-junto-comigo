@@ -10,11 +10,17 @@ type Props = {
 function CardStat({ label, value }: { label: string; value: string }) {
   return (
     <Card>
-      <CardHeader className="p-3 pb-1">
+      <CardHeader className="p-2 pb-1">
         <CardTitle className="text-xs font-medium text-muted-foreground">{label}</CardTitle>
       </CardHeader>
-      <CardContent className="p-3 pt-0">
-        <p className="text-base font-semibold text-foreground">{value}</p>
+      <CardContent className="p-2 pt-0">
+        {/* Três cards em 375px deixam ~85px para o valor: `formatBRL` usa espaço
+            não separável (Intl), então "R$ 2.000,00" não quebra e vazava do card
+            (VJT-018). Espaço normal + `break-words` garantem quebra em vez de
+            corte, e `text-sm` mantém a maioria dos valores em uma linha. */}
+        <p className="break-words text-sm font-semibold text-foreground">
+          {value.replace(/\u00a0/g, " ")}
+        </p>
       </CardContent>
     </Card>
   );

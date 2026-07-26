@@ -34,6 +34,9 @@ const attempts = new Map<string, AdminCodeAttempts>();
  * A sessão é criada pelo mesmo mecanismo já usado no login do portal
  * (`admin.generateLink` + `verifyOtp` no client), então não há segundo
  * caminho de autenticação no produto.
+ *
+ * Procedimento operacional: `docs/runbook-ativacao-manual-entitlements.md`
+ * (Caminho A2).
  */
 export const loginWithAdminCode = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ code: z.string().min(1).max(128) }).parse(input))
