@@ -22,10 +22,7 @@ export function savePostLoginNext(next: string | null | undefined): void {
   if (typeof window === "undefined") return;
   if (!isSafeNext(next)) return;
   try {
-    window.localStorage.setItem(
-      KEY,
-      JSON.stringify({ next, exp: Date.now() + TTL_MS }),
-    );
+    window.localStorage.setItem(KEY, JSON.stringify({ next, exp: Date.now() + TTL_MS }));
   } catch {
     /* Safari privado, quota, etc. — seguimos sem o "melhor esforço". */
   }

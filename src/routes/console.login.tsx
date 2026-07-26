@@ -83,7 +83,6 @@ function ConsoleLogin() {
     });
   }
 
-
   return (
     <div className="min-h-screen bg-appbg flex items-center justify-center px-6">
       <div className="w-full max-w-sm bg-white rounded-3xl p-8 border border-[var(--color-border)] shadow-[0_20px_60px_-30px_rgba(16,32,74,.4)]">

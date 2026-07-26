@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { AlertCircle, RefreshCw, Mail } from "lucide-react";
 
-
 import { z } from "zod";
 
 const loginSearch = z.object({
@@ -269,7 +268,6 @@ function PortalLogin() {
       onDone: () => setGooglePending(false),
     });
   }
-
 
   return (
     <PhoneFrame showNav={false}>
