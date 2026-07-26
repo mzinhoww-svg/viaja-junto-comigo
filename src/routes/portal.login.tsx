@@ -249,23 +249,15 @@ function PortalLogin() {
   const [googlePending, setGooglePending] = useState(false);
   async function handleGoogle() {
     setGooglePending(true);
-    try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin + "/portal/login",
-      });
-      if (result.error) {
-        toast.error("Não conseguimos entrar com o Google. Tente novamente.");
-        setGooglePending(false);
-        return;
-      }
-      if (result.redirected) return;
-      toast.success("Bem-vindo(a)!");
-      nav({ to: search.next ?? "/portal" });
-    } catch {
-      toast.error("Não conseguimos entrar com o Google. Tente novamente.");
-      setGooglePending(false);
-    }
+    const { loginWithGoogle } = await import("@/lib/google-login");
+    await loginWithGoogle({
+      redirectTo: window.location.origin + "/portal/login",
+      next: search.next ?? "/portal",
+      nav,
+      onDone: () => setGooglePending(false),
+    });
   }
+
 
   return (
     <PhoneFrame showNav={false}>

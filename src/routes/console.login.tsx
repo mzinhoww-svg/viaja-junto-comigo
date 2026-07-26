@@ -55,24 +55,17 @@ function ConsoleLogin() {
 
   async function handleGoogle() {
     setGooglePending(true);
-    try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin + "/console/login",
-      });
-      if (result.error) {
-        toast.error("Não conseguimos entrar com o Google.");
-        setGooglePending(false);
-        return;
-      }
-      if (result.redirected) return;
-      await checkAdminAndGo();
-      toast.success("Bem-vinda");
-      nav({ to: search.next ?? "/console" });
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Falha no login com Google.");
-      setGooglePending(false);
-    }
+    const { loginWithGoogle } = await import("@/lib/google-login");
+    await loginWithGoogle({
+      redirectTo: window.location.origin + "/console/login",
+      next: search.next ?? "/console",
+      nav,
+      requireAdmin: true,
+      successMessage: "Bem-vinda",
+      onDone: () => setGooglePending(false),
+    });
   }
+
 
   return (
     <div className="min-h-screen bg-appbg flex items-center justify-center px-6">
