@@ -9,6 +9,7 @@ import { ViajalyLogo } from "@/components/trip/ViajalyLogo";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { loginWithAdminCode } from "@/lib/admin-login.functions";
+import { savePostLoginNext, consumePostLoginNext } from "@/lib/post-login-next";
 
 /**
  * Login próprio do Viajaly Trip (VJT-011d). O Trip é vendido separado da
