@@ -11,6 +11,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { TripLogin } from "./TripLogin";
 
 const { oauthMock, otpMock, verifyOtpMock, adminLoginMock, toastMock } = vi.hoisted(() => ({
+  /**
+   * VJT-021b: o Google deixou de passar por `supabase.auth.signInWithOAuth` e
+   * passa pelo helper gerenciado do Lovable Cloud, que já tem credenciais
+   * provisionadas. O mock acompanhou a troca — este teste protege a garantia
+   * ("o destino original sobrevive ao login"), não o mecanismo.
+   */
   oauthMock: vi.fn(),
   otpMock: vi.fn(),
   verifyOtpMock: vi.fn(),
@@ -21,11 +27,13 @@ const { oauthMock, otpMock, verifyOtpMock, adminLoginMock, toastMock } = vi.hois
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
     auth: {
-      signInWithOAuth: oauthMock,
       signInWithOtp: otpMock,
       verifyOtp: verifyOtpMock,
     },
   },
+}));
+vi.mock("@/integrations/lovable", () => ({
+  lovable: { auth: { signInWithOAuth: oauthMock } },
 }));
 vi.mock("sonner", () => ({ toast: toastMock }));
 vi.mock("@/lib/admin-login.functions", () => ({ loginWithAdminCode: vi.fn() }));
@@ -41,7 +49,8 @@ function renderLogin(next = "/trip") {
 }
 
 beforeEach(() => {
-  oauthMock.mockResolvedValue({ error: null });
+  sessionStorage.clear();
+  oauthMock.mockResolvedValue({ error: null, redirected: true });
   otpMock.mockResolvedValue({ error: null });
   verifyOtpMock.mockResolvedValue({ error: null });
   adminLoginMock.mockReset();
@@ -57,15 +66,20 @@ afterEach(() => {
 });
 
 describe("TripLogin", () => {
-  it("Google leva o `next` no redirect, para voltar ao destino original", async () => {
-    renderLogin("/trip/aceitar-convite?token=abc");
+  it("Google guarda o `next` e usa redirect_uri same-origin, para voltar ao destino original", async () => {
+    const destino = "/trip/aceitar-convite?token=abc";
+    renderLogin(destino);
     fireEvent.click(screen.getByRole("button", { name: /continuar com google/i }));
 
     await waitFor(() => expect(oauthMock).toHaveBeenCalledTimes(1));
-    expect(oauthMock.mock.calls[0][0]).toMatchObject({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/trip/aceitar-convite?token=abc` },
+    expect(oauthMock.mock.calls[0][0]).toBe("google");
+    // `redirect_uri` PRECISA ser a origem nua: apontá-lo direto para a rota
+    // protegida (que é o que a versão anterior fazia com `redirectTo`) quebra
+    // o fluxo do provider gerenciado. O destino real viaja no sessionStorage.
+    expect(oauthMock.mock.calls[0][1]).toMatchObject({
+      redirect_uri: window.location.origin,
     });
+    expect(sessionStorage.getItem("viajaly:post-login-next")).toBe(destino);
   });
 
   it("link por e-mail cria a conta na hora (produto vendido separado)", async () => {

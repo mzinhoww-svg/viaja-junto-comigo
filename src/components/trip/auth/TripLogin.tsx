@@ -104,7 +104,6 @@ export function TripLogin({ next }: { next: string }) {
     onError: () => toast.error("Não foi possível abrir o login do Google. Tente o e-mail."),
   });
 
-
   const linkMut = useMutation({
     mutationFn: async () => {
       const valor = email.trim().toLowerCase();
