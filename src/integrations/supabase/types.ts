@@ -1955,47 +1955,56 @@ export type Database = {
         Row: {
           cambio_atualizado_em: string | null;
           cambio_manual: number | null;
+          cloned_from_template_id: string | null;
           created_at: string;
           data_viagem: string | null;
           destino_cidade: string | null;
           destino_pais: string;
           id: string;
+          is_template: boolean;
           moeda_destino: string | null;
           nome: string;
           num_criancas: number;
           num_pessoas: number;
           owner_id: string;
           status: Database["public"]["Enums"]["trip_status"];
+          template_slug: string | null;
         };
         Insert: {
           cambio_atualizado_em?: string | null;
           cambio_manual?: number | null;
+          cloned_from_template_id?: string | null;
           created_at?: string;
           data_viagem?: string | null;
           destino_cidade?: string | null;
           destino_pais: string;
           id?: string;
+          is_template?: boolean;
           moeda_destino?: string | null;
           nome?: string;
           num_criancas?: number;
           num_pessoas?: number;
           owner_id: string;
           status?: Database["public"]["Enums"]["trip_status"];
+          template_slug?: string | null;
         };
         Update: {
           cambio_atualizado_em?: string | null;
           cambio_manual?: number | null;
+          cloned_from_template_id?: string | null;
           created_at?: string;
           data_viagem?: string | null;
           destino_cidade?: string | null;
           destino_pais?: string;
           id?: string;
+          is_template?: boolean;
           moeda_destino?: string | null;
           nome?: string;
           num_criancas?: number;
           num_pessoas?: number;
           owner_id?: string;
           status?: Database["public"]["Enums"]["trip_status"];
+          template_slug?: string | null;
         };
         Relationships: [];
       };
@@ -2222,6 +2231,10 @@ export type Database = {
       };
       accept_invite: { Args: { _token: string }; Returns: Json };
       accept_trip_invite: { Args: { p_token: string }; Returns: string };
+      clone_template_trip: { Args: { p_trip_id: string }; Returns: string };
+      is_template_trip: { Args: { p_trip_id: string }; Returns: boolean };
+      trip_template_slug: { Args: { p_trip_id: string }; Returns: string };
+      template_trip_savings_total: { Args: { p_trip_id: string }; Returns: number };
       add_product_to_request: {
         Args: {
           _origin?: string;

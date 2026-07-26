@@ -18,6 +18,18 @@ grant usage on schema public to authenticated;
 grant all on all tables in schema public to authenticated;
 grant execute on all functions in schema public to authenticated;
 
+-- `anon` (visitante deslogado) recebe DE PROPÓSITO os mesmos grants amplos de
+-- tabela que o Supabase concede por default no projeto real. Isso torna o
+-- teste mais severo que produção: se alguma policy faltar, a RLS é a única
+-- coisa entre o visitante e a linha, e a sonda enxerga o vazamento em vez de
+-- ser barrada antes por falta de grant. Não confunda com o que a migration do
+-- VJT-020 concede (só SELECT nas 7 tabelas do exemplo).
+grant usage on schema auth to anon;
+grant execute on all functions in schema auth to anon;
+grant usage on schema public to anon;
+grant all on all tables in schema public to anon;
+grant execute on all functions in schema public to anon;
+
 create table public.rls_audit_results (
   seq serial primary key,
   tabela text not null,
@@ -28,6 +40,8 @@ create table public.rls_audit_results (
 alter table public.rls_audit_results disable row level security;
 grant all on public.rls_audit_results to authenticated;
 grant usage, select on sequence public.rls_audit_results_seq_seq to authenticated;
+grant all on public.rls_audit_results to anon;
+grant usage, select on sequence public.rls_audit_results_seq_seq to anon;
 
 -- SECURITY INVOKER on purpose: when `authenticated` calls this, the probed
 -- statement runs as `authenticated`, so RLS applies exactly as it would to a
@@ -310,6 +324,230 @@ select public.rls_probe('trips [as member]', 'UPDATE cambio (legit, VJT-006)', '
 reset role;
 
 \echo ''
+\echo '=== VJT-020: seeding a TEMPLATE trip (owner C) alongside A normal trip ==='
+-- A trip de A (acima) permanece NORMAL e vira o controle negativo: toda sonda
+-- pública abaixo é feita em par -- uma na trip template, outra na trip de A --
+-- para que "o anon enxerga" seja provado junto de "o anon não enxerga o resto".
+-- Sem o par, um SELECT público quebrado que devolvesse tudo passaria batido.
+insert into auth.users (id) values ('33333333-3333-3333-3333-333333333333');
+
+-- Semeada como dona da tabela, e não via `set role authenticated`, porque a
+-- policy trips_insert do VJT-020 barra `is_template = true` vindo de usuário
+-- -- que é exatamente o comportamento desejado e é sondado mais abaixo.
+insert into public.trips (owner_id, destino_pais, destino_cidade, is_template, template_slug)
+  values ('33333333-3333-3333-3333-333333333333', 'Estados Unidos', 'Orlando', true, 'orlando')
+  returning id as tpl_id \gset
+insert into public.trip_members (trip_id, user_id, role)
+  values (:'tpl_id', '33333333-3333-3333-3333-333333333333', 'owner');
+insert into public.budget_categories (trip_id, nome) values (:'tpl_id', 'Parques')
+  returning id as tpl_category_id \gset
+insert into public.budget_items (trip_id, category_id, nome, valor_estimado_brl_cents, valor_pago_brl_cents)
+  values (:'tpl_id', :'tpl_category_id', 'Ingressos Disney', 900000, 400000)
+  returning id as tpl_item_id \gset
+insert into public.savings_entries (trip_id, mes_ano, valor_brl_cents, created_by)
+  values (:'tpl_id', '2026-07-01', 250000, '33333333-3333-3333-3333-333333333333');
+insert into public.checklists (trip_id, tipo, nome) values (:'tpl_id', 'documentos', 'Documentos')
+  returning id as tpl_checklist_id \gset
+insert into public.checklist_items (checklist_id, titulo, done)
+  values (:'tpl_checklist_id', 'Passaporte', true);
+insert into public.itinerary_days (trip_id, dia_numero) values (:'tpl_id', 1)
+  returning id as tpl_day_id \gset
+insert into public.itinerary_slots (day_id, periodo, onde_ir)
+  values (:'tpl_day_id', 'manha', 'Magic Kingdom');
+
+\echo ''
+\echo '=== probing as ANON (deslogado): template must be visible, everything else must not ==='
+set role anon;
+-- auth.uid() lê este GUC; sem zerá-lo o `anon` herdaria o sub do bloco
+-- anterior e o teste mediria um usuário logado achando que mede um visitante.
+set request.jwt.claim.sub = '';
+
+-- --- lado positivo: a viagem exemplo e suas 6 filhas ---
+select public.rls_probe('trips [anon/template]', 'SELECT', 'VISIBLE (public by design)',
+  format('select count(*) from public.trips where id = %L', :'tpl_id'));
+select public.rls_probe('budget_categories [anon/template]', 'SELECT', 'VISIBLE (public by design)',
+  format('select count(*) from public.budget_categories where trip_id = %L', :'tpl_id'));
+select public.rls_probe('budget_items [anon/template]', 'SELECT', 'VISIBLE (public by design)',
+  format('select count(*) from public.budget_items where trip_id = %L', :'tpl_id'));
+select public.rls_probe('checklists [anon/template]', 'SELECT', 'VISIBLE (public by design)',
+  format('select count(*) from public.checklists where trip_id = %L', :'tpl_id'));
+select public.rls_probe('checklist_items [anon/template]', 'SELECT', 'VISIBLE (public by design)',
+  format('select count(*) from public.checklist_items where checklist_id = %L', :'tpl_checklist_id'));
+select public.rls_probe('itinerary_days [anon/template]', 'SELECT', 'VISIBLE (public by design)',
+  format('select count(*) from public.itinerary_days where trip_id = %L', :'tpl_id'));
+select public.rls_probe('itinerary_slots [anon/template]', 'SELECT', 'VISIBLE (public by design)',
+  format('select count(*) from public.itinerary_slots where day_id = %L', :'tpl_day_id'));
+
+-- --- CONTROLE NEGATIVO: a trip normal de A, tabela por tabela ---
+-- Se a abertura pública tivesse vazado (ex.: `using (true)` no lugar de
+-- `using (is_template)`), é aqui que aparece.
+select public.rls_probe('trips [anon/CONTROLE]', 'SELECT', 'no rows',
+  format('select count(*) from public.trips where id = %L', :'trip_id'));
+select public.rls_probe('budget_categories [anon/CONTROLE]', 'SELECT', 'no rows',
+  format('select count(*) from public.budget_categories where trip_id = %L', :'trip_id'));
+select public.rls_probe('budget_items [anon/CONTROLE]', 'SELECT', 'no rows',
+  format('select count(*) from public.budget_items where trip_id = %L', :'trip_id'));
+select public.rls_probe('checklists [anon/CONTROLE]', 'SELECT', 'no rows',
+  format('select count(*) from public.checklists where trip_id = %L', :'trip_id'));
+select public.rls_probe('checklist_items [anon/CONTROLE]', 'SELECT', 'no rows',
+  format('select count(*) from public.checklist_items where checklist_id = %L', :'checklist_id'));
+select public.rls_probe('itinerary_days [anon/CONTROLE]', 'SELECT', 'no rows',
+  format('select count(*) from public.itinerary_days where trip_id = %L', :'trip_id'));
+select public.rls_probe('itinerary_slots [anon/CONTROLE]', 'SELECT', 'no rows',
+  format('select count(*) from public.itinerary_slots where day_id = %L', :'day_id'));
+select public.rls_probe('trip_members [anon/CONTROLE]', 'SELECT', 'no rows',
+  format('select count(*) from public.trip_members where trip_id = %L', :'trip_id'));
+select public.rls_probe('trip_invites [anon/CONTROLE]', 'SELECT', 'no rows',
+  format('select count(*) from public.trip_invites where trip_id = %L', :'trip_id'));
+select public.rls_probe('entitlements [anon/CONTROLE]', 'SELECT', 'no rows',
+  'select count(*) from public.entitlements');
+select public.rls_probe('ai_messages [anon/CONTROLE]', 'SELECT', 'no rows',
+  'select count(*) from public.ai_messages');
+
+-- --- savings_entries: fora da abertura pública, inclusive na trip template ---
+-- É a única tabela do conjunto que carrega identidade (`created_by`).
+select public.rls_probe('savings_entries [anon/template]', 'SELECT', 'no rows',
+  format('select count(*) from public.savings_entries where trip_id = %L', :'tpl_id'));
+select public.rls_probe('savings_entries [anon/CONTROLE]', 'SELECT', 'no rows',
+  format('select count(*) from public.savings_entries where trip_id = %L', :'trip_id'));
+
+-- --- escrita: a abertura é de leitura, e só ---
+select public.rls_probe('trips [anon/template]', 'UPDATE', 'no rows',
+  format('update public.trips set nome = %L where id = %L', 'HACKED', :'tpl_id'));
+select public.rls_probe('trips [anon/template]', 'DELETE', 'no rows',
+  format('delete from public.trips where id = %L', :'tpl_id'));
+select public.rls_probe('trips [anon]', 'INSERT', 'blocked',
+  format('insert into public.trips (owner_id, destino_pais) values (%L, %L)',
+         '33333333-3333-3333-3333-333333333333', 'Trip do visitante'));
+select public.rls_probe('budget_items [anon/template]', 'UPDATE', 'no rows',
+  format('update public.budget_items set valor_pago_brl_cents = 1 where trip_id = %L', :'tpl_id'));
+select public.rls_probe('budget_items [anon/template]', 'INSERT', 'blocked',
+  format('insert into public.budget_items (trip_id, category_id, nome, valor_estimado_brl_cents) values (%L, %L, %L, 1)',
+         :'tpl_id', :'tpl_category_id', 'X'));
+select public.rls_probe('checklist_items [anon/template]', 'UPDATE', 'no rows',
+  format('update public.checklist_items set done = false where checklist_id = %L', :'tpl_checklist_id'));
+select public.rls_probe('checklist_items [anon/template]', 'DELETE', 'no rows',
+  format('delete from public.checklist_items where checklist_id = %L', :'tpl_checklist_id'));
+select public.rls_probe('itinerary_slots [anon/template]', 'UPDATE', 'no rows',
+  format('update public.itinerary_slots set onde_ir = %L where day_id = %L', 'HACKED', :'tpl_day_id'));
+
+-- --- clonar exige sessão ---
+select public.rls_probe('clone_template_trip [anon]', 'EXECUTE', 'blocked',
+  format('select public.clone_template_trip(%L)', :'tpl_id'));
+
+reset role;
+
+\echo ''
+\echo '=== VJT-020: publicar a própria trip é ESCRITA, e continua barrada ==='
+-- `is_template` virou load-bearing para leitura pública, então um membro que
+-- consiga gravá-la publica os dados da viagem para a internet inteira. Mesma
+-- lição do VJT-013 com `owner_id` -- e mesma sonda.
+set role authenticated;
+set request.jwt.claim.sub = '11111111-1111-1111-1111-111111111111';
+select public.rls_probe('trips [as owner]', 'UPDATE is_template (publicação!)', 'no rows',
+  format('update public.trips set is_template = true where id = %L', :'trip_id'));
+select public.rls_probe('trips [as owner]', 'INSERT is_template (publicação!)', 'blocked',
+  format('insert into public.trips (owner_id, destino_pais, is_template) values (%L, %L, true)',
+         '11111111-1111-1111-1111-111111111111', 'Trip auto-publicada'));
+-- VJT-021: sequestrar a URL do exemplo é a mesma escalação por outra porta —
+-- basta gravar `template_slug` para tomar `/orlando`, ou só ocupar o índice
+-- único e impedir o operador de publicar.
+select public.rls_probe('trips [as owner]', 'UPDATE template_slug (sequestro de URL!)', 'no rows',
+  format('update public.trips set template_slug = %L where id = %L', 'orlando', :'trip_id'));
+select public.rls_probe('trips [as owner]', 'INSERT template_slug (sequestro de URL!)', 'blocked',
+  format('insert into public.trips (owner_id, destino_pais, template_slug) values (%L, %L, %L)',
+         '11111111-1111-1111-1111-111111111111', 'Trip com slug', 'paris'));
+select public.rls_probe('trips [as owner]', 'UPDATE nome (legit, regressão)', 'ALLOWED (legit)',
+  format('update public.trips set nome = %L where id = %L', 'Ainda edito a minha', :'trip_id'));
+reset role;
+
+-- Membro apenas EDITOR da trip de A: não pode publicar a viagem de outra
+-- pessoa (o caso pior, porque expõe dado que nem é dele).
+set role authenticated;
+set request.jwt.claim.sub = '22222222-2222-2222-2222-222222222222';
+select public.rls_probe('trips [as editor]', 'UPDATE is_template (publicação alheia!)', 'no rows',
+  format('update public.trips set is_template = true where id = %L', :'trip_id'));
+reset role;
+
+\echo ''
+\echo '=== VJT-020: clonagem (conteúdo + idempotência), como usuário logado D ==='
+set role authenticated;
+set request.jwt.claim.sub = '44444444-4444-4444-4444-444444444444';
+
+select public.clone_template_trip(:'tpl_id') as clone_1 \gset
+select public.clone_template_trip(:'tpl_id') as clone_2 \gset
+
+insert into public.rls_audit_results (tabela, op, expected, actual)
+select 'clone_template_trip', 'idempotência (2 chamadas)', '= mesmo uuid',
+  case when :'clone_1' = :'clone_2' then '= mesmo uuid' else '= DUPLICOU' end;
+
+insert into public.rls_audit_results (tabela, op, expected, actual)
+select 'clone_template_trip', 'owner + is_template do clone', '= owner=D, template=false',
+  case when t.owner_id = '44444444-4444-4444-4444-444444444444' and not t.is_template
+            and t.cloned_from_template_id = :'tpl_id'
+       then '= owner=D, template=false' else '= ERRADO' end
+  from public.trips t where t.id = :'clone_1';
+
+insert into public.rls_audit_results (tabela, op, expected, actual)
+select 'clone_template_trip', 'filhas clonadas (cat/item/lista/item/dia/slot)', '= 1/1/1/1/1/1',
+  '= ' || (select count(*) from public.budget_categories where trip_id = :'clone_1')
+  || '/' || (select count(*) from public.budget_items where trip_id = :'clone_1')
+  || '/' || (select count(*) from public.checklists where trip_id = :'clone_1')
+  || '/' || (select count(*) from public.checklist_items ci
+               join public.checklists c on c.id = ci.checklist_id where c.trip_id = :'clone_1')
+  || '/' || (select count(*) from public.itinerary_days where trip_id = :'clone_1')
+  || '/' || (select count(*) from public.itinerary_slots s
+               join public.itinerary_days d on d.id = s.day_id where d.trip_id = :'clone_1');
+
+-- Decisão 2 do ticket: vem o plano, não o progresso. O template tem 1 item
+-- marcado e R$ 4.000 pagos; o clone tem que nascer zerado nos dois.
+insert into public.rls_audit_results (tabela, op, expected, actual)
+select 'clone_template_trip', 'progresso zerado (done / valor_pago)', '= 0 done, 0 pago',
+  '= ' || (select count(*) from public.checklist_items ci
+             join public.checklists c on c.id = ci.checklist_id
+            where c.trip_id = :'clone_1' and ci.done) || ' done, '
+       || (select coalesce(sum(valor_pago_brl_cents + valor_pago_destino_cents), 0)
+             from public.budget_items where trip_id = :'clone_1') || ' pago';
+
+-- O clone não pode arrastar as economias do dono do template (identidade).
+insert into public.rls_audit_results (tabela, op, expected, actual)
+select 'clone_template_trip', 'savings NÃO clonadas', '= 0 linhas',
+  '= ' || (select count(*) from public.savings_entries where trip_id = :'clone_1') || ' linhas';
+
+-- Estimativas SIM: é o conteúdo que faz o exemplo valer.
+insert into public.rls_audit_results (tabela, op, expected, actual)
+select 'clone_template_trip', 'estimativa preservada', '= 900000',
+  '= ' || (select coalesce(sum(valor_estimado_brl_cents), 0)::text
+             from public.budget_items where trip_id = :'clone_1');
+
+-- Categoria do item clonado tem que apontar para a categoria NOVA, não para a
+-- do template -- o erro clássico de clonagem com id mapeado errado.
+insert into public.rls_audit_results (tabela, op, expected, actual)
+select 'clone_template_trip', 'FK do item aponta para a categoria do clone', '= sim',
+  case when exists (
+    select 1 from public.budget_items bi
+      join public.budget_categories bc on bc.id = bi.category_id
+     where bi.trip_id = :'clone_1' and bc.trip_id = :'clone_1'
+  ) and not exists (
+    select 1 from public.budget_items bi
+     where bi.trip_id = :'clone_1' and bi.category_id = :'tpl_category_id'
+  ) then '= sim' else '= NÃO (vazou id do template)' end;
+
+-- VJT-021: o clone é viagem de gente, não exemplo público — não pode nascer
+-- carregando o slug (tomaria a URL) nem marcado como template.
+insert into public.rls_audit_results (tabela, op, expected, actual)
+select 'clone_template_trip', 'clone não herda template_slug', '= slug nulo',
+  case when (select template_slug from public.trips where id = :'clone_1') is null
+       then '= slug nulo' else '= HERDOU O SLUG' end;
+
+-- Clonar o que não é template não pode funcionar: seria uma via de cópia da
+-- viagem privada de qualquer pessoa cujo uuid vazasse.
+select public.rls_probe('clone_template_trip [trip normal]', 'EXECUTE', 'blocked',
+  format('select public.clone_template_trip(%L)', :'trip_id'));
+
+reset role;
+
+\echo ''
 \echo '================== RLS AUDIT REPORT =================='
 \pset format aligned
 select
@@ -318,6 +556,11 @@ select
   expected,
   actual,
   case
+    -- Asserções de igualdade literal (VJT-020: idempotência e conteúdo da
+    -- clonagem). Marcadas com o prefixo `= ` para não colidirem com as
+    -- famílias de expectativa acima, que são sobre visibilidade.
+    when expected like '= %' and actual = expected then 'ok'
+    when expected like '= %' then '!! MISMATCH'
     -- Writes that SHOULD succeed (a member editing their own trip): the
     -- regression guard for hardening policies too far.
     when expected = 'ALLOWED (legit)' and actual like 'ALLOWED%' then 'ok'
@@ -340,7 +583,8 @@ select
   count(*) filter (where expected <> 'ALLOWED (legit)' and actual like 'ALLOWED%')
   + count(*) filter (where expected = 'no rows' and actual like 'VISIBLE%') as leaks,
   count(*) filter (where expected like 'VISIBLE (public%' and actual not like 'VISIBLE%')
-  + count(*) filter (where expected = 'ALLOWED (legit)' and actual not like 'ALLOWED%') as broken,
+  + count(*) filter (where expected = 'ALLOWED (legit)' and actual not like 'ALLOWED%')
+  + count(*) filter (where expected like '= %' and actual <> expected) as broken,
   count(*) as total_probes
 from public.rls_audit_results;
 
@@ -361,6 +605,7 @@ begin
     + count(*) filter (where expected = 'no rows' and actual like 'VISIBLE%')
     + count(*) filter (where expected like 'VISIBLE (public%' and actual not like 'VISIBLE%')
     + count(*) filter (where expected = 'ALLOWED (legit)' and actual not like 'ALLOWED%')
+    + count(*) filter (where expected like '= %' and actual <> expected)
   into v_bad
   from public.rls_audit_results;
 

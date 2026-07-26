@@ -25,6 +25,16 @@ MIGRATIONS=(
 )
 AUTH_MOCK="$REPO_ROOT/supabase/tests/fixtures/auth_mock.sql"
 if [ "$MODE" = "audit" ]; then
+  # VJT-020 abre SELECT público em trips/filhas para `anon`. O audit é o único
+  # lugar onde essa abertura é medida em vez de argumentada (Seção 3, regra de
+  # processo do VJT-013), então as duas migrations abaixo entram no replay:
+  # a do wizard (traz `trips.num_criancas`, que a RPC de clonagem copia) e a
+  # do próprio VJT-020.
+  MIGRATIONS+=(
+    "$REPO_ROOT/supabase/migrations/20260724150000_vjt003_trip_wizard.sql"
+    "$REPO_ROOT/supabase/migrations/20260726120000_vjt020_template_trip_public_clone.sql"
+    "$REPO_ROOT/supabase/migrations/20260726160000_vjt021_template_slug.sql"
+  )
   TEST_SQL="$REPO_ROOT/supabase/tests/rls_full_schema_audit.sql"
 elif [ "$MODE" = "lgpd" ]; then
   # user_lgpd_consents nasce no VJT-017 e vira log append-only no VJT-017b;

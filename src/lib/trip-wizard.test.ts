@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { tripVariablesFromInput, validarNovaTripInput, type NovaTripInput } from "./trip-wizard";
+import {
+  limparOrcamento,
+  orcamentoInicialSugerido,
+  ORCAMENTO_OUTRO,
+  ORCAMENTO_SUGESTOES,
+  tripVariablesFromInput,
+  validarNovaTripInput,
+  type NovaTripInput,
+} from "./trip-wizard";
 
 function input(overrides: Partial<NovaTripInput> = {}): NovaTripInput {
   return {
@@ -125,5 +133,55 @@ describe("tripVariablesFromInput", () => {
     expect(vars.regiao).toBeNull();
     expect(vars.clima).toBeNull();
     expect(vars.destinoPack).toBeNull();
+  });
+});
+
+describe("orçamento com sugestões (VJT-021)", () => {
+  it("abre o passo com três sugestões nomeadas e sem valor", () => {
+    const inicial = orcamentoInicialSugerido();
+    expect(inicial).toHaveLength(3);
+    expect(inicial.every((i) => i.nome !== "")).toBe(true);
+    expect(inicial.every((i) => i.valorEstimadoBrlCents === 0)).toBe(true);
+    expect(inicial.every((i) => ORCAMENTO_SUGESTOES.includes(i.nome))).toBe(true);
+  });
+
+  it("descarta sugestão que o usuário não preencheu", () => {
+    const limpo = limparOrcamento([
+      { nome: "Passagens aéreas", valorEstimadoBrlCents: 500000 },
+      { nome: "Hospedagem", valorEstimadoBrlCents: 0 },
+      { nome: "", valorEstimadoBrlCents: 0 },
+    ]);
+    expect(limpo).toEqual([{ nome: "Passagens aéreas", valorEstimadoBrlCents: 500000 }]);
+  });
+
+  it("o estado inicial do wizard passa na validação sem o usuário tocar em nada", () => {
+    // A regressão que este teste guarda: sem `limparOrcamento`, as três
+    // sugestões com valor zero virariam "o valor estimado deve ser maior que
+    // zero" e travariam o botão de criar viagem.
+    const erros = validarNovaTripInput({
+      destino: {
+        pais: "Estados Unidos",
+        cidade: "Orlando",
+        regiao: null,
+        clima: null,
+        destinoPack: null,
+      },
+      dataViagem: null,
+      viajantes: { numPessoas: 2, numCriancas: 0 },
+      orcamento: limparOrcamento(orcamentoInicialSugerido()),
+    });
+    expect(erros).toEqual([]);
+  });
+
+  it("item digitado à mão sobrevive à limpeza", () => {
+    const limpo = limparOrcamento([
+      { nome: "Estacionamento no aeroporto", valorEstimadoBrlCents: 12000 },
+    ]);
+    expect(limpo).toHaveLength(1);
+    expect(ORCAMENTO_SUGESTOES).not.toContain("Estacionamento no aeroporto");
+  });
+
+  it("a sentinela de 'Outro' não colide com nenhuma sugestão", () => {
+    expect(ORCAMENTO_SUGESTOES).not.toContain(ORCAMENTO_OUTRO);
   });
 });

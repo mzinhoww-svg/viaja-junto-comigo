@@ -24,6 +24,53 @@ export type WizardOrcamentoItem = {
   valorEstimadoBrlCents: number;
 };
 
+/**
+ * Sugestões do passo de orçamento (VJT-021). O passo nascia com campo de
+ * texto vazio, o que empurra para o usuário a pergunta que o produto já sabe
+ * responder — "o que é que se gasta numa viagem?". A lista cobre as linhas de
+ * gasto de qualquer viagem internacional, não de um destino específico: o
+ * corte por destino é papel dos `checklist_templates`, e duplicar essa
+ * inteligência aqui criaria duas listas para manter.
+ */
+export const ORCAMENTO_SUGESTOES: readonly string[] = [
+  "Passagens aéreas",
+  "Hospedagem",
+  "Alimentação",
+  "Ingressos e passeios",
+  "Transporte no destino",
+  "Seguro viagem",
+  "Aluguel de carro",
+  "Chip internacional / eSIM",
+  "Compras e lembranças",
+  "Vistos e documentos",
+  "Bagagem despachada",
+  "Imprevistos",
+];
+
+/** Valor do `Select` que libera o campo livre. */
+export const ORCAMENTO_OUTRO = "__outro__";
+
+/**
+ * Com o que o passo abre: as três linhas que praticamente toda viagem tem,
+ * já nomeadas e sem valor. O usuário só digita quanto — e o que ele não
+ * preencher some no `limparOrcamento`, então sugerir não vira obrigação.
+ */
+export function orcamentoInicialSugerido(): WizardOrcamentoItem[] {
+  return ORCAMENTO_SUGESTOES.slice(0, 3).map((nome) => ({
+    nome,
+    valorEstimadoBrlCents: 0,
+  }));
+}
+
+/**
+ * Descarta as linhas que o usuário não preencheu. Roda ANTES da validação:
+ * sem isso, as sugestões que ele deixou em branco virariam erro de "valor
+ * deve ser maior que zero" e transformariam uma ajuda em bloqueio.
+ */
+export function limparOrcamento(itens: WizardOrcamentoItem[]): WizardOrcamentoItem[] {
+  return itens.filter((item) => item.nome.trim() !== "" && item.valorEstimadoBrlCents > 0);
+}
+
 export type NovaTripInput = {
   destino: WizardDestino;
   /** ISO `YYYY-MM-DD`, ou `null` no modo sonho (ainda não sei a data). */

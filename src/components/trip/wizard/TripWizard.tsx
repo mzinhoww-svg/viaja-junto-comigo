@@ -19,6 +19,10 @@ import { OUTRO_DESTINO_ID, TRIP_DESTINATIONS } from "@/lib/trip-destinations";
 import {
   validarNovaTripInput,
   type NovaTripInput,
+  limparOrcamento,
+  orcamentoInicialSugerido,
+  ORCAMENTO_OUTRO,
+  ORCAMENTO_SUGESTOES,
   type WizardOrcamentoItem,
 } from "@/lib/trip-wizard";
 
@@ -43,7 +47,7 @@ const ESTADO_INICIAL: FormState = {
   dataViagem: "",
   numPessoas: 2,
   numCriancas: 0,
-  orcamento: [],
+  orcamento: orcamentoInicialSugerido(),
 };
 
 function buildInput(form: FormState): NovaTripInput {
@@ -69,7 +73,9 @@ function buildInput(form: FormState): NovaTripInput {
     destino,
     dataViagem: form.modoSonho ? null : form.dataViagem || null,
     viajantes: { numPessoas: form.numPessoas, numCriancas: form.numCriancas },
-    orcamento: form.orcamento,
+    // Sugestões que o usuário não preencheu não são itens — some com elas
+    // antes da validação (VJT-021).
+    orcamento: limparOrcamento(form.orcamento),
   };
 }
 
@@ -297,44 +303,115 @@ function PassoOrcamento({ form, setForm }: PassoProps) {
         Adicione itens que já sabe que vai gastar. Pode pular e preencher depois.
       </p>
       {form.orcamento.map((item, index) => (
-        <div key={index} className="flex items-end gap-2">
-          <div className="flex-1">
-            <Label htmlFor={`item-nome-${index}`}>Item</Label>
-            <Input
-              id={`item-nome-${index}`}
-              className="mt-1"
-              value={item.nome}
-              onChange={(e) => atualizarItem(index, { nome: e.target.value })}
-              placeholder="Ex.: Passagens aéreas"
-            />
-          </div>
-          <div className="w-32">
-            <Label htmlFor={`item-valor-${index}`}>Valor</Label>
-            <Input
-              id={`item-valor-${index}`}
-              className="mt-1"
-              inputMode="decimal"
-              value={item.valorEstimadoBrlCents ? formatBRL(item.valorEstimadoBrlCents) : ""}
-              onChange={(e) =>
-                atualizarItem(index, { valorEstimadoBrlCents: brlToCents(e.target.value) })
-              }
-              placeholder="R$ 0,00"
-            />
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Remover item"
-            onClick={() => removerItem(index)}
-          >
-            <Trash2 className="h-4 w-4" aria-hidden />
-          </Button>
-        </div>
+        <ItemOrcamento
+          key={index}
+          item={item}
+          index={index}
+          onChange={(patch) => atualizarItem(index, patch)}
+          onRemove={() => removerItem(index)}
+        />
       ))}
-      <Button variant="outline" className="w-full" onClick={adicionarItem}>
+      <Button variant="outline" className="h-12 w-full" onClick={adicionarItem}>
         <Plus className="mr-2 h-4 w-4" aria-hidden />
         Adicionar item
       </Button>
+    </div>
+  );
+}
+
+/**
+ * Uma linha do orçamento (VJT-021). Duas mudanças, e as duas vieram de uso em
+ * aparelho real:
+ *
+ * 1. **Empilhada, não em uma linha só.** O layout anterior era
+ *    `flex` com nome (`flex-1`) + valor (`w-32`) + botão de lixeira lado a
+ *    lado. A 375px, descontando o `px-6` do wizard, sobravam ~143px para o
+ *    nome — o placeholder "Ex.: Passagens aéreas" não cabia inteiro. Agora o
+ *    nome ocupa a largura toda e valor/remover dividem a linha de baixo.
+ * 2. **Sugestão em vez de campo em branco.** O campo livre só aparece depois
+ *    de escolher "Outro", que é quando ele de fato é necessário.
+ */
+function ItemOrcamento({
+  item,
+  index,
+  onChange,
+  onRemove,
+}: {
+  item: WizardOrcamentoItem;
+  index: number;
+  onChange: (patch: Partial<WizardOrcamentoItem>) => void;
+  onRemove: () => void;
+}) {
+  // "Outro" é um estado da linha, não do dado: um item cujo nome não está na
+  // lista de sugestões já é, por definição, um item livre — inclusive quando
+  // a tela remonta. Guardar isso em `useState` faria a linha voltar para o
+  // Select depois de qualquer re-render.
+  const livre = item.nome !== "" && !ORCAMENTO_SUGESTOES.includes(item.nome);
+  const [forcarLivre, setForcarLivre] = useState(false);
+  const mostrarCampoLivre = livre || forcarLivre;
+
+  return (
+    <div className="space-y-3 rounded-lg border border-border p-3">
+      <div>
+        <Label htmlFor={`item-nome-${index}`}>Item</Label>
+        {mostrarCampoLivre ? (
+          <Input
+            id={`item-nome-${index}`}
+            className="mt-1 h-11"
+            value={item.nome}
+            autoFocus={forcarLivre}
+            onChange={(e) => onChange({ nome: e.target.value })}
+            placeholder="Ex.: Estacionamento no aeroporto"
+          />
+        ) : (
+          <Select
+            value={item.nome || undefined}
+            onValueChange={(valor) => {
+              if (valor === ORCAMENTO_OUTRO) {
+                setForcarLivre(true);
+                onChange({ nome: "" });
+                return;
+              }
+              onChange({ nome: valor });
+            }}
+          >
+            <SelectTrigger id={`item-nome-${index}`} className="mt-1 h-11">
+              <SelectValue placeholder="Escolha um item" />
+            </SelectTrigger>
+            <SelectContent>
+              {ORCAMENTO_SUGESTOES.map((sugestao) => (
+                <SelectItem key={sugestao} value={sugestao}>
+                  {sugestao}
+                </SelectItem>
+              ))}
+              <SelectItem value={ORCAMENTO_OUTRO}>Outro (digitar)</SelectItem>
+            </SelectContent>
+          </Select>
+        )}
+      </div>
+
+      <div className="flex items-end gap-2">
+        <div className="flex-1">
+          <Label htmlFor={`item-valor-${index}`}>Valor estimado</Label>
+          <Input
+            id={`item-valor-${index}`}
+            className="mt-1 h-11"
+            inputMode="decimal"
+            value={item.valorEstimadoBrlCents ? formatBRL(item.valorEstimadoBrlCents) : ""}
+            onChange={(e) => onChange({ valorEstimadoBrlCents: brlToCents(e.target.value) })}
+            placeholder="R$ 0,00"
+          />
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-11 w-11 shrink-0"
+          aria-label={`Remover ${item.nome || "item"}`}
+          onClick={onRemove}
+        >
+          <Trash2 className="h-4 w-4" aria-hidden />
+        </Button>
+      </div>
     </div>
   );
 }

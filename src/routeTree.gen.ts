@@ -14,6 +14,7 @@ import { Route as ConsoleRouteImport } from './routes/console'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MilhasRouteImport } from './routes/milhas'
 import { Route as OrcamentoRouteImport } from './routes/orcamento'
+import { Route as OrlandoRouteImport } from './routes/orlando'
 import { Route as PassaporteRouteImport } from './routes/passaporte'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
@@ -58,6 +59,7 @@ import { Route as TripFinanceiroRouteImport } from './routes/trip.financeiro'
 import { Route as TripMaisRouteImport } from './routes/trip.mais'
 import { Route as TripNovoRouteImport } from './routes/trip.novo'
 import { Route as TripRoteiroRouteImport } from './routes/trip.roteiro'
+import { Route as TripExemploRouteImport } from './routes/trip_.exemplo'
 import { Route as TripLoginRouteImport } from './routes/trip_.login'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
@@ -89,6 +91,11 @@ const MilhasRoute = MilhasRouteImport.update({
 const OrcamentoRoute = OrcamentoRouteImport.update({
   id: '/orcamento',
   path: '/orcamento',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrlandoRoute = OrlandoRouteImport.update({
+  id: '/orlando',
+  path: '/orlando',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PassaporteRoute = PassaporteRouteImport.update({
@@ -313,6 +320,11 @@ const TripRoteiroRoute = TripRoteiroRouteImport.update({
   path: '/roteiro',
   getParentRoute: () => TripRoute,
 } as any)
+const TripExemploRoute = TripExemploRouteImport.update({
+  id: '/trip_/exemplo',
+  path: '/trip/exemplo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TripLoginRoute = TripLoginRouteImport.update({
   id: '/trip_/login',
   path: '/trip/login',
@@ -358,6 +370,7 @@ export interface FileRoutesByFullPath {
   '/mcp': typeof McpRoute
   '/milhas': typeof MilhasRoute
   '/orcamento': typeof OrcamentoRouteWithChildren
+  '/orlando': typeof OrlandoRoute
   '/passaporte': typeof PassaporteRoute
   '/portal': typeof PortalRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
@@ -399,6 +412,7 @@ export interface FileRoutesByFullPath {
   '/trip/mais': typeof TripMaisRoute
   '/trip/novo': typeof TripNovoRoute
   '/trip/roteiro': typeof TripRoteiroRoute
+  '/trip/exemplo': typeof TripExemploRoute
   '/trip/login': typeof TripLoginRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -415,6 +429,7 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/milhas': typeof MilhasRoute
   '/orcamento': typeof OrcamentoRouteWithChildren
+  '/orlando': typeof OrlandoRoute
   '/passaporte': typeof PassaporteRoute
   '/privacidade': typeof PrivacidadeRoute
   '/roteiros': typeof RoteirosRoute
@@ -454,6 +469,7 @@ export interface FileRoutesByTo {
   '/trip/mais': typeof TripMaisRoute
   '/trip/novo': typeof TripNovoRoute
   '/trip/roteiro': typeof TripRoteiroRoute
+  '/trip/exemplo': typeof TripExemploRoute
   '/trip/login': typeof TripLoginRoute
   '/console': typeof ConsoleIndexRoute
   '/portal': typeof PortalIndexRoute
@@ -472,6 +488,7 @@ export interface FileRoutesById {
   '/mcp': typeof McpRoute
   '/milhas': typeof MilhasRoute
   '/orcamento': typeof OrcamentoRouteWithChildren
+  '/orlando': typeof OrlandoRoute
   '/passaporte': typeof PassaporteRoute
   '/portal': typeof PortalRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
@@ -513,6 +530,7 @@ export interface FileRoutesById {
   '/trip/mais': typeof TripMaisRoute
   '/trip/novo': typeof TripNovoRoute
   '/trip/roteiro': typeof TripRoteiroRoute
+  '/trip_/exemplo': typeof TripExemploRoute
   '/trip_/login': typeof TripLoginRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -532,6 +550,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/milhas'
     | '/orcamento'
+    | '/orlando'
     | '/passaporte'
     | '/portal'
     | '/privacidade'
@@ -573,6 +592,7 @@ export interface FileRouteTypes {
     | '/trip/mais'
     | '/trip/novo'
     | '/trip/roteiro'
+    | '/trip/exemplo'
     | '/trip/login'
     | '/console/'
     | '/portal/'
@@ -589,6 +609,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/milhas'
     | '/orcamento'
+    | '/orlando'
     | '/passaporte'
     | '/privacidade'
     | '/roteiros'
@@ -628,6 +649,7 @@ export interface FileRouteTypes {
     | '/trip/mais'
     | '/trip/novo'
     | '/trip/roteiro'
+    | '/trip/exemplo'
     | '/trip/login'
     | '/console'
     | '/portal'
@@ -645,6 +667,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/milhas'
     | '/orcamento'
+    | '/orlando'
     | '/passaporte'
     | '/portal'
     | '/privacidade'
@@ -686,6 +709,7 @@ export interface FileRouteTypes {
     | '/trip/mais'
     | '/trip/novo'
     | '/trip/roteiro'
+    | '/trip_/exemplo'
     | '/trip_/login'
     | '/console/'
     | '/portal/'
@@ -704,6 +728,7 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   MilhasRoute: typeof MilhasRoute
   OrcamentoRoute: typeof OrcamentoRouteWithChildren
+  OrlandoRoute: typeof OrlandoRoute
   PassaporteRoute: typeof PassaporteRoute
   PortalRoute: typeof PortalRouteWithChildren
   PrivacidadeRoute: typeof PrivacidadeRoute
@@ -713,6 +738,7 @@ export interface RootRouteChildren {
   VistosRoute: typeof VistosRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  TripExemploRoute: typeof TripExemploRoute
   TripLoginRoute: typeof TripLoginRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -754,6 +780,13 @@ declare module '@tanstack/react-router' {
       path: '/orcamento'
       fullPath: '/orcamento'
       preLoaderRoute: typeof OrcamentoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orlando': {
+      id: '/orlando'
+      path: '/orlando'
+      fullPath: '/orlando'
+      preLoaderRoute: typeof OrlandoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/passaporte': {
@@ -1064,6 +1097,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TripRoteiroRouteImport
       parentRoute: typeof TripRoute
     }
+    '/trip_/exemplo': {
+      id: '/trip_/exemplo'
+      path: '/trip/exemplo'
+      fullPath: '/trip/exemplo'
+      preLoaderRoute: typeof TripExemploRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/trip_/login': {
       id: '/trip_/login'
       path: '/trip/login'
@@ -1234,6 +1274,7 @@ const rootRouteChildren: RootRouteChildren = {
   McpRoute: McpRoute,
   MilhasRoute: MilhasRoute,
   OrcamentoRoute: OrcamentoRouteWithChildren,
+  OrlandoRoute: OrlandoRoute,
   PassaporteRoute: PassaporteRoute,
   PortalRoute: PortalRouteWithChildren,
   PrivacidadeRoute: PrivacidadeRoute,
@@ -1244,6 +1285,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  TripExemploRoute: TripExemploRoute,
   TripLoginRoute: TripLoginRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,

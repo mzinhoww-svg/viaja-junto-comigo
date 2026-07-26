@@ -41,95 +41,101 @@
   --color-ring: var(--ring);
 
   /* Viajaly brand */
-  --color-navy: #10204A;
-  --color-navy-light: #2A3D6B;
-  --color-navy-dark: #0A1633;
-  --color-coral: #FF5A5F;
-  --color-coral-hover: #FF8488;
-  --color-coral-pressed: #E23F44;
-  --color-coral-disabled: #FFB0B3;
-  --color-teal: #2DB7C9;
-  --color-teal-light: #5BC9D6;
-  --color-teal-dark: #1E8E9D;
-  --color-vgreen: #1F8A5B;
-  --color-amber: #E8A33D;
-  --color-cream: #FFF6ED;
-  --color-appbg: #E7E5DF;
-  --color-ink: #3A4660;
-  --color-ink-soft: #5A6A86;
-  --color-ink-muted: #6B7488;
+  --color-navy: #10204a;
+  --color-navy-light: #2a3d6b;
+  --color-navy-dark: #0a1633;
+  --color-coral: #ff5a5f;
+  --color-coral-hover: #ff8488;
+  --color-coral-pressed: #e23f44;
+  --color-coral-disabled: #ffb0b3;
+  --color-teal: #2db7c9;
+  --color-teal-light: #5bc9d6;
+  --color-teal-dark: #1e8e9d;
+  --color-vgreen: #1f8a5b;
+  --color-amber: #e8a33d;
+  --color-cream: #fff6ed;
+  --color-appbg: #e7e5df;
+  --color-ink: #3a4660;
+  --color-ink-soft: #5a6a86;
+  --color-ink-muted: #6b7488;
 
   /* status pill colors */
-  --color-success-bg: #E2F3EA;
-  --color-success-fg: #1F8A5B;
-  --color-warning-bg: #FFF1D9;
-  --color-warning-fg: #B07A1E;
-  --color-danger-bg: #FBE6E6;
-  --color-danger-fg: #C23B3B;
-  --color-info-bg: #E7EEFB;
-  --color-info-fg: #10204A;
-  --color-now-bg: #FFE4E5;
-  --color-now-fg: #E23F44;
-  --color-locked-bg: #F1F3F8;
-  --color-locked-fg: #A6AEBD;
+  --color-success-bg: #e2f3ea;
+  --color-success-fg: #1f8a5b;
+  --color-warning-bg: #fff1d9;
+  --color-warning-fg: #b07a1e;
+  --color-danger-bg: #fbe6e6;
+  --color-danger-fg: #c23b3b;
+  --color-info-bg: #e7eefb;
+  --color-info-fg: #10204a;
+  --color-now-bg: #ffe4e5;
+  --color-now-fg: #e23f44;
+  --color-locked-bg: #f1f3f8;
+  --color-locked-fg: #a6aebd;
 }
 
 :root {
   --radius: 12px;
-  --background: #E7E5DF;          /* app-bg */
-  --foreground: #3A4660;          /* ink */
-  --card: #FFFFFF;
-  --card-foreground: #3A4660;
-  --popover: #FFFFFF;
-  --popover-foreground: #3A4660;
-  --primary: #FF5A5F;             /* coral */
-  --primary-foreground: #FFF6ED;
-  --secondary: #10204A;           /* navy */
-  --secondary-foreground: #FFF6ED;
-  --muted: #F4F2EC;
-  --muted-foreground: #5A6A86;
-  --accent: #2DB7C9;              /* teal */
-  --accent-foreground: #FFFFFF;
-  --destructive: #C23B3B;
-  --destructive-foreground: #FFFFFF;
-  --border: #E6E9F0;
-  --input: #E6E9F0;
-  --ring: #2DB7C9;
+  --background: #e7e5df; /* app-bg */
+  --foreground: #3a4660; /* ink */
+  --card: #ffffff;
+  --card-foreground: #3a4660;
+  --popover: #ffffff;
+  --popover-foreground: #3a4660;
+  --primary: #ff5a5f; /* coral */
+  --primary-foreground: #fff6ed;
+  --secondary: #10204a; /* navy */
+  --secondary-foreground: #fff6ed;
+  --muted: #f4f2ec;
+  --muted-foreground: #5a6a86;
+  --accent: #2db7c9; /* teal */
+  --accent-foreground: #ffffff;
+  --destructive: #c23b3b;
+  --destructive-foreground: #ffffff;
+  --border: #e6e9f0;
+  --input: #e6e9f0;
+  --ring: #2db7c9;
 }
 
 .dark {
-  --background: #0A1633;
-  --foreground: #FFF6ED;
-  --card: #10204A;
-  --card-foreground: #FFF6ED;
-  --popover: #10204A;
-  --popover-foreground: #FFF6ED;
-  --primary: #FF5A5F;
-  --primary-foreground: #FFF6ED;
-  --secondary: #2A3D6B;
-  --secondary-foreground: #FFF6ED;
-  --muted: #2A3D6B;
-  --muted-foreground: #8A93A6;
-  --accent: #2DB7C9;
-  --accent-foreground: #0A1633;
-  --destructive: #C23B3B;
-  --destructive-foreground: #FFF6ED;
+  --background: #0a1633;
+  --foreground: #fff6ed;
+  --card: #10204a;
+  --card-foreground: #fff6ed;
+  --popover: #10204a;
+  --popover-foreground: #fff6ed;
+  --primary: #ff5a5f;
+  --primary-foreground: #fff6ed;
+  --secondary: #2a3d6b;
+  --secondary-foreground: #fff6ed;
+  --muted: #2a3d6b;
+  --muted-foreground: #8a93a6;
+  --accent: #2db7c9;
+  --accent-foreground: #0a1633;
+  --destructive: #c23b3b;
+  --destructive-foreground: #fff6ed;
   --border: rgba(255, 255, 255, 0.1);
   --input: rgba(255, 255, 255, 0.15);
-  --ring: #2DB7C9;
+  --ring: #2db7c9;
 }
 
 @layer base {
   * {
     border-color: var(--color-border);
   }
-  html, body {
+  html,
+  body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-display);
     letter-spacing: -0.02em;
     color: var(--color-navy);
@@ -141,34 +147,155 @@
 }
 
 @layer utilities {
-  .font-display { font-family: var(--font-display); }
-  .text-navy { color: var(--color-navy); }
-  .text-coral { color: var(--color-coral); }
-  .text-teal { color: var(--color-teal); }
-  .text-ink { color: var(--color-ink); }
-  .text-ink-soft { color: var(--color-ink-soft); }
-  .text-ink-muted { color: var(--color-ink-muted); }
-  .text-cream { color: var(--color-cream); }
-  .bg-navy { background-color: var(--color-navy); }
-  .bg-coral { background-color: var(--color-coral); }
-  .bg-teal { background-color: var(--color-teal); }
-  .bg-cream { background-color: var(--color-cream); }
-  .bg-appbg { background-color: var(--color-appbg); }
-  .border-navy { border-color: var(--color-navy); }
+  .font-display {
+    font-family: var(--font-display);
+  }
+  .text-navy {
+    color: var(--color-navy);
+  }
+  .text-coral {
+    color: var(--color-coral);
+  }
+  .text-teal {
+    color: var(--color-teal);
+  }
+  .text-ink {
+    color: var(--color-ink);
+  }
+  .text-ink-soft {
+    color: var(--color-ink-soft);
+  }
+  .text-ink-muted {
+    color: var(--color-ink-muted);
+  }
+  .text-cream {
+    color: var(--color-cream);
+  }
+  .bg-navy {
+    background-color: var(--color-navy);
+  }
+  .bg-coral {
+    background-color: var(--color-coral);
+  }
+  .bg-teal {
+    background-color: var(--color-teal);
+  }
+  .bg-cream {
+    background-color: var(--color-cream);
+  }
+  .bg-appbg {
+    background-color: var(--color-appbg);
+  }
+  .border-navy {
+    border-color: var(--color-navy);
+  }
 }
 
 @keyframes vfade {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes vpop {
-  0%   { transform: scale(0.7); }
-  60%  { transform: scale(1.06); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0.7);
+  }
+  60% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
-.anim-vfade { animation: vfade .4s ease-out both; }
-.anim-vpop  { animation: vpop .35s ease-out both; }
+.anim-vfade {
+  animation: vfade 0.4s ease-out both;
+}
+.anim-vpop {
+  animation: vpop 0.35s ease-out both;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .anim-vfade, .anim-vpop { animation: none; }
+  .anim-vfade,
+  .anim-vpop {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * VJT-021 — motion da viagem exemplo.
+ *
+ * As curvas abaixo são springs traduzidos para cubic-bezier no padrão do
+ * Kinetics (kinetics.colorion.co), copiados como CSS: o app tem CSP estrito e
+ * não carrega nada de fora, então biblioteca de animação aqui seria uma
+ * dependência nova para resolver o que três curvas resolvem.
+ *
+ * `--spring-firme` é o movimento de entrada (desacelera forte, sem passar do
+ * ponto); `--spring-macio` tem overshoot e fica reservado ao que precisa
+ * chamar atenção — barra de progresso e toque no CTA. Usar overshoot em tudo
+ * deixa a tela nervosa.
+ * ------------------------------------------------------------------------ */
+:root {
+  --spring-firme: cubic-bezier(0.22, 1, 0.36, 1);
+  --spring-macio: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes vjt-sobe {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes vjt-barra {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* O `both` preserva o estado inicial durante o atraso do stagger — sem ele o
+   elemento pisca visível antes de começar a própria animação. */
+.vjt-sobe {
+  animation: vjt-sobe 0.5s var(--spring-firme) both;
+}
+.vjt-barra {
+  transform-origin: left;
+  animation: vjt-barra 0.9s var(--spring-macio) both;
+}
+.vjt-toque {
+  transition: transform 0.18s var(--spring-macio);
+}
+.vjt-toque:active {
+  transform: scale(0.975);
+}
+
+/* Trama de rota do hero: duas diagonais em gradiente, sem imagem — nada para
+   baixar e nada que o CSP possa barrar. */
+.vjt-trama {
+  background-image:
+    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.04) 0 1px, transparent 1px 22px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vjt-sobe,
+  .vjt-barra {
+    animation: none;
+  }
+  .vjt-toque {
+    transition: none;
+  }
+  .vjt-toque:active {
+    transform: none;
+  }
 }

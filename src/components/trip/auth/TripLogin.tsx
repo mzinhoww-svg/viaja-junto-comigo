@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { KeyRound, Loader2, Mail, Plane } from "lucide-react";
+import { KeyRound, Loader2, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ViajalyLogo } from "@/components/trip/ViajalyLogo";
 import { supabase } from "@/integrations/supabase/client";
 import { loginWithAdminCode } from "@/lib/admin-login.functions";
 
@@ -58,19 +59,52 @@ export function TripLogin({ next }: { next: string }) {
   /**
    * Google é o caminho principal: entra em um toque, sem depender de entrega
    * de e-mail (o link mágico esbarra em spam e em quem abre o e-mail em
-   * outro aparelho). Provider habilitado no painel do Supabase — se estiver
-   * desligado lá, o erro do provider aparece no toast em vez de quebrar a
-   * tela.
+   * outro aparelho).
+   *
+   * VJT-021 — por que existe uma sondagem antes de navegar: a versão anterior
+   * chamava `signInWithOAuth` sem `skipBrowserRedirect`, então o próprio
+   * supabase-js já mandava o navegador para `/auth/v1/authorize`. Com o
+   * provider habilitado no painel MAS sem Client ID/Secret, esse endpoint
+   * responde `400 {"error_code":"validation_failed","msg":"Unsupported
+   * provider: missing OAuth secret"}` — e o usuário via o JSON cru numa
+   * página em branco. O `onError` daqui nunca chegava a rodar, porque do lado
+   * do JS não houve erro nenhum: a falha acontece depois da navegação.
+   *
+   * Então pedimos a URL sem navegar e batemos nela antes. `opaqueredirect` é
+   * a resposta de um provider configurado (ele quer redirecionar para o
+   * Google); status >= 400 é a configuração faltando. Se o fetch falhar por
+   * CORS ou rede, seguimos o fluxo normal: barrar um login que provavelmente
+   * funciona seria pior que o risco de mostrar o erro.
    */
   const googleMut = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo: `${window.location.origin}${next}` },
+        options: {
+          redirectTo: `${window.location.origin}${next}`,
+          skipBrowserRedirect: true,
+        },
       });
       if (error) throw error;
+      if (!data?.url) throw new Error("SEM_URL");
+
+      let configurado = true;
+      try {
+        const resposta = await fetch(data.url, { method: "GET", redirect: "manual" });
+        if (resposta.type !== "opaqueredirect" && resposta.status >= 400) configurado = false;
+      } catch {
+        /* CORS/rede: não dá para saber daqui — segue o caminho normal */
+      }
+      if (!configurado) throw new Error("PROVIDER_NAO_CONFIGURADO");
+
+      window.location.href = data.url;
     },
-    onError: () => toast.error("Não foi possível abrir o login do Google. Tente o e-mail."),
+    onError: (e: Error) =>
+      toast.error(
+        e.message === "PROVIDER_NAO_CONFIGURADO"
+          ? "O login com Google ainda não está disponível. Use o link por e-mail aqui embaixo — dá no mesmo."
+          : "Não foi possível abrir o login do Google. Tente o e-mail.",
+      ),
   });
 
   const linkMut = useMutation({
@@ -118,19 +152,22 @@ export function TripLogin({ next }: { next: string }) {
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center gap-6 px-6 py-10">
-      <div className="space-y-2">
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
-          <Plane className="h-5 w-5 text-primary" aria-hidden />
-        </div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Viajaly Trip</h1>
+      <div className="space-y-3">
+        <ViajalyLogo size="lg" />
         <p className="text-sm text-muted-foreground">
           Planeje sua viagem inteira num lugar só: roteiro, orçamento, checklists e economia.
         </p>
       </div>
 
       <div className="space-y-3">
+        {/* Fundo branco com borda, e não o coral do app: a diretriz de marca
+            do Google admite botão branco ou preto, nunca uma cor arbitrária —
+            e o mark colorido sobre o coral tinha contraste ruim de verdade em
+            tela de celular sob luz do dia. `h-12` para alvo de toque
+            confortável no mobile-first (base 375px). */}
         <Button
-          className="w-full"
+          variant="outline"
+          className="h-12 w-full border-input bg-white text-base font-medium text-[#1F1F1F] hover:bg-neutral-50 hover:text-[#1F1F1F]"
           onClick={() => googleMut.mutate()}
           disabled={googleMut.isPending}
         >

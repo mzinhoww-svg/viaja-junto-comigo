@@ -33,6 +33,15 @@ begin
 exception when duplicate_object then null;
 end $$;
 
+-- Supabase's anonymous role: o visitante deslogado. Existe no projeto real e
+-- não numa instância vanilla; sem ele o VJT-020 (SELECT público na viagem
+-- template) não teria como ser testado do lado de fora do login.
+do $$
+begin
+  create role anon nologin noinherit;
+exception when duplicate_object then null;
+end $$;
+
 -- Supabase's service_role, referenced by some migrations' grants.
 do $$
 begin
