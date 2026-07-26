@@ -29,8 +29,12 @@ export function SavingsEntryForm({ mesAnoPadrao, isSaving, onSubmit }: Props) {
   return (
     <Card>
       <CardContent className="p-4">
+        {/* `min-w-0` nos dois campos (VJT-018): sem isso o input de mês, que tem
+            largura intrínseca grande por causa do seletor nativo, ficava com 213px
+            em 375px e espremia o campo de valor para 57px — estreito demais para
+            digitar "R$ 2.000,00" no celular. */}
         <form className="flex items-end gap-2" onSubmit={handleSubmit}>
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
             <Label htmlFor="economia-mes" className="text-xs">
               Mês
             </Label>
@@ -42,7 +46,7 @@ export function SavingsEntryForm({ mesAnoPadrao, isSaving, onSubmit }: Props) {
               onChange={(e) => setMes(e.target.value)}
             />
           </div>
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
             <Label htmlFor="economia-valor" className="text-xs">
               Valor guardado
             </Label>

@@ -89,18 +89,27 @@ export function ChecklistItemRow({
     );
   }
 
+  // O título é um <label> do próprio checkbox (VJT-018): marcar um item é a
+  // ação principal do produto e, no celular, o quadradinho de 16px sozinho é
+  // alvo pequeno demais. Com o label, a linha inteira vira área de toque, sem
+  // mudar nada visualmente. <button> é elemento "labelable", então o clique no
+  // label é encaminhado para o checkbox do Radix.
+  const checkboxId = `checklist-item-${item.id}`;
+
   return (
     <div className="flex items-center gap-2 py-1.5">
       <Checkbox
+        id={checkboxId}
         checked={item.done}
         onCheckedChange={(checked) => onToggle(checked === true)}
         aria-label={`Marcar "${item.titulo}" como concluído`}
       />
-      <p
-        className={`flex-1 text-sm ${item.done ? "text-muted-foreground line-through" : "text-foreground"}`}
+      <label
+        htmlFor={checkboxId}
+        className={`flex-1 cursor-pointer py-1.5 text-sm ${item.done ? "text-muted-foreground line-through" : "text-foreground"}`}
       >
         {item.titulo}
-      </p>
+      </label>
       <Button
         size="icon"
         variant="ghost"
