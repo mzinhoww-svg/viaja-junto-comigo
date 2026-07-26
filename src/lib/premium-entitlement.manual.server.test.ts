@@ -101,6 +101,26 @@ describe("activateManualPremiumEntitlement", () => {
     expect(getRow(userId)?.origem).toBe("stripe");
   });
 
+  // O runbook (docs/runbook-ativacao-manual-entitlements.md, Caminho A1) diz
+  // que o código não rebaixa nem troca a origem de quem já é premium por
+  // QUALQUER origem — não só por `stripe`. `pacote_visto` é o caso que
+  // importa na operação: é o bônus Pro+/Vip+, e trocá-lo por `manual` apagaria
+  // do registro que aquele Premium veio de um pacote da consultoria.
+  it("já premium via pacote_visto: não reescreve nem troca a origem", async () => {
+    seed(userId, {
+      plano: "premium",
+      origem: "pacote_visto",
+      expires_at: null,
+      stripe_payment_id: null,
+    });
+    const { activateManualPremiumEntitlement } = await import("./premium-entitlement.server");
+    const result = await activateManualPremiumEntitlement(userId);
+
+    expect(result).toEqual({ activated: false, already: true });
+    expect(upsertCalls()).toHaveLength(0);
+    expect(getRow(userId)?.origem).toBe("pacote_visto");
+  });
+
   it("premium expirado: reativa e preserva o stripe_payment_id anterior", async () => {
     seed(userId, {
       plano: "premium",

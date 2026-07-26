@@ -1,9 +1,12 @@
 /**
  * Código de acesso admin (VJT-011c) — ativa o plano Premium sem passar pelo
- * SQL Editor nem pelo checkout do Stripe. Substitui, no dia a dia, o runbook
- * manual do VJT-011b (`UPDATE entitlements SET plano='premium',
- * origem='manual' WHERE user_id=...`) para os casos operacionais: QA interno,
- * demo para cliente, e liberação do bônus Pro+/Vip+ pela consultoria.
+ * SQL Editor nem pelo checkout do Stripe. É o caminho padrão dos casos
+ * operacionais — QA interno, demo para cliente, liberação do bônus Pro+/Vip+
+ * pela consultoria — e substitui o SQL do VJT-011b no dia a dia, mas não em
+ * tudo: ativar em nome de terceiro, gravar `origem = 'pacote_visto'`, definir
+ * prazo em `expires_at` e revogar continuam sendo SQL. Os dois caminhos, e
+ * quando usar cada um, estão em
+ * `docs/runbook-ativacao-manual-entitlements.md`.
  *
  * Módulo puro: sem I/O, sem acesso a Supabase — mesma convenção de
  * entitlements.ts/trip-math.ts. O código válido NUNCA vive aqui nem em
