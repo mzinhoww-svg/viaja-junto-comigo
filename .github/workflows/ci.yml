@@ -38,5 +38,13 @@ jobs:
       - name: RLS tests (VJT-017b LGPD consent log — append-only + histórico)
         run: bash scripts/test-rls.sh --lgpd
 
+      # VJT-020 abriu SELECT público na viagem exemplo. O audit é o que prova
+      # que a abertura para `anon` não passou de trips template — inclusive
+      # com controle negativo — e ele sai com código != 0 quando não prova.
+      # Rodar só à mão deixaria a garantia valendo até o próximo PR mexer numa
+      # policy sem ninguém rodar de novo.
+      - name: RLS audit (VJT-020 abertura pública — 0 leaks, com controle negativo)
+        run: bash scripts/test-rls.sh --audit
+
       - name: Build
         run: bun run build

@@ -58,6 +58,7 @@ import { Route as TripFinanceiroRouteImport } from './routes/trip.financeiro'
 import { Route as TripMaisRouteImport } from './routes/trip.mais'
 import { Route as TripNovoRouteImport } from './routes/trip.novo'
 import { Route as TripRoteiroRouteImport } from './routes/trip.roteiro'
+import { Route as TripExemploRouteImport } from './routes/trip_.exemplo'
 import { Route as TripLoginRouteImport } from './routes/trip_.login'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
@@ -313,6 +314,11 @@ const TripRoteiroRoute = TripRoteiroRouteImport.update({
   path: '/roteiro',
   getParentRoute: () => TripRoute,
 } as any)
+const TripExemploRoute = TripExemploRouteImport.update({
+  id: '/trip_/exemplo',
+  path: '/trip/exemplo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TripLoginRoute = TripLoginRouteImport.update({
   id: '/trip_/login',
   path: '/trip/login',
@@ -399,6 +405,7 @@ export interface FileRoutesByFullPath {
   '/trip/mais': typeof TripMaisRoute
   '/trip/novo': typeof TripNovoRoute
   '/trip/roteiro': typeof TripRoteiroRoute
+  '/trip/exemplo': typeof TripExemploRoute
   '/trip/login': typeof TripLoginRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -454,6 +461,7 @@ export interface FileRoutesByTo {
   '/trip/mais': typeof TripMaisRoute
   '/trip/novo': typeof TripNovoRoute
   '/trip/roteiro': typeof TripRoteiroRoute
+  '/trip/exemplo': typeof TripExemploRoute
   '/trip/login': typeof TripLoginRoute
   '/console': typeof ConsoleIndexRoute
   '/portal': typeof PortalIndexRoute
@@ -513,6 +521,7 @@ export interface FileRoutesById {
   '/trip/mais': typeof TripMaisRoute
   '/trip/novo': typeof TripNovoRoute
   '/trip/roteiro': typeof TripRoteiroRoute
+  '/trip_/exemplo': typeof TripExemploRoute
   '/trip_/login': typeof TripLoginRoute
   '/console/': typeof ConsoleIndexRoute
   '/portal/': typeof PortalIndexRoute
@@ -573,6 +582,7 @@ export interface FileRouteTypes {
     | '/trip/mais'
     | '/trip/novo'
     | '/trip/roteiro'
+    | '/trip/exemplo'
     | '/trip/login'
     | '/console/'
     | '/portal/'
@@ -628,6 +638,7 @@ export interface FileRouteTypes {
     | '/trip/mais'
     | '/trip/novo'
     | '/trip/roteiro'
+    | '/trip/exemplo'
     | '/trip/login'
     | '/console'
     | '/portal'
@@ -686,6 +697,7 @@ export interface FileRouteTypes {
     | '/trip/mais'
     | '/trip/novo'
     | '/trip/roteiro'
+    | '/trip_/exemplo'
     | '/trip_/login'
     | '/console/'
     | '/portal/'
@@ -713,6 +725,7 @@ export interface RootRouteChildren {
   VistosRoute: typeof VistosRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  TripExemploRoute: typeof TripExemploRoute
   TripLoginRoute: typeof TripLoginRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1064,6 +1077,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TripRoteiroRouteImport
       parentRoute: typeof TripRoute
     }
+    '/trip_/exemplo': {
+      id: '/trip_/exemplo'
+      path: '/trip/exemplo'
+      fullPath: '/trip/exemplo'
+      preLoaderRoute: typeof TripExemploRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/trip_/login': {
       id: '/trip_/login'
       path: '/trip/login'
@@ -1244,6 +1264,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  TripExemploRoute: TripExemploRoute,
   TripLoginRoute: TripLoginRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
