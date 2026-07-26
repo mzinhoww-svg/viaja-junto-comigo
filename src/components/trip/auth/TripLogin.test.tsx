@@ -9,26 +9,34 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { TripLogin } from "./TripLogin";
+import { consumePostLoginNext } from "@/lib/post-login-next";
 
-const { oauthMock, otpMock, verifyOtpMock, adminLoginMock, toastMock } = vi.hoisted(() => ({
-  /**
-   * VJT-021b: o Google deixou de passar por `supabase.auth.signInWithOAuth` e
-   * passa pelo helper gerenciado do Lovable Cloud, que já tem credenciais
-   * provisionadas. O mock acompanhou a troca — este teste protege a garantia
-   * ("o destino original sobrevive ao login"), não o mecanismo.
-   */
-  oauthMock: vi.fn(),
-  otpMock: vi.fn(),
-  verifyOtpMock: vi.fn(),
-  adminLoginMock: vi.fn(),
-  toastMock: { success: vi.fn(), error: vi.fn() },
-}));
+const { oauthMock, otpMock, verifyOtpMock, onAuthStateChangeMock, adminLoginMock, toastMock } =
+  vi.hoisted(() => ({
+    /**
+     * VJT-021b: o Google deixou de passar por `supabase.auth.signInWithOAuth` e
+     * passa pelo helper gerenciado do Lovable Cloud, que já tem credenciais
+     * provisionadas. O mock acompanhou a troca — este teste protege a garantia
+     * ("o destino original sobrevive ao login"), não o mecanismo.
+     */
+    oauthMock: vi.fn(),
+    otpMock: vi.fn(),
+    verifyOtpMock: vi.fn(),
+    onAuthStateChangeMock: vi.fn(),
+    adminLoginMock: vi.fn(),
+    toastMock: { success: vi.fn(), error: vi.fn() },
+  }));
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
     auth: {
       signInWithOtp: otpMock,
       verifyOtp: verifyOtpMock,
+      // A tela assina SIGNED_IN para consumir o `next` quando o provedor
+      // volta por full-page redirect (VJT-021c). Sem este mock o componente
+      // estoura no mount e derruba o arquivo de teste inteiro, não só o
+      // caso do Google.
+      onAuthStateChange: onAuthStateChangeMock,
     },
   },
 }));
@@ -49,7 +57,10 @@ function renderLogin(next = "/trip") {
 }
 
 beforeEach(() => {
-  sessionStorage.clear();
+  localStorage.clear();
+  onAuthStateChangeMock.mockReturnValue({
+    data: { subscription: { unsubscribe: vi.fn() } },
+  });
   oauthMock.mockResolvedValue({ error: null, redirected: true });
   otpMock.mockResolvedValue({ error: null });
   verifyOtpMock.mockResolvedValue({ error: null });
@@ -66,20 +77,23 @@ afterEach(() => {
 });
 
 describe("TripLogin", () => {
-  it("Google guarda o `next` e usa redirect_uri same-origin, para voltar ao destino original", async () => {
+  it("Google persiste o `next` e volta por /trip/login, para chegar ao destino original", async () => {
     const destino = "/trip/aceitar-convite?token=abc";
     renderLogin(destino);
     fireEvent.click(screen.getByRole("button", { name: /continuar com google/i }));
 
     await waitFor(() => expect(oauthMock).toHaveBeenCalledTimes(1));
     expect(oauthMock.mock.calls[0][0]).toBe("google");
-    // `redirect_uri` PRECISA ser a origem nua: apontá-lo direto para a rota
-    // protegida (que é o que a versão anterior fazia com `redirectTo`) quebra
-    // o fluxo do provider gerenciado. O destino real viaja no sessionStorage.
+    // `redirect_uri` aponta para a PRÓPRIA tela de login, e não para a origem
+    // nua: `/` é HTML estático e deixava o usuário parado na home, com os
+    // tokens presos no hash da URL e sem sessão. `/trip/login` monta o cliente
+    // Supabase e consome esse retorno.
     expect(oauthMock.mock.calls[0][1]).toMatchObject({
-      redirect_uri: window.location.origin,
+      redirect_uri: `${window.location.origin}/trip/login`,
     });
-    expect(sessionStorage.getItem("viajaly:post-login-next")).toBe(destino);
+    // Lido pelo contrato do módulo, não pelo formato do storage: assim o teste
+    // sobrevive a uma troca de localStorage/TTL/serialização.
+    expect(consumePostLoginNext("/fallback")).toBe(destino);
   });
 
   it("link por e-mail cria a conta na hora (produto vendido separado)", async () => {

@@ -66,4 +66,3 @@ export async function loginWithGoogle(opts: GoogleLoginOptions): Promise<void> {
     onDone?.();
   }
 }
-
