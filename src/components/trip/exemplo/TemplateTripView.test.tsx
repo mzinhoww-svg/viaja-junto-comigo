@@ -125,7 +125,17 @@ describe("TemplateTripView — leitura pública", () => {
     expect(screen.getByText("Você está vendo um exemplo")).toBeTruthy();
     expect(screen.getByText("Expedição Orlando em Família")).toBeTruthy();
     expect(screen.getByText("Ingressos Disney")).toBeTruthy();
-    expect(screen.getByText("Magic Kingdom")).toBeTruthy();
+    // Aparece DUAS vezes desde o VJT-023, e isso é o recurso: uma como
+    // título do dia (para dar para escanear 12 dias sem abrir nenhum) e
+    // outra dentro do slot da manhã.
+    expect(screen.getAllByText("Magic Kingdom").length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("o dia do roteiro é escaneável sem abrir: mostra destino e períodos", () => {
+    renderView();
+    expect(screen.getByText("Dia 1")).toBeTruthy();
+    // Os chips de período resumem o dia fechado.
+    expect(screen.getAllByText("Manhã").length).toBeGreaterThanOrEqual(1);
   });
 
   it("não renderiza bottom nav nem nenhum controle de edição", () => {
